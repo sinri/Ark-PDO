@@ -1,0 +1,22 @@
+{
+  "name": "sinri/ark-pdo",
+  "description": "The PDO Component for Ark 2",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Sinri Edogawa",
+      "email": "e.joshua.s.e@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "ext-pdo": "*",
+    "sinri/ark-core": "~1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "sinri\\ark\\database\\": "src/"
+    }
+  }
+}
