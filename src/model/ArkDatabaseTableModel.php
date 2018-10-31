@@ -112,7 +112,7 @@ abstract class ArkDatabaseTableModel
         }
 
         $table = $this->getTableExpressForSQL();
-        $sql = "SELECT ${$fields} FROM {$table} WHERE {$condition_sql} LIMIT 1";
+        $sql = "SELECT {$fields} FROM {$table} WHERE {$condition_sql} LIMIT 1";
         try {
             return $this->db()->getRow($sql);
         } catch (\Exception $e) {
@@ -139,7 +139,7 @@ abstract class ArkDatabaseTableModel
             $condition_sql = "1";
         }
         $table = $this->getTableExpressForSQL();
-        $sql = "SELECT * FROM {$table} WHERE {$condition_sql} ";
+        $sql = "SELECT {$fields} FROM {$table} WHERE {$condition_sql} ";
         $limit = intval($limit, 10);
         $offset = intval($offset, 10);
         if ($limit > 0) {
@@ -211,7 +211,7 @@ abstract class ArkDatabaseTableModel
         }
         $table = $this->getTableExpressForSQL();
 
-        $sql = "SELECT ${$fields} FROM {$table} WHERE {$condition_sql} ";
+        $sql = "SELECT {$fields} FROM {$table} WHERE {$condition_sql} ";
 
         if ($sort) {
             $sql .= "order by " . $sort;
