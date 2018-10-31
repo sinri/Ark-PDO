@@ -97,17 +97,22 @@ abstract class ArkDatabaseTableModel
 
     /**
      * @param array|string $conditions
+     * @param string|string[] $fields "*","f1,f2" or ["f1","f2"] @since 1.2
      * @return array|bool
      */
-    public function selectRow($conditions)
+    public function selectRow($conditions, $fields = "*")
     {
+        if (is_array($fields)) {
+            $fields = '`' . implode("`,`", $fields) . '`';
+        }
+
         $condition_sql = $this->buildCondition($conditions, 'AND');
         if ($condition_sql === '') {
             $condition_sql = "1";
         }
 
         $table = $this->getTableExpressForSQL();
-        $sql = "SELECT * FROM {$table} WHERE {$condition_sql} LIMIT 1";
+        $sql = "SELECT ${$fields} FROM {$table} WHERE {$condition_sql} LIMIT 1";
         try {
             return $this->db()->getRow($sql);
         } catch (\Exception $e) {
@@ -120,10 +125,15 @@ abstract class ArkDatabaseTableModel
      * @param array|string $conditions
      * @param int $limit
      * @param int $offset
+     * @param string|string[] $fields "*","f1,f2" or ["f1","f2"] @since 1.2
      * @return array|bool
      */
-    public function selectRows($conditions, $limit = 0, $offset = 0)
+    public function selectRows($conditions, $limit = 0, $offset = 0, $fields = "*")
     {
+        if (is_array($fields)) {
+            $fields = '`' . implode("`,`", $fields) . '`';
+        }
+
         $condition_sql = $this->buildCondition($conditions);
         if ($condition_sql === '') {
             $condition_sql = "1";
@@ -176,12 +186,32 @@ abstract class ArkDatabaseTableModel
      */
     public function selectRowsWithSort($conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null)
     {
+        return $this->selectRowsForFieldsWithSort("*", $conditions, $sort, $limit, $offset, $refKey);
+    }
+
+    /**
+     * @since 1.2
+     * @param string|string[] $fields such as '*', 'f1,f2' or ['f1','f2']
+     * @param $conditions
+     * @param null|string $sort "field","field desc"," f1 asc, f2 desc"
+     * @param int $limit
+     * @param int $offset
+     * @param null|string $refKey normally PK or UK if you want to get map rather than list
+     * @return array|bool
+     */
+    public function selectRowsForFieldsWithSort($fields, $conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null)
+    {
+        if (is_array($fields)) {
+            $fields = '`' . implode("`,`", $fields) . '`';
+        }
+
         $condition_sql = $this->buildCondition($conditions);
         if ($condition_sql === '') {
             $condition_sql = "1";
         }
         $table = $this->getTableExpressForSQL();
-        $sql = "SELECT * FROM {$table} WHERE {$condition_sql} ";
+
+        $sql = "SELECT ${$fields} FROM {$table} WHERE {$condition_sql} ";
 
         if ($sort) {
             $sql .= "order by " . $sort;
