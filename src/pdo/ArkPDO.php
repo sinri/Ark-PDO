@@ -260,6 +260,26 @@ class ArkPDO
     }
 
     /**
+     * @since 1.1
+     * @param callable $callback such as function(...$parameters)
+     * @param array $parameters
+     * @return mixed only return when success
+     * @throws \Exception throw any exception when error
+     */
+    public function executeInTransaction($callback, $parameters = [])
+    {
+        $this->beginTransaction();
+        try {
+            $result = call_user_func_array($callback, $parameters);
+            $this->commit();
+            return $result;
+        } catch (\Exception $exception) {
+            $this->rollBack();
+            throw $exception;
+        }
+    }
+
+    /**
      * @return mixed
      */
     public function getPDOErrorCode()
