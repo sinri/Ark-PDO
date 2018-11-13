@@ -72,6 +72,89 @@ class ArkSQLCondition
         }
     }
 
+    public static function makeEqual($field, $value)
+    {
+        return new ArkSQLCondition($field, self::OP_EQ, $value);
+    }
+
+    public static function makeGreaterThan($field, $value)
+    {
+        return new ArkSQLCondition($field, self::OP_GT, $value);
+    }
+
+    public static function makeNoLessThan($field, $value)
+    {
+        return new ArkSQLCondition($field, self::OP_EGT, $value);
+    }
+
+    public static function makeLessThan($field, $value)
+    {
+        return new ArkSQLCondition($field, self::OP_LT, $value);
+    }
+
+    public static function makeNoGreaterThan($field, $value)
+    {
+        return new ArkSQLCondition($field, self::OP_ELT, $value);
+    }
+
+    public static function makeNotEqual($field, $value)
+    {
+        return new ArkSQLCondition($field, self::OP_NEQ, $value);
+    }
+
+    public static function makeNotEqualNullSafe($field, $value)
+    {
+        return new ArkSQLCondition($field, self::OP_NULL_SAFE_EQUAL, $value);
+    }
+
+    public static function makeIsNull($field)
+    {
+        return new ArkSQLCondition($field, self::OP_IS, self::CONST_NULL);
+    }
+
+    public static function makeIsNotNull($field)
+    {
+        return new ArkSQLCondition($field, self::OP_IS_NOT, self::CONST_NULL);
+    }
+
+    public static function makeInArray($field, $value)
+    {
+        return new ArkSQLCondition($field, self::OP_IN, $value);
+    }
+
+    public static function makeNotInArray($field, $value)
+    {
+        return new ArkSQLCondition($field, self::OP_NOT_IN, $value);
+    }
+
+    public static function makeBetween($field, $value1, $value2)
+    {
+        return new ArkSQLCondition($field, self::OP_BETWEEN, [$value1, $value2]);
+    }
+
+    public static function makeNotBetween($field, $value1, $value2)
+    {
+        return new ArkSQLCondition($field, self::OP_NOT_BETWEEN, [$value1, $value2]);
+    }
+
+    public static function makeStringHasPrefix($field, $value)
+    {
+        return new ArkSQLCondition($field, self::OP_LIKE, $value, self::LIKE_RIGHT_WILDCARD);
+    }
+
+    public static function makeStringHasSuffix($field, $value)
+    {
+        return new ArkSQLCondition($field, self::OP_LIKE, $value, self::LIKE_LEFT_WILDCARD);
+    }
+
+    public static function makeStringContainsText($field, $value)
+    {
+        return new ArkSQLCondition($field, self::OP_LIKE, $value, self::LIKE_BOTH_WILDCARD);
+    }
+
+
+
+
     /**
      * @return string
      * @throws \Exception
