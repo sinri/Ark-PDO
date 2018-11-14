@@ -63,7 +63,7 @@ abstract class ArkDatabaseTableModel
         return date('Y-m-d H:i:s');
     }
 
-    protected final function buildCondition($conditions, $glue = 'AND')
+    protected final function buildCondition($conditions, $glue = ' AND ')
     {
         $condition_sql = "";
         if (is_string($conditions)) {

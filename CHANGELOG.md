@@ -5,6 +5,7 @@
 ### 1.2.2
 
 Add quick condition generate methods.
+Better implode default option.
 
 ### 1.2.1
 
