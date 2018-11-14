@@ -2,6 +2,10 @@
 
 ## 1.x
 
+### 1.2.3
+
+Fix a long term bug for IN and NOT IN conditions.
+
 ### 1.2.2
 
 Add quick condition generate methods.
