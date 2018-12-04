@@ -2,6 +2,10 @@
 
 ## 1.x
 
+### 1.3
+
+Small Fix and Refactor.
+
 ### 1.2.3
 
 Fix a long term bug for IN and NOT IN conditions.
