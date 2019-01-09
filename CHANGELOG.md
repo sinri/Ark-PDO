@@ -2,6 +2,10 @@
 
 ## 1.x
 
+### 1.4
+
+Use version 2 of Ark-Core.
+
 ### 1.3
 
 Small Fix and Refactor.
