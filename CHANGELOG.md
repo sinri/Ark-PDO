@@ -2,10 +2,13 @@
 
 ## 1.x
 
-### 1.5
+### 1.5.2 
+Fix `selectRowsForCount` of `ArkDatabaseTableModel`.
+
+### 1.5.1
 
 Add `GROUP BY` support to `ArkDatabaseTableModel`;
-Add `(NOT) EXISTS` support to `ArkSQLCondition`; 
+Add `(NOT) EXISTS` support to `ArkSQLCondition`.
 
 ### 1.4
 

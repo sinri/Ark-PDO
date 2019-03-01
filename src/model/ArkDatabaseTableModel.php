@@ -172,24 +172,25 @@ abstract class ArkDatabaseTableModel
 
     /**
      * @param array|string $conditions
-     * @param null|string[] $groupBy @since 1.5
+     * @param string $countField @since 1.5.2
+     * @param bool $useDistinct @since 1.5.2
      * @return int|bool
      */
-    public function selectRowsForCount($conditions, $groupBy = null)
+    public function selectRowsForCount($conditions, $countField = '*', $useDistinct = false)
     {
         $condition_sql = $this->buildCondition($conditions);
         if ($condition_sql === '') {
             $condition_sql = "1";
         }
-        $table = $this->getTableExpressForSQL();
-        $sql = "SELECT count(*) FROM {$table} WHERE {$condition_sql} ";
 
-        if ($groupBy !== null) {
-//            foreach ($groupBy as $groupByKey => $groupByValue) {
-//                $groupBy[$groupByKey] = ArkPDO::dryQuote($groupByValue);
-//            }
-            $sql .= "group by " . implode(",", $groupBy) . " ";
+        if ($countField === '*') {
+            $countTarget = "*";
+        } else {
+            $countTarget = ($useDistinct ? "DISTINCT " : '') . $countField;
         }
+
+        $table = $this->getTableExpressForSQL();
+        $sql = "SELECT count({$countTarget}) FROM {$table} WHERE {$condition_sql} ";
 
         try {
             $count = $this->db()->getOne($sql);
