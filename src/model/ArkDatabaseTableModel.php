@@ -115,9 +115,9 @@ abstract class ArkDatabaseTableModel
         $table = $this->getTableExpressForSQL();
         $sql = "SELECT {$fields} FROM {$table} WHERE {$condition_sql}";
         if ($groupBy !== null) {
-            foreach ($groupBy as $groupByKey => $groupByValue) {
-                $groupBy[$groupByKey] = ArkPDO::dryQuote($groupByValue);
-            }
+//            foreach ($groupBy as $groupByKey => $groupByValue) {
+//                $groupBy[$groupByKey] = ArkPDO::dryQuote($groupByValue);
+//            }
             $sql .= "group by " . implode(",", $groupBy) . " ";
         }
         $sql .= " LIMIT 1";
@@ -150,9 +150,9 @@ abstract class ArkDatabaseTableModel
         $table = $this->getTableExpressForSQL();
         $sql = "SELECT {$fields} FROM {$table} WHERE {$condition_sql} ";
         if ($groupBy !== null) {
-            foreach ($groupBy as $groupByKey => $groupByValue) {
-                $groupBy[$groupByKey] = ArkPDO::dryQuote($groupByValue);
-            }
+//            foreach ($groupBy as $groupByKey => $groupByValue) {
+//                $groupBy[$groupByKey] = ArkPDO::dryQuote($groupByValue);
+//            }
             $sql .= "group by " . implode(",", $groupBy) . " ";
         }
         $limit = intval($limit, 10);
@@ -185,9 +185,9 @@ abstract class ArkDatabaseTableModel
         $sql = "SELECT count(*) FROM {$table} WHERE {$condition_sql} ";
 
         if ($groupBy !== null) {
-            foreach ($groupBy as $groupByKey => $groupByValue) {
-                $groupBy[$groupByKey] = ArkPDO::dryQuote($groupByValue);
-            }
+//            foreach ($groupBy as $groupByKey => $groupByValue) {
+//                $groupBy[$groupByKey] = ArkPDO::dryQuote($groupByValue);
+//            }
             $sql .= "group by " . implode(",", $groupBy) . " ";
         }
 
@@ -239,9 +239,9 @@ abstract class ArkDatabaseTableModel
         $sql = "SELECT {$fields} FROM {$table} WHERE {$condition_sql} ";
 
         if ($groupBy !== null) {
-            foreach ($groupBy as $groupByKey => $groupByValue) {
-                $groupBy[$groupByKey] = ArkPDO::dryQuote($groupByValue);
-            }
+//            foreach ($groupBy as $groupByKey => $groupByValue) {
+//                $groupBy[$groupByKey] = ArkPDO::dryQuote($groupByValue);
+//            }
             $sql .= "group by " . implode(",", $groupBy) . " ";
         }
 
