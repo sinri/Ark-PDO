@@ -98,9 +98,10 @@ abstract class ArkDatabaseTableModel
     /**
      * @param array|string $conditions
      * @param string|string[] $fields "*","f1,f2" or ["f1","f2"] @since 1.2
+     * @param null|string[] $groupBy @since 1.5
      * @return array|bool
      */
-    public function selectRow($conditions, $fields = "*")
+    public function selectRow($conditions, $fields = "*", $groupBy = null)
     {
         if (is_array($fields)) {
             $fields = '`' . implode("`,`", $fields) . '`';
@@ -112,7 +113,14 @@ abstract class ArkDatabaseTableModel
         }
 
         $table = $this->getTableExpressForSQL();
-        $sql = "SELECT {$fields} FROM {$table} WHERE {$condition_sql} LIMIT 1";
+        $sql = "SELECT {$fields} FROM {$table} WHERE {$condition_sql}";
+        if ($groupBy !== null) {
+            foreach ($groupBy as $groupByKey => $groupByValue) {
+                $groupBy[$groupByKey] = ArkPDO::dryQuote($groupByValue);
+            }
+            $sql .= "group by " . implode(",", $groupBy) . " ";
+        }
+        $sql .= " LIMIT 1";
         try {
             return $this->db()->getRow($sql);
         } catch (\Exception $e) {
@@ -126,9 +134,10 @@ abstract class ArkDatabaseTableModel
      * @param int $limit
      * @param int $offset
      * @param string|string[] $fields "*","f1,f2" or ["f1","f2"] @since 1.2
+     * @param null|string[] $groupBy @since 1.5
      * @return array|bool
      */
-    public function selectRows($conditions, $limit = 0, $offset = 0, $fields = "*")
+    public function selectRows($conditions, $limit = 0, $offset = 0, $fields = "*", $groupBy = null)
     {
         if (is_array($fields)) {
             $fields = '`' . implode("`,`", $fields) . '`';
@@ -140,6 +149,12 @@ abstract class ArkDatabaseTableModel
         }
         $table = $this->getTableExpressForSQL();
         $sql = "SELECT {$fields} FROM {$table} WHERE {$condition_sql} ";
+        if ($groupBy !== null) {
+            foreach ($groupBy as $groupByKey => $groupByValue) {
+                $groupBy[$groupByKey] = ArkPDO::dryQuote($groupByValue);
+            }
+            $sql .= "group by " . implode(",", $groupBy) . " ";
+        }
         $limit = intval($limit, 10);
         $offset = intval($offset, 10);
         if ($limit > 0) {
@@ -157,9 +172,10 @@ abstract class ArkDatabaseTableModel
 
     /**
      * @param array|string $conditions
+     * @param null|string[] $groupBy @since 1.5
      * @return int|bool
      */
-    public function selectRowsForCount($conditions)
+    public function selectRowsForCount($conditions, $groupBy = null)
     {
         $condition_sql = $this->buildCondition($conditions);
         if ($condition_sql === '') {
@@ -167,6 +183,13 @@ abstract class ArkDatabaseTableModel
         }
         $table = $this->getTableExpressForSQL();
         $sql = "SELECT count(*) FROM {$table} WHERE {$condition_sql} ";
+
+        if ($groupBy !== null) {
+            foreach ($groupBy as $groupByKey => $groupByValue) {
+                $groupBy[$groupByKey] = ArkPDO::dryQuote($groupByValue);
+            }
+            $sql .= "group by " . implode(",", $groupBy) . " ";
+        }
 
         try {
             $count = $this->db()->getOne($sql);
@@ -182,11 +205,12 @@ abstract class ArkDatabaseTableModel
      * @param int $limit
      * @param int $offset
      * @param null|string $refKey normally PK or UK if you want to get map rather than list
+     * @param null|string[] $groupBy @since 1.5
      * @return array|bool
      */
-    public function selectRowsWithSort($conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null)
+    public function selectRowsWithSort($conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null, $groupBy = null)
     {
-        return $this->selectRowsForFieldsWithSort("*", $conditions, $sort, $limit, $offset, $refKey);
+        return $this->selectRowsForFieldsWithSort("*", $conditions, $sort, $limit, $offset, $refKey, $groupBy);
     }
 
     /**
@@ -197,9 +221,10 @@ abstract class ArkDatabaseTableModel
      * @param int $limit
      * @param int $offset
      * @param null|string $refKey normally PK or UK if you want to get map rather than list
+     * @param null|string[] $groupBy @since 1.5
      * @return array|bool
      */
-    public function selectRowsForFieldsWithSort($fields, $conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null)
+    public function selectRowsForFieldsWithSort($fields, $conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null, $groupBy = null)
     {
         if (is_array($fields)) {
             $fields = '`' . implode("`,`", $fields) . '`';
@@ -213,7 +238,14 @@ abstract class ArkDatabaseTableModel
 
         $sql = "SELECT {$fields} FROM {$table} WHERE {$condition_sql} ";
 
-        if ($sort) {
+        if ($groupBy !== null) {
+            foreach ($groupBy as $groupByKey => $groupByValue) {
+                $groupBy[$groupByKey] = ArkPDO::dryQuote($groupByValue);
+            }
+            $sql .= "group by " . implode(",", $groupBy) . " ";
+        }
+
+        if ($sort !== null) {
             $sql .= "order by " . $sort;
         }
 

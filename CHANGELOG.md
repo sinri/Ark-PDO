@@ -2,6 +2,11 @@
 
 ## 1.x
 
+### 1.5
+
+Add `GROUP BY` support to `ArkDatabaseTableModel`;
+Add `(NOT) EXISTS` support to `ArkSQLCondition`; 
+
 ### 1.4
 
 Use version 2 of Ark-Core.

@@ -31,6 +31,9 @@ class ArkSQLCondition
     //const OP_GREATEST="GREATEST";
     //const OP_LEAST="LEAST";
 
+    const OP_EXISTS = "EXISTS";
+    const OP_NOT_EXISTS = "NOT EXISTS";
+
     const CONST_TRUE = "TRUE";
     const CONST_FALSE = "FALSE";
     const CONST_NULL = "NULL";
@@ -197,6 +200,11 @@ class ArkSQLCondition
             case self::OP_BETWEEN:
             case self::OP_NOT_BETWEEN:
                 return "`{$this->field}` " . $this->operate . " " . ArkPDO::dryQuote($this->value[0]) . " AND " . ArkPDO::dryQuote($this->value[1]);
+                break;
+            case self::OP_EXISTS:
+            case self::OP_NOT_EXISTS:
+                // NOTE: only value is used as raw sql string @since 1.5
+                return "{$this->operate} (" . $this->value . ")";
                 break;
             default:
                 throw new \Exception("ERROR, UNKNOWN OPERATE");
