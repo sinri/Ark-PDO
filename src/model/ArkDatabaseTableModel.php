@@ -478,4 +478,9 @@ abstract class ArkDatabaseTableModel
     {
         ArkHelper::writeIntoArray($this->fields, $name, $value);
     }
+
+    public function __isset($name)
+    {
+        return (isset($this->fields[$name]));
+    }
 }

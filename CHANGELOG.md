@@ -2,6 +2,10 @@
 
 ## 1.x
 
+### 1.5.3
+
+Fix Model ISSET lack.
+
 ### 1.5.2 
 Fix `selectRowsForCount` of `ArkDatabaseTableModel`.
 
