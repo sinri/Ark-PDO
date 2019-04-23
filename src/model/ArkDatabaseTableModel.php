@@ -9,6 +9,7 @@
 namespace sinri\ark\database\model;
 
 
+use Exception;
 use sinri\ark\core\ArkHelper;
 use sinri\ark\database\pdo\ArkPDO;
 
@@ -74,7 +75,7 @@ abstract class ArkDatabaseTableModel
                 if (is_a($value, ArkSQLCondition::class)) {
                     try {
                         $c[] = $value->makeConditionSQL();
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                         // ignore the error
                     }
                 } else {
@@ -123,7 +124,7 @@ abstract class ArkDatabaseTableModel
         $sql .= " LIMIT 1";
         try {
             return $this->db()->getRow($sql);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -165,7 +166,7 @@ abstract class ArkDatabaseTableModel
         }
         try {
             return $this->db()->getAll($sql);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -195,7 +196,7 @@ abstract class ArkDatabaseTableModel
         try {
             $count = $this->db()->getOne($sql);
             return intval($count, 10);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -264,7 +265,7 @@ abstract class ArkDatabaseTableModel
                 $all = ArkHelper::turnListToMapping($all, $refKey);
             }
             return $all;
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return false;
         }
     }
@@ -288,7 +289,7 @@ abstract class ArkDatabaseTableModel
         $sql = "INSERT INTO {$table} ({$fields}) VALUES ({$values})";
         try {
             return $this->db()->insert($sql, $pk);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -311,7 +312,7 @@ abstract class ArkDatabaseTableModel
         $sql = "replace INTO {$table} ({$fields}) VALUES ({$values})";
         try {
             return $this->db()->insert($sql);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -332,7 +333,7 @@ abstract class ArkDatabaseTableModel
         $sql = "UPDATE {$table} SET {$data_sql} WHERE {$condition_sql}";
         try {
             return $this->db()->exec($sql);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -351,7 +352,7 @@ abstract class ArkDatabaseTableModel
         $sql = "DELETE FROM {$table} WHERE {$condition_sql}";
         try {
             return $this->db()->exec($sql);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -385,7 +386,7 @@ abstract class ArkDatabaseTableModel
             $table = $this->getTableExpressForSQL();
             $sql = "INSERT INTO {$table} ({$fields}) VALUES {$values}";
             return $this->db()->insert($sql, $pk);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return false;
         }
     }
@@ -418,7 +419,7 @@ abstract class ArkDatabaseTableModel
             $table = $this->getTableExpressForSQL();
             $sql = "REPLACE INTO {$table} ({$fields}) VALUES {$values}";
             return $this->db()->exec($sql);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return false;
         }
     }
@@ -426,14 +427,14 @@ abstract class ArkDatabaseTableModel
 
     /**
      * @return ArkDatabaseTableFieldDefinition[]
-     * @throws \Exception
+     * @throws Exception
      */
     protected function loadTableDesc()
     {
         $fieldDefinition = [];
         $field_list = $this->db()->getAll("desc " . $this->getTableExpressForSQL());
         if (empty($field_list)) {
-            throw new \Exception("Seems no such table " . $this->getTableExpressForSQL());
+            throw new Exception("Seems no such table " . $this->getTableExpressForSQL());
         }
         foreach ($field_list as $field) {
             $fieldDefinition[$field['Field']] = ArkDatabaseTableFieldDefinition::makeInstanceWithDescResultRow($field);
@@ -444,7 +445,7 @@ abstract class ArkDatabaseTableModel
     /**
      * When you design a model for a certain table which is eventually designed,
      * you might run this method to get `@property` lines for the model class PHPDoc.
-     * @throws \Exception
+     * @throws Exception
      */
     public function devShowFieldsForPHPDoc()
     {

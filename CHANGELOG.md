@@ -2,6 +2,10 @@
 
 ## 1.x
 
+### 1.5.4
+
+Add back `dbname` to DSN if available.
+
 ### 1.5.3
 
 Fix Model ISSET lack.

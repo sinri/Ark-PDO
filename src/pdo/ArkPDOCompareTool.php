@@ -9,6 +9,8 @@
 namespace sinri\ark\database\pdo;
 
 
+use Exception;
+use PDO;
 use sinri\ark\core\ArkHelper;
 
 class ArkPDOCompareTool
@@ -27,7 +29,7 @@ class ArkPDOCompareTool
      * ArkPDOCompareTool constructor.
      * @param ArkPDOConfig $configA
      * @param ArkPDOConfig $configB
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct(ArkPDOConfig $configA, ArkPDOConfig $configB)
     {
@@ -108,7 +110,7 @@ class ArkPDOCompareTool
 
     /**
      * @param null $tables
-     * @throws \Exception
+     * @throws Exception
      */
     public function compareTableStructure($tables = null)
     {
@@ -209,11 +211,11 @@ class ArkPDOCompareTool
      * @param ArkPDO $db
      * @param string[]|null $tables
      * @return string[]
-     * @throws \Exception
+     * @throws Exception
      */
     protected function getTableNames($db, $tables = null)
     {
-        $rows = $db->safeQueryAll("show tables", [], \PDO::FETCH_NUM);
+        $rows = $db->safeQueryAll("show tables", [], PDO::FETCH_NUM);
         $ddl = array_column($rows, 0);
         if ($tables && is_array($tables)) $ddl = array_intersect($ddl, $tables);
         array_walk($ddl, function (&$item) {
@@ -246,13 +248,13 @@ class ArkPDOCompareTool
      * @param ArkPDO $db
      * @param string $table
      * @return bool|mixed
-     * @throws \Exception
+     * @throws Exception
      */
     protected function getTableCreation($db, $table)
     {
-        $creation = $db->safeQueryAll("show create table " . $table, [], \PDO::FETCH_NUM);
+        $creation = $db->safeQueryAll("show create table " . $table, [], PDO::FETCH_NUM);
         $creation = ArkHelper::readTarget($creation, [0, 1]);
-        if (!$creation) throw new \Exception("cannot get create DDL of " . $table . ' but get ' . json_encode($creation));
+        if (!$creation) throw new Exception("cannot get create DDL of " . $table . ' but get ' . json_encode($creation));
         return $creation;
     }
 
@@ -260,7 +262,7 @@ class ArkPDOCompareTool
      * @param ArkPDO $db
      * @param string $table
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     protected function getTableFields($db, $table)
     {
@@ -327,7 +329,7 @@ class ArkPDOCompareTool
         try {
             $count = $db->getOne("select count(*) from $table");
             return intval($count, 10);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return -1;
         }
     }

@@ -9,6 +9,7 @@
 namespace sinri\ark\database\model;
 
 
+use Exception;
 use sinri\ark\database\pdo\ArkPDO;
 
 class ArkSQLCondition
@@ -156,11 +157,9 @@ class ArkSQLCondition
     }
 
 
-
-
     /**
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     public function makeConditionSQL()
     {
@@ -177,14 +176,14 @@ class ArkSQLCondition
             case self::OP_IS:
             case self::OP_IS_NOT:
                 if (!in_array($this->value, [self::CONST_FALSE, self::CONST_TRUE, self::CONST_NULL])) {
-                    throw new \Exception("ERROR, YOU MUST USE CONSTANT FOR IS COMPARISION!");
+                    throw new Exception("ERROR, YOU MUST USE CONSTANT FOR IS COMPARISION!");
                 }
                 return "`{$this->field}` " . $this->operate . " " . $this->value;
                 break;
             case self::OP_IN:
             case self::OP_NOT_IN:
                 if (!is_array($this->value) || empty($this->value)) {
-                    throw new \Exception("ERROR, YOU MUST GIVE AN ARRAY OF STRING FOR IN OPERATION!");
+                    throw new Exception("ERROR, YOU MUST GIVE AN ARRAY OF STRING FOR IN OPERATION!");
                 }
                 $group = [];
                 foreach ($this->value as $item) {
@@ -207,7 +206,7 @@ class ArkSQLCondition
                 return "{$this->operate} (" . $this->value . ")";
                 break;
             default:
-                throw new \Exception("ERROR, UNKNOWN OPERATE");
+                throw new Exception("ERROR, UNKNOWN OPERATE");
         }
     }
 }
