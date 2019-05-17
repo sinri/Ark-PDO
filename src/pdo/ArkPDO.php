@@ -130,7 +130,7 @@ class ArkPDO
     }
 
     /**
-     * @param $sql
+     * @param string $sql
      * @return array
      * @throws Exception
      */
@@ -142,7 +142,7 @@ class ArkPDO
     }
 
     /**
-     * @param $sql
+     * @param string $sql
      * @param bool $usePrepare
      * @return PDOStatement
      * @throws Exception
@@ -164,8 +164,8 @@ class ArkPDO
     }
 
     /**
-     * @param $sql
-     * @param null $field
+     * @param string $sql
+     * @param null|string|int $field
      * @return array
      * @throws Exception
      */
@@ -193,7 +193,7 @@ class ArkPDO
     }
 
     /**
-     * @param $sql
+     * @param string $sql
      * @return mixed|bool
      * @throws Exception
      */
@@ -209,7 +209,29 @@ class ArkPDO
     }
 
     /**
-     * @param $sql
+     * @param string $sql
+     * @param callable $callback function($row,$index):bool; format of $row is decided by fetchStyle and $index starts since 1; return false would stop fetching next row.
+     * @param int $fetchStyle
+     * @return int How many rows fetched and processed
+     * @throws Exception
+     * @since 1.6.0
+     */
+    public function getAllAsStream($sql, $callback, $fetchStyle = PDO::FETCH_ASSOC)
+    {
+        $stmt = $this->buildPDOStatement($sql);
+        $index = 0;
+        while (true) {
+            $row = $stmt->fetch($fetchStyle);
+            if ($row === false) break;
+            $index += 1;
+            $shouldContinue = call_user_func_array($callback, [$row, $index]);
+            if (!$shouldContinue) break;
+        }
+        return $index;
+    }
+
+    /**
+     * @param string $sql
      * @return int|false affected row count(might be zero anyway), or false on error
      */
     public function exec($sql)
@@ -220,7 +242,7 @@ class ArkPDO
     }
 
     /**
-     * @param $sql
+     * @param string $sql
      * @param null $pk
      * @return bool|string
      */
@@ -303,7 +325,40 @@ class ArkPDO
     }
 
     /**
-     * @param $sql
+     * @return string
+     * @since 1.6.0
+     */
+    public function getPDOErrorDescription()
+    {
+        return "PDO ERROR #" . $this->getPDOErrorCode() . ": " . implode(";", $this->getPDOErrorInfo());
+    }
+
+    /**
+     * @param string $sql
+     * @param array $values
+     * @param callable $callback function($row,$index):bool; format of $row is decided by fetchStyle and $index starts since 1; return false would stop fetching next row.
+     * @param int $fetchStyle
+     * @return int How many rows fetched and processed
+     * @throws Exception
+     * @since 1.6.0
+     */
+    public function safeQueryAllAsStream($sql, $values, $callback, $fetchStyle = PDO::FETCH_ASSOC)
+    {
+        $stmt = $this->buildPDOStatement($sql, true);
+        $stmt->execute($values);
+        $index = 0;
+        while (true) {
+            $row = $stmt->fetch($fetchStyle);
+            if ($row === false) break;
+            $index += 1;
+            $shouldContinue = call_user_func_array($callback, [$row, $index]);
+            if (!$shouldContinue) break;
+        }
+        return $index;
+    }
+
+    /**
+     * @param string $sql
      * @param array $values
      * @param int $fetchStyle
      * @return array
@@ -318,7 +373,7 @@ class ArkPDO
     }
 
     /**
-     * @param $sql
+     * @param string $sql
      * @param array $values
      * @return mixed
      * @throws Exception
@@ -334,7 +389,7 @@ class ArkPDO
     }
 
     /**
-     * @param $sql
+     * @param string $sql
      * @param array $values
      * @return string
      * @throws Exception
@@ -350,7 +405,7 @@ class ArkPDO
     }
 
     /**
-     * @param $sql
+     * @param string $sql
      * @param array $values
      * @param int $insertedId
      * @param null $pk
@@ -367,7 +422,7 @@ class ArkPDO
     }
 
     /**
-     * @param $sql
+     * @param string $sql
      * @param array $values
      * @param null $sth @since 1.3.3
      * @return bool

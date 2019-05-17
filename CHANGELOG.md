@@ -2,6 +2,10 @@
 
 ## 1.x
 
+### 1.6.0
+
+PDO Stream Fetching. 
+
 ### 1.5.4
 
 Add back `dbname` to DSN if available.
