@@ -270,12 +270,7 @@ abstract class ArkDatabaseTableModel
         }
     }
 
-    /**
-     * @param array $data
-     * @param null $pk
-     * @return bool|string
-     */
-    public function insert($data, $pk = null)
+    protected function writeInto($data, $pk = null, $shouldReplace = false)
     {
         $fields = [];
         $values = [];
@@ -286,12 +281,41 @@ abstract class ArkDatabaseTableModel
         $fields = implode(",", $fields);
         $values = implode(",", $values);
         $table = $this->getTableExpressForSQL();
-        $sql = "INSERT INTO {$table} ({$fields}) VALUES ({$values})";
+
         try {
-            return $this->db()->insert($sql, $pk);
+            if ($shouldReplace) {
+                $sql = "REPLACE INTO {$table} ({$fields}) VALUES ({$values})";
+                return $this->db()->insert($sql);
+            } else {
+                $sql = "INSERT INTO {$table} ({$fields}) VALUES ({$values})";
+                return $this->db()->insert($sql, $pk);
+            }
         } catch (Exception $e) {
             return false;
         }
+    }
+
+    /**
+     * @param string $pkWithAI
+     * @return int|false
+     * @since 1.6.1
+     */
+    public function getMaxSinglePK($pkWithAI)
+    {
+        $rows = $this->selectRowsForFieldsWithSort([$pkWithAI], [], "`{$pkWithAI}` desc", 1);
+        if ($rows === false) return false;
+        $targetLastId = ArkHelper::readTarget($rows, [0, $pkWithAI], 0);
+        return $targetLastId;
+    }
+
+    /**
+     * @param array $data
+     * @param null $pk
+     * @return bool|string
+     */
+    public function insert($data, $pk = null)
+    {
+        return $this->writeInto($data, $pk, false);
     }
 
     /**
@@ -300,21 +324,7 @@ abstract class ArkDatabaseTableModel
      */
     public function replace($data)
     {
-        $fields = [];
-        $values = [];
-        foreach ($data as $key => $value) {
-            $fields[] = "`{$key}`";
-            $values[] = $this->db()->quote($value);
-        }
-        $fields = implode(",", $fields);
-        $values = implode(",", $values);
-        $table = $this->getTableExpressForSQL();
-        $sql = "replace INTO {$table} ({$fields}) VALUES ({$values})";
-        try {
-            return $this->db()->insert($sql);
-        } catch (Exception $e) {
-            return false;
-        }
+        return $this->writeInto($data, null, true);
     }
 
     /**
@@ -357,12 +367,7 @@ abstract class ArkDatabaseTableModel
         }
     }
 
-    /**
-     * @param array $dataList
-     * @param null $pk
-     * @return bool|string
-     */
-    public function batchInsert($dataList, $pk = null)
+    protected function batchWriteInto($dataList, $pk = null, $shouldReplace = false)
     {
         try {
             $fields = [];
@@ -384,11 +389,27 @@ abstract class ArkDatabaseTableModel
             $fields = implode(",", $fields);
             $values = implode(",", $values);
             $table = $this->getTableExpressForSQL();
-            $sql = "INSERT INTO {$table} ({$fields}) VALUES {$values}";
-            return $this->db()->insert($sql, $pk);
+            if ($shouldReplace) {
+                $sql = "REPLACE INTO {$table} ({$fields}) VALUES {$values}";
+                return $this->db()->exec($sql);
+            } else {
+                $sql = "INSERT INTO {$table} ({$fields}) VALUES {$values}";
+                return $this->db()->insert($sql, $pk);
+            }
+
         } catch (Exception $exception) {
             return false;
         }
+    }
+
+    /**
+     * @param array $dataList
+     * @param null $pk
+     * @return bool|string
+     */
+    public function batchInsert($dataList, $pk = null)
+    {
+        return $this->batchWriteInto($dataList, $pk, false);
     }
 
     /**
@@ -397,31 +418,7 @@ abstract class ArkDatabaseTableModel
      */
     public function batchReplace($dataList)
     {
-        try {
-            $fields = [];
-            $values = [];
-
-            foreach ($dataList[0] as $key => $value) {
-                $fields[] = "`{$key}`";
-            }
-            foreach ($dataList as $data) {
-                $tmp = [];
-                if (count($data) != count($fields)) {
-                    return false;
-                }
-                foreach ($data as $key => $value) {
-                    $tmp[] = $this->db()->quote($value);
-                }
-                $values[] = "(" . implode(",", $tmp) . ")";
-            }
-            $fields = implode(",", $fields);
-            $values = implode(",", $values);
-            $table = $this->getTableExpressForSQL();
-            $sql = "REPLACE INTO {$table} ({$fields}) VALUES {$values}";
-            return $this->db()->exec($sql);
-        } catch (Exception $exception) {
-            return false;
-        }
+        return $this->batchWriteInto($dataList, null, true);
     }
 
 

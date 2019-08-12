@@ -2,6 +2,10 @@
 
 ## 1.x
 
+### 1.6.1
+
+Fetch Table Max PK with AI.
+
 ### 1.6.0
 
 PDO Stream Fetching. 
