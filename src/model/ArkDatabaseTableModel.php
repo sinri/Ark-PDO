@@ -30,21 +30,24 @@ abstract class ArkDatabaseTableModel
 
     /**
      * @return null|string
+     * @since 1.6.2
      */
-    protected function mappingSchemeName()
+    public function mappingSchemeName()
     {
         return null;
     }
 
     /**
      * @return string
+     * @since 1.6.2
      */
-    abstract protected function mappingTableName();
+    abstract public function mappingTableName();
 
     /**
      * @return string
+     * @since 1.6.2
      */
-    protected function getTableExpressForSQL()
+    public function getTableExpressForSQL()
     {
         $e = ($this->scheme === null ? "" : '`' . $this->scheme . "`.");
         $e .= "`{$this->table}`";

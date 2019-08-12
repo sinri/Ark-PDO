@@ -2,6 +2,10 @@
 
 ## 1.x
 
+## 1.6.2
+
+Make Table and Schema Name Public.
+
 ### 1.6.1
 
 Fetch Table Max PK with AI.
