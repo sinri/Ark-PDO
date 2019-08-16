@@ -2,6 +2,10 @@
 
 ## 1.x
 
+## 1.7.0
+
+Table Model Architecture Change. 
+
 ## 1.6.2
 
 Make Table and Schema Name Public.
