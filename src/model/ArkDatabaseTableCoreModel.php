@@ -52,6 +52,11 @@ abstract class ArkDatabaseTableCoreModel
         return date('Y-m-d H:i:s');
     }
 
+    /**
+     * @param string|array $conditions
+     * @param string $glue
+     * @return string
+     */
     protected final function buildCondition($conditions, $glue = ' AND ')
     {
         $condition_sql = "";
@@ -92,29 +97,11 @@ abstract class ArkDatabaseTableCoreModel
      */
     public function selectRow($conditions, $fields = "*", $groupBy = null)
     {
-        if (is_array($fields)) {
-            $fields = '`' . implode("`,`", $fields) . '`';
-        }
-
-        $condition_sql = $this->buildCondition($conditions, 'AND');
-        if ($condition_sql === '') {
-            $condition_sql = "1";
-        }
-
-        $table = $this->getTableExpressForSQL();
-        $sql = "SELECT {$fields} FROM {$table} WHERE {$condition_sql}";
-        if ($groupBy !== null) {
-//            foreach ($groupBy as $groupByKey => $groupByValue) {
-//                $groupBy[$groupByKey] = ArkPDO::dryQuote($groupByValue);
-//            }
-            $sql .= "group by " . implode(",", $groupBy) . " ";
-        }
-        $sql .= " LIMIT 1";
-        try {
-            return $this->db()->getRow($sql);
-        } catch (Exception $e) {
+        $rows = $this->selectRows($conditions, 1, 0, $fields, $groupBy);
+        if (empty($rows)) {
             return false;
         }
+        return $rows[0];
     }
 
 
@@ -128,35 +115,7 @@ abstract class ArkDatabaseTableCoreModel
      */
     public function selectRows($conditions, $limit = 0, $offset = 0, $fields = "*", $groupBy = null)
     {
-        if (is_array($fields)) {
-            $fields = '`' . implode("`,`", $fields) . '`';
-        }
-
-        $condition_sql = $this->buildCondition($conditions);
-        if ($condition_sql === '') {
-            $condition_sql = "1";
-        }
-        $table = $this->getTableExpressForSQL();
-        $sql = "SELECT {$fields} FROM {$table} WHERE {$condition_sql} ";
-        if ($groupBy !== null) {
-//            foreach ($groupBy as $groupByKey => $groupByValue) {
-//                $groupBy[$groupByKey] = ArkPDO::dryQuote($groupByValue);
-//            }
-            $sql .= "group by " . implode(",", $groupBy) . " ";
-        }
-        $limit = intval($limit, 10);
-        $offset = intval($offset, 10);
-        if ($limit > 0) {
-            $sql .= " limit {$limit} ";
-            if ($offset > 0) {
-                $sql .= " offset {$offset} ";
-            }
-        }
-        try {
-            return $this->db()->getAll($sql);
-        } catch (Exception $e) {
-            return false;
-        }
+        return $this->selectRowsForFieldsWithSort($fields, $conditions, null, $limit, $offset, null, $groupBy);
     }
 
     /**
@@ -229,9 +188,6 @@ abstract class ArkDatabaseTableCoreModel
         $sql = "SELECT {$fields} FROM {$table} WHERE {$condition_sql} ";
 
         if ($groupBy !== null) {
-//            foreach ($groupBy as $groupByKey => $groupByValue) {
-//                $groupBy[$groupByKey] = ArkPDO::dryQuote($groupByValue);
-//            }
             $sql .= "group by " . implode(",", $groupBy) . " ";
         }
 
@@ -284,15 +240,26 @@ abstract class ArkDatabaseTableCoreModel
     }
 
     /**
-     * @param string $pkWithAI
-     * @return int|false
+     * @param $pkWithAI
+     * @return false|int
      * @since 1.6.1
+     * @deprecated since 1.7.1 use getMaxValueOfFiled instead
      */
     public function getMaxSinglePK($pkWithAI)
     {
-        $rows = $this->selectRowsForFieldsWithSort([$pkWithAI], [], "`{$pkWithAI}` desc", 1);
+        return $this->getMaxValueOfFiled($pkWithAI);
+    }
+
+    /**
+     * @param string $field
+     * @return int|false
+     * @since 1.7.1
+     */
+    public function getMaxValueOfFiled($field)
+    {
+        $rows = $this->selectRowsForFieldsWithSort([$field], [], "`{$field}` desc", 1);
         if ($rows === false) return false;
-        $targetLastId = ArkHelper::readTarget($rows, [0, $pkWithAI], 0);
+        $targetLastId = ArkHelper::readTarget($rows, [0, $field], 0);
         return $targetLastId;
     }
 

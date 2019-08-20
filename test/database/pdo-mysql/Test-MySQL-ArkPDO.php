@@ -6,15 +6,18 @@
  * Time: 14:31
  */
 
+use sinri\ark\core\ArkLogger;
 use sinri\ark\database\model\ArkDatabaseTableModel;
+use sinri\ark\database\pdo\ArkPDO;
+use sinri\ark\database\pdo\ArkPDOConfig;
 
 //require_once __DIR__ . '/../../../vendor/autoload.php';
 //require_once __DIR__ . '/../../../autoload.php';
 
-$logger = new \sinri\ark\core\ArkLogger(__DIR__ . '/../../log', 'pdo-mysql');
+$logger = new ArkLogger(__DIR__ . '/../../log', 'pdo-mysql');
 //$logger->setIgnoreLevel(\Psr\Log\LogLevel::INFO);
 
-$config = new \sinri\ark\database\pdo\ArkPDOConfig();
+$config = new ArkPDOConfig();
 
 // REQUIRE config.php (you might generate one besides) to do the commented job
 //$config->setHost('db.com')
@@ -28,7 +31,7 @@ $config = new \sinri\ark\database\pdo\ArkPDOConfig();
 require __DIR__ . '/config.php';
 
 try {
-    $db = new \sinri\ark\database\pdo\ArkPDO();
+    $db = new ArkPDO();
     $db->setPdoConfig($config);
     $db->setLogger($logger);
     $db->connect();
@@ -81,13 +84,13 @@ try {
         /**
          * @return string
          */
-        protected function mappingTableName()
+        public function mappingTableName()
         {
             return 'ark_test_table';
         }
 
         /**
-         * @return \sinri\ark\database\pdo\ArkPDO
+         * @return ArkPDO
          */
         public function db()
         {

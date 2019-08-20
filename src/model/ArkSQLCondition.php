@@ -35,6 +35,9 @@ class ArkSQLCondition
     const OP_EXISTS = "EXISTS";
     const OP_NOT_EXISTS = "NOT EXISTS";
 
+    const OP_PARENTHESES_AND = "AND";
+    const OP_PARENTHESES_OR = "OR";
+
     const CONST_TRUE = "TRUE";
     const CONST_FALSE = "FALSE";
     const CONST_NULL = "NULL";
@@ -156,6 +159,23 @@ class ArkSQLCondition
         return new ArkSQLCondition($field, self::OP_LIKE, $value, self::LIKE_BOTH_WILDCARD);
     }
 
+    /**
+     * @param ArkSQLCondition[] $conditions
+     * @return ArkSQLCondition
+     */
+    public static function makeConditionsIntersect($conditions)
+    {
+        return new ArkSQLCondition(null, self::OP_PARENTHESES_AND, $conditions);
+    }
+
+    /**
+     * @param ArkSQLCondition[] $conditions
+     * @return ArkSQLCondition
+     */
+    public static function makeConditionsUnion($conditions)
+    {
+        return new ArkSQLCondition(null, self::OP_PARENTHESES_OR, $conditions);
+    }
 
     /**
      * @return string
@@ -204,6 +224,20 @@ class ArkSQLCondition
             case self::OP_NOT_EXISTS:
                 // NOTE: only value is used as raw sql string @since 1.5
                 return "{$this->operate} (" . $this->value . ")";
+                break;
+            case self::OP_PARENTHESES_AND:
+            case self::OP_PARENTHESES_OR:
+                // NOTE: to support the parentheses @since 1.7.1
+                $parts = [];
+                if (is_array($this->value)) {
+                    foreach ($this->value as $subSQLCondition) {
+                        $parts[] = $subSQLCondition->makeConditionSQL();
+                    }
+                }
+                if (empty($parts)) {
+                    throw new Exception("Condition Set Empty");
+                }
+                return '(' . implode(" " . $this->operate . " ", $parts) . ')';
                 break;
             default:
                 throw new Exception("ERROR, UNKNOWN OPERATE");

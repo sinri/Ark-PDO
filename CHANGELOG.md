@@ -2,6 +2,10 @@
 
 ## 1.x
 
+## 1.7.1
+
+Support the parentheses in SQL Condition Class.
+
 ## 1.7.0
 
 Table Model Architecture Change. 
