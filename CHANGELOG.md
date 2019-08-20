@@ -2,6 +2,10 @@
 
 ## 1.x
 
+## 1.7.2
+
+Fix a bug for MySQL `<=>` operator.
+
 ## 1.7.1
 
 Support the parentheses in SQL Condition Class.

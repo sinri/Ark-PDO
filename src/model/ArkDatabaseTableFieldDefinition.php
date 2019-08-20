@@ -73,6 +73,7 @@ class ArkDatabaseTableFieldDefinition
             case 'timestamp':
             case 'time':
             case 'year':
+                // maybe timestamp or time need integer?
                 return 'string';
             case 'char':
             case 'varchar':

@@ -29,8 +29,8 @@ class ArkSQLCondition
     const OP_NOT_LIKE = "NOT LIKE";
     const OP_BETWEEN = "BETWEEN";
     const OP_NOT_BETWEEN = "NOT BETWEEN";
-    //const OP_GREATEST="GREATEST";
-    //const OP_LEAST="LEAST";
+//    const OP_GREATEST="GREATEST";
+//    const OP_LEAST="LEAST";
 
     const OP_EXISTS = "EXISTS";
     const OP_NOT_EXISTS = "NOT EXISTS";
@@ -109,7 +109,7 @@ class ArkSQLCondition
         return new ArkSQLCondition($field, self::OP_NEQ, $value);
     }
 
-    public static function makeNotEqualNullSafe($field, $value)
+    public static function makeEqualNullSafe($field, $value)
     {
         return new ArkSQLCondition($field, self::OP_NULL_SAFE_EQUAL, $value);
     }
