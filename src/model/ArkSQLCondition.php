@@ -32,6 +32,9 @@ class ArkSQLCondition
 //    const OP_GREATEST="GREATEST";
 //    const OP_LEAST="LEAST";
 
+    const MACRO_IS_NULL_OR_EMPTY_STRING = "MACRO_IS_NULL_OR_EMPTY_STRING";
+    const MACRO_IS_NOT_NULL_NOR_EMPTY_STRING = "MACRO_IS_NOT_NULL_NOR_EMPTY_STRING";
+
     const OP_EXISTS = "EXISTS";
     const OP_NOT_EXISTS = "NOT EXISTS";
 
@@ -178,6 +181,26 @@ class ArkSQLCondition
     }
 
     /**
+     * @param $field
+     * @return ArkSQLCondition
+     * @since 1.7.3
+     */
+    public static function makeFieldIsNullOrEmptyString($field)
+    {
+        return new ArkSQLCondition($field, self::MACRO_IS_NULL_OR_EMPTY_STRING, null);
+    }
+
+    /**
+     * @param $field
+     * @return ArkSQLCondition
+     * @since 1.7.3
+     */
+    public static function makeFieldIsNotNullNorEmptyString($field)
+    {
+        return new ArkSQLCondition($field, self::MACRO_IS_NOT_NULL_NOR_EMPTY_STRING, null);
+    }
+
+    /**
      * @return string
      * @throws Exception
      */
@@ -238,6 +261,12 @@ class ArkSQLCondition
                     throw new Exception("Condition Set Empty");
                 }
                 return '(' . implode(" " . $this->operate . " ", $parts) . ')';
+                break;
+            case self::MACRO_IS_NULL_OR_EMPTY_STRING:
+                return "(`{$this->field}` IS NULL OR `{$this->field}` = '')";
+                break;
+            case self::MACRO_IS_NOT_NULL_NOR_EMPTY_STRING:
+                return "(`{$this->field}` IS NOT NULL AND `{$this->field}` <> '')";
                 break;
             default:
                 throw new Exception("ERROR, UNKNOWN OPERATE");

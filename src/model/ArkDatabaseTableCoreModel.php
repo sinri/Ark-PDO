@@ -53,7 +53,7 @@ abstract class ArkDatabaseTableCoreModel
     }
 
     /**
-     * @param string|array $conditions
+     * @param string|array|ArkSQLCondition[] $conditions It might be the condition sql (the string after WHERE), or the key-value array, with FIELD-VALUE or KEY-ArkSQLCondition format.
      * @param string $glue
      * @return string
      */
@@ -156,6 +156,7 @@ abstract class ArkDatabaseTableCoreModel
      * @param null|string $refKey normally PK or UK if you want to get map rather than list
      * @param null|string[] $groupBy @since 1.5
      * @return array|bool
+     * @deprecated @since 1.7.3 Please use `selectRowsForFieldsWithSort` instead!
      */
     public function selectRowsWithSort($conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null, $groupBy = null)
     {
@@ -163,7 +164,7 @@ abstract class ArkDatabaseTableCoreModel
     }
 
     /**
-     * @param string|string[] $fields such as '*', 'f1,f2' or ['f1','f2']
+     * @param string|string[] $fields such as '*', 'field_1,field_2 as x,sum(field_3)' or ['field_1','field_2 as x','sum(field_3)']
      * @param $conditions
      * @param null|string $sort "field","field desc"," f1 asc, f2 desc"
      * @param int $limit
@@ -176,7 +177,11 @@ abstract class ArkDatabaseTableCoreModel
     public function selectRowsForFieldsWithSort($fields, $conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null, $groupBy = null)
     {
         if (is_array($fields)) {
-            $fields = '`' . implode("`,`", $fields) . '`';
+            // $fields = '`' . implode("`,`", $fields) . '`'; // before 1.7.3
+            // @since 1.7.3 the field protection sign "``" is removed
+            // Of course it might open the door to the hackers to inject something evil,
+            // But it is obvious that the parameters of the method, especially `fields` should not decided by user input.
+            $fields = implode(",", $fields);
         }
 
         $condition_sql = $this->buildCondition($conditions);
@@ -240,7 +245,7 @@ abstract class ArkDatabaseTableCoreModel
     }
 
     /**
-     * @param $pkWithAI
+     * @param string $pkWithAI
      * @return false|int
      * @since 1.6.1
      * @deprecated since 1.7.1 use getMaxValueOfFiled instead
@@ -259,13 +264,12 @@ abstract class ArkDatabaseTableCoreModel
     {
         $rows = $this->selectRowsForFieldsWithSort([$field], [], "`{$field}` desc", 1);
         if ($rows === false) return false;
-        $targetLastId = ArkHelper::readTarget($rows, [0, $field], 0);
-        return $targetLastId;
+        return ArkHelper::readTarget($rows, [0, $field], 0);
     }
 
     /**
      * @param array $data
-     * @param null $pk
+     * @param null|string $pk
      * @return bool|string
      */
     public function insert($data, $pk = null)
