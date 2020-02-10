@@ -90,6 +90,29 @@ abstract class ArkDatabaseTableCoreModel
     }
 
     /**
+     * @param array $valuesForOneRow [field_name=>value], NULL for NULL.
+     * @param string $fields as output
+     * @return string
+     * @since 1.7.4
+     */
+    protected function buildRowValues($valuesForOneRow, &$fields = null)
+    {
+        $sql = [];
+        $fields = [];
+        foreach ($valuesForOneRow as $key => $value) {
+            $fields[] = "`{$key}`";
+            if ($value === null) {
+                $part = "`{$key}`=NULL";
+            } else {
+                $part = "`{$key}`=" . $this->db()->quote($value);
+            }
+            $sql[] = $part;
+        }
+        $fields = implode(",", $fields);
+        return implode(",", $sql);
+    }
+
+    /**
      * @param array|string $conditions
      * @param string|string[] $fields "*","f1,f2" or ["f1","f2"] @since 1.2
      * @param null|string[] $groupBy @since 1.5
@@ -221,15 +244,16 @@ abstract class ArkDatabaseTableCoreModel
 
     protected function writeInto($data, $pk = null, $shouldReplace = false)
     {
-        $fields = [];
-        $values = [];
-        foreach ($data as $key => $value) {
-            $fields[] = "`{$key}`";
-            $values[] = $this->db()->quote($value);
-        }
-        $fields = implode(",", $fields);
-        $values = implode(",", $values);
+//        $fields = [];
+//        $values = [];
+//        foreach ($data as $key => $value) {
+//            $fields[] = "`{$key}`";
+//            $values[] = $this->db()->quote($value);
+//        }
+//        $fields = implode(",", $fields);
+//        $values = implode(",", $values);
         $table = $this->getTableExpressForSQL();
+        $values = $this->buildRowValues($data, $fields);
 
         try {
             if ($shouldReplace) {
@@ -297,7 +321,7 @@ abstract class ArkDatabaseTableCoreModel
         if ($condition_sql === '') {
             $condition_sql = "1";
         }
-        $data_sql = $this->buildCondition($data, ",");
+        $data_sql = $this->buildRowValues($data);
         $table = $this->getTableExpressForSQL();
         $sql = "UPDATE {$table} SET {$data_sql} WHERE {$condition_sql}";
         try {
@@ -336,14 +360,10 @@ abstract class ArkDatabaseTableCoreModel
                 $fields[] = "`{$key}`";
             }
             foreach ($dataList as $data) {
-                $tmp = [];
                 if (count($data) != count($fields)) {
                     return false;
                 }
-                foreach ($data as $key => $value) {
-                    $tmp[] = $this->db()->quote($value);
-                }
-                $values[] = "(" . implode(",", $tmp) . ")";
+                $values[] = "(" . $this->buildRowValues($data) . ")";
             }
             $fields = implode(",", $fields);
             $values = implode(",", $values);

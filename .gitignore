@@ -8,3 +8,4 @@ composer.phar
 
 
 /test/database/pdo-mysql/config.php
+/debug

@@ -2,6 +2,10 @@
 
 ## 1.x
 
+## 1.7.4
+
+Add NULL support to the modify data parameters.
+
 ## 1.7.3
 
 Add the checking package for is null and is empty string.
