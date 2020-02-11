@@ -137,8 +137,7 @@ class ArkPDO
     public function getAll($sql)
     {
         $stmt = $this->buildPDOStatement($sql);
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return $rows;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
@@ -188,8 +187,7 @@ class ArkPDO
         $stmt = $this->buildPDOStatement($sql);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (!is_array($rows) || count($rows) < 1) return false;
-        $row = $rows[0];
-        return $row;
+        return $rows[0];
     }
 
     /**
@@ -237,8 +235,7 @@ class ArkPDO
     public function exec($sql)
     {
         $this->logger->debug("Ready to execute sql", ["sql" => $sql]);
-        $rows = $this->pdo->exec($sql);
-        return $rows;
+        return $this->pdo->exec($sql);
     }
 
     /**
@@ -368,8 +365,7 @@ class ArkPDO
     {
         $sth = $this->buildPDOStatement($sql, true);
         $sth->execute($values);
-        $rows = $sth->fetchAll($fetchStyle);
-        return $rows;
+        return $sth->fetchAll($fetchStyle);
     }
 
     /**
@@ -382,8 +378,7 @@ class ArkPDO
     {
         $sth = $this->buildPDOStatement($sql, true);
         if ($sth->execute($values)) {
-            $row = $sth->fetch(PDO::FETCH_ASSOC);
-            return $row;
+            return $sth->fetch(PDO::FETCH_ASSOC);
         }
         return false;
     }
@@ -398,8 +393,7 @@ class ArkPDO
     {
         $sth = $this->buildPDOStatement($sql, true);
         if ($sth->execute($values)) {
-            $col = $sth->fetchColumn(0);
-            return $col;
+            return $sth->fetchColumn(0);
         }
         return false;
     }

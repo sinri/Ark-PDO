@@ -2,6 +2,10 @@
 
 ## 1.x
 
+## 1.7.6
+
+Add two kinds of select methods in model.
+
 ## 1.7.5
 
 Add NULL support to the modify data parameters.

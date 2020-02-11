@@ -133,6 +133,47 @@ abstract class ArkDatabaseTableCoreModel
 
     /**
      * @param array|string $conditions
+     * @param string $field
+     * @param null|string $orderBy
+     * @param null|string[] $groupBy
+     * @param int $limit
+     * @param int $offset
+     * @return bool|string|int
+     * @since 1.7.6
+     */
+    public function selectOne($conditions, string $field, $orderBy = null, $groupBy = null, $limit = 0, $offset = 0)
+    {
+        try {
+            $sql = $this->makeSelectSQL($field, $conditions, $orderBy, $limit, $offset, $groupBy);
+            return $this->db()->getOne($sql);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * @param array|string $conditions
+     * @param string $field
+     * @param null|string $orderBy
+     * @param null|string[] $groupBy
+     * @param int $limit
+     * @param int $offset
+     * @param null|string $useAnotherKeyToFetch
+     * @return array|bool
+     * @since 1.7.6
+     */
+    public function selectColumn($conditions, string $field, $orderBy = null, $groupBy = null, $limit = 0, $offset = 0, $useAnotherKeyToFetch = null)
+    {
+        try {
+            $sql = $this->makeSelectSQL($field, $conditions, $orderBy, $limit, $offset, $groupBy);
+            return $this->db()->getCol($sql, $useAnotherKeyToFetch);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * @param array|string $conditions
      * @param string|string[] $fields "*","f1,f2" or ["f1","f2"] @since 1.2
      * @param null|string[] $groupBy @since 1.5
      * @return array|bool
@@ -207,7 +248,7 @@ abstract class ArkDatabaseTableCoreModel
 
     /**
      * @param string|string[] $fields such as '*', 'field_1,field_2 as x,sum(field_3)' or ['field_1','field_2 as x','sum(field_3)']
-     * @param $conditions
+     * @param array|string $conditions
      * @param null|string $sort "field","field desc"," f1 asc, f2 desc"
      * @param int $limit
      * @param int $offset
@@ -217,6 +258,29 @@ abstract class ArkDatabaseTableCoreModel
      * @since 1.2
      */
     public function selectRowsForFieldsWithSort($fields, $conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null, $groupBy = null)
+    {
+        $sql = $this->makeSelectSQL($fields, $conditions, $sort, $limit, $offset, $groupBy);
+        try {
+            $all = $this->db()->getAll($sql);
+            if ($refKey) {
+                $all = ArkHelper::turnListToMapping($all, $refKey);
+            }
+            return $all;
+        } catch (Exception $exception) {
+            return false;
+        }
+    }
+
+    /**
+     * @param string|string[] $fields
+     * @param array|string $conditions
+     * @param null|string $sort
+     * @param int $limit
+     * @param int $offset
+     * @param null|string[] $groupBy
+     * @return string
+     */
+    protected function makeSelectSQL($fields, $conditions, $sort = null, $limit = 0, $offset = 0, $groupBy = null)
     {
         if (is_array($fields)) {
             // $fields = '`' . implode("`,`", $fields) . '`'; // before 1.7.3
@@ -250,15 +314,7 @@ abstract class ArkDatabaseTableCoreModel
                 $sql .= " offset {$offset} ";
             }
         }
-        try {
-            $all = $this->db()->getAll($sql);
-            if ($refKey) {
-                $all = ArkHelper::turnListToMapping($all, $refKey);
-            }
-            return $all;
-        } catch (Exception $exception) {
-            return false;
-        }
+        return $sql;
     }
 
     protected function writeInto($data, $pk = null, $shouldReplace = false)
