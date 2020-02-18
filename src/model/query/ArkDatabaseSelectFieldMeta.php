@@ -3,7 +3,11 @@
 
 namespace sinri\ark\database\model\query;
 
-
+/**
+ * Class ArkDatabaseSelectFieldMeta
+ * @package sinri\ark\database\model\query
+ * @since 2.0
+ */
 class ArkDatabaseSelectFieldMeta
 {
     /**
@@ -63,5 +67,18 @@ class ArkDatabaseSelectFieldMeta
     public function generateSQLComponent(): string
     {
         return $this->getFieldExpression() . ($this->alias === '' ? '' : ' as ' . $this->alias);
+    }
+
+    /**
+     * @param ArkDatabaseSelectFieldMeta[] $selectFields
+     * @return string
+     */
+    public static function generateFieldSQLComponent(array $selectFields)
+    {
+        $fields = [];
+        foreach ($selectFields as $fieldMeta) {
+            $fields[] = $fieldMeta->generateSQLComponent();
+        }
+        return implode(',', $fields);
     }
 }

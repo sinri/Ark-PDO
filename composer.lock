@@ -4,7 +4,7 @@
     "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
     "This file is @generated automatically"
   ],
-  "content-hash": "746ced4e1e65e26fdbd64f11d0f3a9ec",
+  "content-hash": "cd5a752ecc30e3bac32331798797df5f",
   "packages": [
     {
       "name": "psr/log",
@@ -18,7 +18,13 @@
         "type": "zip",
         "url": "https://api.github.com/repos/php-fig/log/zipball/446d54b4cb6bf489fc9d75f55843658e6f25d801",
         "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801",
-        "shasum": ""
+        "shasum": "",
+        "mirrors": [
+          {
+            "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+            "preferred": true
+          }
+        ]
       },
       "require": {
         "php": ">=5.3.0"
@@ -65,7 +71,13 @@
         "type": "zip",
         "url": "https://api.github.com/repos/sinri/Ark-Core/zipball/f573fed77a18cb58a9c58d80b9944a5f2e7c05aa",
         "reference": "f573fed77a18cb58a9c58d80b9944a5f2e7c05aa",
-        "shasum": ""
+        "shasum": "",
+        "mirrors": [
+          {
+            "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+            "preferred": true
+          }
+        ]
       },
       "require": {
         "ext-json": "*",
@@ -98,6 +110,7 @@
   "prefer-stable": false,
   "prefer-lowest": false,
   "platform": {
+    "php": "~7.0",
     "ext-json": "*",
     "ext-pdo": "*"
   },

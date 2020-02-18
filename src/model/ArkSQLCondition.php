@@ -286,4 +286,23 @@ class ArkSQLCondition
                 throw new Exception("ERROR, UNKNOWN OPERATE");
         }
     }
+
+    /**
+     * @param ArkSQLCondition[] $conditions
+     * @return string
+     * @throws Exception
+     */
+    public static function generateConditionSQLComponent(array $conditions)
+    {
+        $condition_sql = [];
+        foreach ($conditions as $condition) {
+            $condition_sql[] = $condition->makeConditionSQL();
+        }
+        if (empty($condition_sql)) {
+            $condition_sql = '1=1';
+        } else {
+            $condition_sql = implode(' AND ', $condition_sql);
+        }
+        return $condition_sql;
+    }
 }

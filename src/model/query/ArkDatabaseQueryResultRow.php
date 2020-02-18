@@ -3,7 +3,13 @@
 
 namespace sinri\ark\database\model\query;
 
+use sinri\ark\core\ArkHelper;
 
+/**
+ * Class ArkDatabaseQueryResultRow
+ * @package sinri\ark\database\model\query
+ * @since 2.0
+ */
 class ArkDatabaseQueryResultRow
 {
     /**
@@ -32,5 +38,15 @@ class ArkDatabaseQueryResultRow
     public function getRawRow(): array
     {
         return $this->row;
+    }
+
+    /**
+     * @param string $fieldName
+     * @param mixed $default
+     * @return mixed
+     */
+    public function getField(string $fieldName, $default = null)
+    {
+        return ArkHelper::readTarget($this->row, [$fieldName], $default);
     }
 }

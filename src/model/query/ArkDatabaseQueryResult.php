@@ -26,7 +26,51 @@ class ArkDatabaseQueryResult
      * @var string
      */
     protected $error;
-    protected $afx;
+    /**
+     * @var int
+     */
+    protected $lastInsertedID;
+    /**
+     * @var int
+     */
+    protected $affectedRowsCount;
+
+    /**
+     * @return int
+     */
+    public function getLastInsertedID(): int
+    {
+        return $this->lastInsertedID;
+    }
+
+    /**
+     * @param int $lastInsertedID
+     * @return ArkDatabaseQueryResult
+     */
+    public function setLastInsertedID(int $lastInsertedID): ArkDatabaseQueryResult
+    {
+        $this->lastInsertedID = $lastInsertedID;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAffectedRowsCount(): int
+    {
+        return $this->affectedRowsCount;
+    }
+
+    /**
+     * @param int $affectedRowsCount
+     * @return ArkDatabaseQueryResult
+     */
+    public function setAffectedRowsCount(int $affectedRowsCount): ArkDatabaseQueryResult
+    {
+        $this->affectedRowsCount = $affectedRowsCount;
+        return $this;
+    }
+
     /**
      * @var ArkDatabaseQueryResultRow[]
      */
@@ -38,7 +82,8 @@ class ArkDatabaseQueryResult
         $this->sql = '';
         $this->status = self::STATUS_INIT;
         $this->error = 'Not Executed Yet';
-        $this->afx = -1;
+        $this->lastInsertedID = -1;
+        $this->affectedRowsCount = -1;
         $this->resultRows = [];
         $this->resultRowStream = null;
     }

@@ -2,6 +2,9 @@
 
 use sinri\ark\core\ArkLogger;
 use sinri\ark\database\model\ArkDatabaseDynamicTableModel;
+use sinri\ark\database\model\ArkSQLCondition;
+use sinri\ark\database\model\query\ArkDatabaseQueryResult;
+use sinri\ark\database\model\query\ArkDatabaseSelectFieldMeta;
 use sinri\ark\database\pdo\ArkPDO;
 use sinri\ark\database\pdo\ArkPDOConfig;
 
@@ -49,28 +52,49 @@ try {
     $logger->info('Created Table: ', ['afx' => $afx]);
 
     // insert
-    $afx = $model->insert(['value' => 'A', 'score' => 1]);
-    $logger->smartLogLite($afx, 'INSERT ONE RAW');
-    $afx = $model->insert(['value' => 'B', 'score' => 2]);
-    $logger->smartLogLite($afx, 'INSERT ONE RAW');
-    $afx = $model->insert(['value' => 'C']);
-    $logger->smartLogLite($afx, 'INSERT ONE RAW');
+    $result = $model->insertOneRow(['value' => 'A', 'score' => 1]);
+    $logger->smartLogLite($result->getStatus() === ArkDatabaseQueryResult::STATUS_EXECUTED, 'INSERT ONE RAW', ['id' => $result->getLastInsertedID()]);
+    $result = $model->insertOneRow(['value' => 'B', 'score' => 2]);
+    $logger->smartLogLite($result->getStatus() === ArkDatabaseQueryResult::STATUS_EXECUTED, 'INSERT ONE RAW', ['id' => $result->getLastInsertedID()]);
+    $result = $model->insertOneRow(['value' => 'C']);
+    $logger->smartLogLite($result->getStatus() === ArkDatabaseQueryResult::STATUS_EXECUTED, 'INSERT ONE RAW', ['id' => $result->getLastInsertedID()]);
+
+    $result = $model->replaceOneRow(['value' => 'B', 'score' => 3]);
+    $logger->smartLogLite($result->getStatus() === ArkDatabaseQueryResult::STATUS_EXECUTED, 'REPLACE ONE RAW', ['id' => $result->getLastInsertedID()]);
+    $result = $model->replaceOneRow(['value' => 'D', 'score' => 4]);
+    $logger->smartLogLite($result->getStatus() === ArkDatabaseQueryResult::STATUS_EXECUTED, 'REPLACE ONE RAW', ['id' => $result->getLastInsertedID()]);
+
+    // update
+    $result = $model->updateRows(
+        [
+            ArkSQLCondition::makeGreaterThan('score', 3),
+        ],
+        [
+            'score' => 5
+        ]
+    );
+    $logger->smartLogLite($result->getStatus() === ArkDatabaseQueryResult::STATUS_EXECUTED, 'UPDATE ONE RAW', ['afx' => $result->getAffectedRowsCount()]);
+
+    // delete
+    $result = $model->deleteRows([ArkSQLCondition::makeEqual('score', 1)]);
+    $logger->smartLogLite($result->getStatus() === ArkDatabaseQueryResult::STATUS_EXECUTED, 'DELETE ONE RAW', ['afx' => $result->getAffectedRowsCount()]);
+
 
     // select
     $result = $model->selectInTable()
         ->addSelectFieldByDetail('value')
         ->addSelectFieldByDetail('concat(value,"=",score)', 'mixed')
         ->addSelectFields([
-            new \sinri\ark\database\model\query\ArkDatabaseSelectFieldMeta('score'),
-            new \sinri\ark\database\model\query\ArkDatabaseSelectFieldMeta('score*2', 'twice'),
+            new ArkDatabaseSelectFieldMeta('score'),
+            new ArkDatabaseSelectFieldMeta('score*2', 'twice'),
         ])
-        ->addCondition(\sinri\ark\database\model\ArkSQLCondition::makeIsNotNull('score'))
+        //->addCondition(\sinri\ark\database\model\ArkSQLCondition::makeIsNotNull('score'))
         ->setGroupByFields(['id'])
         ->setLimit(10)
         ->setOffset(0)
         ->queryForRows();
     $logger->smartLogLite(
-        $result->getStatus() === \sinri\ark\database\model\query\ArkDatabaseQueryResult::STATUS_QUERIED,
+        $result->getStatus() === ArkDatabaseQueryResult::STATUS_QUERIED,
         'SELECTED',
         [
             'status' => $result->getStatus(),
@@ -79,6 +103,13 @@ try {
             'data' => $result->getRawMatrix(),
         ]
     );
+    foreach ($result->getResultRows() as $resultRow) {
+        $logger->info("row", [
+            'score' => $resultRow->score,
+            'mixed' => $resultRow->getField('mixed', false),
+            'all' => $resultRow->getRawRow()
+        ]);
+    }
 
     // drop
     $sql = "DROP TABLE ark_test_table";

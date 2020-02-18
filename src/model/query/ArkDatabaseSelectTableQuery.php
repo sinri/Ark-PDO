@@ -8,6 +8,11 @@ use Exception;
 use sinri\ark\database\model\ArkDatabaseTableCoreModel;
 use sinri\ark\database\model\ArkSQLCondition;
 
+/**
+ * Class ArkDatabaseSelectTableQuery
+ * @package sinri\ark\database\model\query
+ * @since 2.0
+ */
 class ArkDatabaseSelectTableQuery
 {
     /**
@@ -203,22 +208,8 @@ class ArkDatabaseSelectTableQuery
     public function generateSQL()
     {
         $table = $this->model->getTableExpressForSQL();
-
-        $fields = [];
-        foreach ($this->selectFields as $fieldMeta) {
-            $fields[] = $fieldMeta->generateSQLComponent();
-        }
-        $fields = implode(',', $fields);
-
-        $condition_sql = [];
-        foreach ($this->conditions as $condition) {
-            $condition_sql[] = $condition->makeConditionSQL();
-        }
-        if (empty($condition_sql)) {
-            $condition_sql = '1=1';
-        } else {
-            $condition_sql = implode(' AND ', $condition_sql);
-        }
+        $fields = ArkDatabaseSelectFieldMeta::generateFieldSQLComponent($this->selectFields);
+        $condition_sql = ArkSQLCondition::generateConditionSQLComponent($this->conditions);
 
         $sql = "SELECT {$fields} FROM {$table} WHERE {$condition_sql} ";
 

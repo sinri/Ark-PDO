@@ -11,6 +11,7 @@
   ],
   "minimum-stability": "stable",
   "require": {
+    "php": "~7.0",
     "ext-json": "*",
     "ext-pdo": "*",
     "sinri/ark-core": "~2.0"
@@ -23,6 +24,12 @@
   "autoload-dev": {
     "psr-4": {
       "sinri\\ark\\database\\test\\": "test/"
+    }
+  },
+  "repositories": {
+    "packagist": {
+      "type": "composer",
+      "url": "https://mirrors.aliyun.com/composer/"
     }
   }
 }
