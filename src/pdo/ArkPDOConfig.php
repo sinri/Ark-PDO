@@ -37,6 +37,7 @@ class ArkPDOConfig
     const CONFIG_OPTIONS = "options";
 
     const CHARSET_UTF8 = "utf8";
+    const CHARSET_UTF8MB4 = "utf8mb4";
 
     const ENGINE_MYSQL = "mysql";
 

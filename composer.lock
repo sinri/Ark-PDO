@@ -8,16 +8,16 @@
   "packages": [
     {
       "name": "psr/log",
-      "version": "1.1.0",
+      "version": "1.1.2",
       "source": {
         "type": "git",
         "url": "https://github.com/php-fig/log.git",
-        "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd"
+        "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/php-fig/log/zipball/6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
-        "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
+        "url": "https://api.github.com/repos/php-fig/log/zipball/446d54b4cb6bf489fc9d75f55843658e6f25d801",
+        "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801",
         "shasum": ""
       },
       "require": {
@@ -26,7 +26,7 @@
       "type": "library",
       "extra": {
         "branch-alias": {
-          "dev-master": "1.0.x-dev"
+          "dev-master": "1.1.x-dev"
         }
       },
       "autoload": {
@@ -51,20 +51,20 @@
         "psr",
         "psr-3"
       ],
-      "time": "2018-11-20T15:27:04+00:00"
+      "time": "2019-11-01T11:05:21+00:00"
     },
     {
       "name": "sinri/ark-core",
-      "version": "2.0",
+      "version": "2.6.6",
       "source": {
         "type": "git",
         "url": "https://github.com/sinri/Ark-Core.git",
-        "reference": "5c0eae9cfb2da4eefc06e92e9667f0d31c380c5c"
+        "reference": "f573fed77a18cb58a9c58d80b9944a5f2e7c05aa"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/sinri/Ark-Core/zipball/5c0eae9cfb2da4eefc06e92e9667f0d31c380c5c",
-        "reference": "5c0eae9cfb2da4eefc06e92e9667f0d31c380c5c",
+        "url": "https://api.github.com/repos/sinri/Ark-Core/zipball/f573fed77a18cb58a9c58d80b9944a5f2e7c05aa",
+        "reference": "f573fed77a18cb58a9c58d80b9944a5f2e7c05aa",
         "shasum": ""
       },
       "require": {
@@ -88,7 +88,7 @@
         }
       ],
       "description": "The core components of Ark 2",
-      "time": "2019-01-08T16:30:30+00:00"
+      "time": "2020-01-15T09:59:40+00:00"
     }
   ],
   "packages-dev": [],

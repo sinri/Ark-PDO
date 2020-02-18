@@ -35,6 +35,8 @@ class ArkSQLCondition
     const MACRO_IS_NULL_OR_EMPTY_STRING = "MACRO_IS_NULL_OR_EMPTY_STRING";
     const MACRO_IS_NOT_NULL_NOR_EMPTY_STRING = "MACRO_IS_NOT_NULL_NOR_EMPTY_STRING";
 
+    const MACRO_RAW_EXPRESSION = "MACRO_RAW_EXPRESSION";
+
     const OP_EXISTS = "EXISTS";
     const OP_NOT_EXISTS = "NOT EXISTS";
 
@@ -60,7 +62,7 @@ class ArkSQLCondition
      * @param string|int|array $value
      * @param null|string $addition
      */
-    public function __construct($field, $operate, $value, $addition = null)
+    public function __construct(string $field, string $operate, $value, $addition = null)
     {
         $this->field = $field;
         $this->operate = $operate;
@@ -82,82 +84,82 @@ class ArkSQLCondition
         }
     }
 
-    public static function makeEqual($field, $value)
+    public static function makeEqual(string $field, $value)
     {
         return new ArkSQLCondition($field, self::OP_EQ, $value);
     }
 
-    public static function makeGreaterThan($field, $value)
+    public static function makeGreaterThan(string $field, $value)
     {
         return new ArkSQLCondition($field, self::OP_GT, $value);
     }
 
-    public static function makeNoLessThan($field, $value)
+    public static function makeNoLessThan(string $field, $value)
     {
         return new ArkSQLCondition($field, self::OP_EGT, $value);
     }
 
-    public static function makeLessThan($field, $value)
+    public static function makeLessThan(string $field, $value)
     {
         return new ArkSQLCondition($field, self::OP_LT, $value);
     }
 
-    public static function makeNoGreaterThan($field, $value)
+    public static function makeNoGreaterThan(string $field, $value)
     {
         return new ArkSQLCondition($field, self::OP_ELT, $value);
     }
 
-    public static function makeNotEqual($field, $value)
+    public static function makeNotEqual(string $field, $value)
     {
         return new ArkSQLCondition($field, self::OP_NEQ, $value);
     }
 
-    public static function makeEqualNullSafe($field, $value)
+    public static function makeEqualNullSafe(string $field, $value)
     {
         return new ArkSQLCondition($field, self::OP_NULL_SAFE_EQUAL, $value);
     }
 
-    public static function makeIsNull($field)
+    public static function makeIsNull(string $field)
     {
         return new ArkSQLCondition($field, self::OP_IS, self::CONST_NULL);
     }
 
-    public static function makeIsNotNull($field)
+    public static function makeIsNotNull(string $field)
     {
         return new ArkSQLCondition($field, self::OP_IS_NOT, self::CONST_NULL);
     }
 
-    public static function makeInArray($field, $value)
+    public static function makeInArray(string $field, $value)
     {
         return new ArkSQLCondition($field, self::OP_IN, $value);
     }
 
-    public static function makeNotInArray($field, $value)
+    public static function makeNotInArray(string $field, $value)
     {
         return new ArkSQLCondition($field, self::OP_NOT_IN, $value);
     }
 
-    public static function makeBetween($field, $value1, $value2)
+    public static function makeBetween(string $field, $value1, $value2)
     {
         return new ArkSQLCondition($field, self::OP_BETWEEN, [$value1, $value2]);
     }
 
-    public static function makeNotBetween($field, $value1, $value2)
+    public static function makeNotBetween(string $field, $value1, $value2)
     {
         return new ArkSQLCondition($field, self::OP_NOT_BETWEEN, [$value1, $value2]);
     }
 
-    public static function makeStringHasPrefix($field, $value)
+    public static function makeStringHasPrefix(string $field, $value)
     {
         return new ArkSQLCondition($field, self::OP_LIKE, $value, self::LIKE_RIGHT_WILDCARD);
     }
 
-    public static function makeStringHasSuffix($field, $value)
+    public static function makeStringHasSuffix(string $field, $value)
     {
         return new ArkSQLCondition($field, self::OP_LIKE, $value, self::LIKE_LEFT_WILDCARD);
     }
 
-    public static function makeStringContainsText($field, $value)
+    public static function makeStringContainsText(string $field, $value)
     {
         return new ArkSQLCondition($field, self::OP_LIKE, $value, self::LIKE_BOTH_WILDCARD);
     }
@@ -166,7 +168,7 @@ class ArkSQLCondition
      * @param ArkSQLCondition[] $conditions
      * @return ArkSQLCondition
      */
-    public static function makeConditionsIntersect($conditions)
+    public static function makeConditionsIntersect(array $conditions)
     {
         return new ArkSQLCondition(null, self::OP_PARENTHESES_AND, $conditions);
     }
@@ -175,7 +177,7 @@ class ArkSQLCondition
      * @param ArkSQLCondition[] $conditions
      * @return ArkSQLCondition
      */
-    public static function makeConditionsUnion($conditions)
+    public static function makeConditionsUnion(array $conditions)
     {
         return new ArkSQLCondition(null, self::OP_PARENTHESES_OR, $conditions);
     }
@@ -185,7 +187,7 @@ class ArkSQLCondition
      * @return ArkSQLCondition
      * @since 1.7.3
      */
-    public static function makeFieldIsNullOrEmptyString($field)
+    public static function makeFieldIsNullOrEmptyString(string $field)
     {
         return new ArkSQLCondition($field, self::MACRO_IS_NULL_OR_EMPTY_STRING, null);
     }
@@ -195,9 +197,18 @@ class ArkSQLCondition
      * @return ArkSQLCondition
      * @since 1.7.3
      */
-    public static function makeFieldIsNotNullNorEmptyString($field)
+    public static function makeFieldIsNotNullNorEmptyString(string $field)
     {
         return new ArkSQLCondition($field, self::MACRO_IS_NOT_NULL_NOR_EMPTY_STRING, null);
+    }
+
+    /**
+     * @param string $rawExpression
+     * @return ArkSQLCondition
+     */
+    public static function makeRawConditionExpression(string $rawExpression)
+    {
+        return new ArkSQLCondition('', self::MACRO_RAW_EXPRESSION, $rawExpression);
     }
 
     /**
@@ -267,6 +278,9 @@ class ArkSQLCondition
                 break;
             case self::MACRO_IS_NOT_NULL_NOR_EMPTY_STRING:
                 return "(`{$this->field}` IS NOT NULL AND `{$this->field}` <> '')";
+                break;
+            case self::MACRO_RAW_EXPRESSION:
+                return $this->value;
                 break;
             default:
                 throw new Exception("ERROR, UNKNOWN OPERATE");

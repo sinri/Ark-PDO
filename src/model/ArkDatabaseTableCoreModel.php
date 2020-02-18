@@ -6,6 +6,7 @@ namespace sinri\ark\database\model;
 
 use Exception;
 use sinri\ark\core\ArkHelper;
+use sinri\ark\database\model\query\ArkDatabaseSelectTableQuery;
 use sinri\ark\database\pdo\ArkPDO;
 
 /**
@@ -131,120 +132,110 @@ abstract class ArkDatabaseTableCoreModel
         return implode(",", $sql);
     }
 
-    /**
-     * @param array|string $conditions
-     * @param string $field
-     * @param null|string $orderBy
-     * @param null|string[] $groupBy
-     * @param int $limit
-     * @param int $offset
-     * @return bool|string|int
-     * @since 1.7.6
-     */
-    public function selectOne($conditions, string $field, $orderBy = null, $groupBy = null, $limit = 0, $offset = 0)
-    {
-        try {
-            $sql = $this->makeSelectSQL($field, $conditions, $orderBy, $limit, $offset, $groupBy);
-            return $this->db()->getOne($sql);
-        } catch (Exception $e) {
-            return false;
-        }
-    }
+//    /**
+//     * @param array|string $conditions
+//     * @param string $field
+//     * @param null|string $orderBy
+//     * @param null|string[] $groupBy
+//     * @param int $limit
+//     * @param int $offset
+//     * @return bool|string|int
+//     * @since 1.7.6
+//     * @deprecated since 2.0
+//     */
+//    public function selectOne($conditions, string $field, $orderBy = null, $groupBy = null, $limit = 0, $offset = 0)
+//    {
+//        try {
+//            $sql = $this->makeSelectSQL($field, $conditions, $orderBy, $limit, $offset, $groupBy);
+//            return $this->db()->getOne($sql);
+//        } catch (Exception $e) {
+//            return false;
+//        }
+//    }
 
-    /**
-     * @param array|string $conditions
-     * @param string $field
-     * @param null|string $orderBy
-     * @param null|string[] $groupBy
-     * @param int $limit
-     * @param int $offset
-     * @param null|string $useAnotherKeyToFetch
-     * @return array|bool
-     * @since 1.7.6
-     */
-    public function selectColumn($conditions, string $field, $orderBy = null, $groupBy = null, $limit = 0, $offset = 0, $useAnotherKeyToFetch = null)
-    {
-        try {
-            $sql = $this->makeSelectSQL($field, $conditions, $orderBy, $limit, $offset, $groupBy);
-            return $this->db()->getCol($sql, $useAnotherKeyToFetch);
-        } catch (Exception $e) {
-            return false;
-        }
-    }
+//    /**
+//     * @param array|string $conditions
+//     * @param string $field
+//     * @param null|string $orderBy
+//     * @param null|string[] $groupBy
+//     * @param int $limit
+//     * @param int $offset
+//     * @param null|string $useAnotherKeyToFetch
+//     * @return array|bool
+//     * @since 1.7.6
+//     * @deprecated since 2.0
+//     */
+//    public function selectColumn($conditions, string $field, $orderBy = null, $groupBy = null, $limit = 0, $offset = 0, $useAnotherKeyToFetch = null)
+//    {
+//        try {
+//            $sql = $this->makeSelectSQL($field, $conditions, $orderBy, $limit, $offset, $groupBy);
+//            return $this->db()->getCol($sql, $useAnotherKeyToFetch);
+//        } catch (Exception $e) {
+//            return false;
+//        }
+//    }
 
-    /**
-     * @param array|string $conditions
-     * @param string|string[] $fields "*","f1,f2" or ["f1","f2"] @since 1.2
-     * @param null|string[] $groupBy @since 1.5
-     * @return array|bool
-     */
-    public function selectRow($conditions, $fields = "*", $groupBy = null)
-    {
-        $rows = $this->selectRows($conditions, 1, 0, $fields, $groupBy);
-        if (empty($rows)) {
-            return false;
-        }
-        return $rows[0];
-    }
+//    /**
+//     * @param array|string $conditions
+//     * @param string|string[] $fields "*","f1,f2" or ["f1","f2"] @since 1.2
+//     * @param null|string[] $groupBy @since 1.5
+//     * @return array|bool
+//     * @deprecated since 2.0
+//     */
+//    public function selectRow($conditions, $fields = "*", $groupBy = null)
+//    {
+//        $rows = $this->selectRows($conditions, 1, 0, $fields, $groupBy);
+//        if (empty($rows)) {
+//            return false;
+//        }
+//        return $rows[0];
+//    }
 
 
-    /**
-     * @param array|string $conditions
-     * @param int $limit
-     * @param int $offset
-     * @param string|string[] $fields "*","f1,f2" or ["f1","f2"] @since 1.2
-     * @param null|string[] $groupBy @since 1.5
-     * @return array|bool
-     */
-    public function selectRows($conditions, $limit = 0, $offset = 0, $fields = "*", $groupBy = null)
-    {
-        return $this->selectRowsForFieldsWithSort($fields, $conditions, null, $limit, $offset, null, $groupBy);
-    }
+//    /**
+//     * @param array|string $conditions
+//     * @param int $limit
+//     * @param int $offset
+//     * @param string|string[] $fields "*","f1,f2" or ["f1","f2"] @since 1.2
+//     * @param null|string[] $groupBy @since 1.5
+//     * @return array|bool
+//     * @deprecated since 2.0
+//     */
+//    public function selectRows($conditions, $limit = 0, $offset = 0, $fields = "*", $groupBy = null)
+//    {
+//        return $this->selectRowsForFieldsWithSort($fields, $conditions, null, $limit, $offset, null, $groupBy);
+//    }
 
-    /**
-     * @param array|string $conditions
-     * @param string $countField @since 1.5.2
-     * @param bool $useDistinct @since 1.5.2
-     * @return int|bool
-     */
-    public function selectRowsForCount($conditions, $countField = '*', $useDistinct = false)
-    {
-        $condition_sql = $this->buildCondition($conditions);
-        if ($condition_sql === '') {
-            $condition_sql = "1";
-        }
-
-        if ($countField === '*') {
-            $countTarget = "*";
-        } else {
-            $countTarget = ($useDistinct ? "DISTINCT " : '') . $countField;
-        }
-
-        $table = $this->getTableExpressForSQL();
-        $sql = "SELECT count({$countTarget}) FROM {$table} WHERE {$condition_sql} ";
-
-        try {
-            $count = $this->db()->getOne($sql);
-            return intval($count, 10);
-        } catch (Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * @param $conditions
-     * @param null|string $sort "field","field desc"," f1 asc, f2 desc"
-     * @param int $limit
-     * @param int $offset
-     * @param null|string $refKey normally PK or UK if you want to get map rather than list
-     * @param null|string[] $groupBy @since 1.5
-     * @return array|bool
-     * @deprecated @since 1.7.3 Please use `selectRowsForFieldsWithSort` instead!
-     */
-    public function selectRowsWithSort($conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null, $groupBy = null)
-    {
-        return $this->selectRowsForFieldsWithSort("*", $conditions, $sort, $limit, $offset, $refKey, $groupBy);
-    }
+//    /**
+//     * @param array|string $conditions
+//     * @param string $countField @since 1.5.2
+//     * @param bool $useDistinct @since 1.5.2
+//     * @return int|bool
+//     * @deprecated since 2.0
+//     */
+//    public function selectRowsForCount($conditions, $countField = '*', $useDistinct = false)
+//    {
+//        $condition_sql = $this->buildCondition($conditions);
+//        if ($condition_sql === '') {
+//            $condition_sql = "1";
+//        }
+//
+//        if ($countField === '*') {
+//            $countTarget = "*";
+//        } else {
+//            $countTarget = ($useDistinct ? "DISTINCT " : '') . $countField;
+//        }
+//
+//        $table = $this->getTableExpressForSQL();
+//        $sql = "SELECT count({$countTarget}) FROM {$table} WHERE {$condition_sql} ";
+//
+//        try {
+//            $count = $this->db()->getOne($sql);
+//            return intval($count, 10);
+//        } catch (Exception $e) {
+//            return false;
+//        }
+//    }
 
     /**
      * @param string|string[] $fields such as '*', 'field_1,field_2 as x,sum(field_3)' or ['field_1','field_2 as x','sum(field_3)']
@@ -269,6 +260,15 @@ abstract class ArkDatabaseTableCoreModel
         } catch (Exception $exception) {
             return false;
         }
+    }
+
+    /**
+     * @return ArkDatabaseSelectTableQuery
+     * @since 2.0
+     */
+    public function selectInTable()
+    {
+        return new ArkDatabaseSelectTableQuery($this);
     }
 
     /**
@@ -343,16 +343,16 @@ abstract class ArkDatabaseTableCoreModel
         }
     }
 
-    /**
-     * @param string $pkWithAI
-     * @return false|int
-     * @since 1.6.1
-     * @deprecated since 1.7.1 use getMaxValueOfFiled instead
-     */
-    public function getMaxSinglePK($pkWithAI)
-    {
-        return $this->getMaxValueOfFiled($pkWithAI);
-    }
+//    /**
+//     * @param string $pkWithAI
+//     * @return false|int
+//     * @since 1.6.1
+//     * @deprecated since 1.7.1 use getMaxValueOfFiled instead
+//     */
+//    public function getMaxSinglePK($pkWithAI)
+//    {
+//        return $this->getMaxValueOfFiled($pkWithAI);
+//    }
 
     /**
      * @param string $field
