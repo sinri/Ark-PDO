@@ -5,3 +5,5 @@
 [![Packagist](https://img.shields.io/packagist/v/sinri/ark-pdo.svg)](https://packagist.org/packages/sinri/ark-pdo) 
 
 The PDO Component for Ark 2
+
+Version 2.x In Here Now !
