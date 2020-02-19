@@ -3,6 +3,7 @@
 
 namespace sinri\ark\database\model\query;
 
+use Exception;
 use PDO;
 use PDOStatement;
 
@@ -17,6 +18,7 @@ class ArkDatabaseQueryResult
     const STATUS_QUERIED = "QUERIED";
     const STATUS_EXECUTED = "EXECUTED";
     const STATUS_STREAMING = "STREAMING";
+    const STATUS_STREAMED = "STREAMED";
     const STATUS_ERROR = "ERROR";
     /**
      * @var string
@@ -38,6 +40,25 @@ class ArkDatabaseQueryResult
      * @var int
      */
     protected $affectedRowsCount;
+    /**
+     * @var ArkDatabaseQueryResultRow[]
+     */
+    protected $resultRows;
+    /**
+     * @var PDOStatement|null
+     */
+    protected $resultRowStream;
+
+    public function __construct()
+    {
+        $this->sql = '';
+        $this->status = self::STATUS_INIT;
+        $this->error = 'Not Executed Yet';
+        $this->lastInsertedID = -1;
+        $this->affectedRowsCount = -1;
+        $this->resultRows = [];
+        $this->resultRowStream = null;
+    }
 
     /**
      * @return int
@@ -73,26 +94,6 @@ class ArkDatabaseQueryResult
     {
         $this->affectedRowsCount = $affectedRowsCount;
         return $this;
-    }
-
-    /**
-     * @var ArkDatabaseQueryResultRow[]
-     */
-    protected $resultRows;
-    /**
-     * @var PDOStatement|null
-     */
-    protected $resultRowStream;
-
-    public function __construct()
-    {
-        $this->sql = '';
-        $this->status = self::STATUS_INIT;
-        $this->error = 'Not Executed Yet';
-        $this->lastInsertedID = -1;
-        $this->affectedRowsCount = -1;
-        $this->resultRows = [];
-        $this->resultRowStream = null;
     }
 
     /**
@@ -171,17 +172,25 @@ class ArkDatabaseQueryResult
 
     /**
      * @return ArkDatabaseQueryResultRow[]
+     * @throws Exception
      */
     public function getResultRows()
     {
+        if ($this->status !== self::STATUS_QUERIED) {
+            throw new Exception("Illegal Call");
+        }
         return $this->resultRows;
     }
 
     /**
      * @return array[]
+     * @throws Exception
      */
     public function getRawMatrix()
     {
+        if ($this->status !== self::STATUS_QUERIED) {
+            throw new Exception("Illegal Call");
+        }
         $matrix = [];
         foreach ($this->resultRows as $resultRow) {
             $matrix[] = $resultRow->getRawRow();
@@ -215,7 +224,7 @@ class ArkDatabaseQueryResult
         }
         $fetchedRow = $this->resultRowStream->fetch(PDO::FETCH_ASSOC);
         if ($fetchedRow === false) {
-            $this->status = self::STATUS_QUERIED;
+            $this->status = self::STATUS_STREAMED;
             $this->resultRowStream->closeCursor();
             $this->resultRowStream = null;
             return false;
