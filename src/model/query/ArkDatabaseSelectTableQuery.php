@@ -5,6 +5,7 @@ namespace sinri\ark\database\model\query;
 
 
 use Exception;
+use sinri\ark\core\ArkHelper;
 use sinri\ark\database\model\ArkDatabaseTableCoreModel;
 use sinri\ark\database\model\ArkSQLCondition;
 
@@ -172,7 +173,7 @@ class ArkDatabaseSelectTableQuery
     }
 
     /**
-     * @param string $resultRowCustomizedClass
+     * @param string $resultRowCustomizedClass // I wonder if it is useful.
      * @return ArkDatabaseQueryResult
      */
     public function queryForRows($resultRowCustomizedClass = ArkDatabaseQueryResultRow::class)
@@ -192,6 +193,30 @@ class ArkDatabaseSelectTableQuery
                 $result->addResultRow(new $resultRowCustomizedClass($row));
             }
             $result->setStatus(ArkDatabaseQueryResult::STATUS_QUERIED);
+
+            return $result;
+        } catch (Exception $exception) {
+            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
+            $result->setError('Exception: ' . $exception->getMessage() . '; PDO Last Error: ' . $this->model->db()->getPDOErrorDescription());
+            return $result;
+        }
+    }
+
+    /**
+     * @return ArkDatabaseQueryResult
+     */
+    public function queryForStream()
+    {
+        $result = new ArkDatabaseQueryResult();
+        try {
+            $sql = $this->generateSQL();
+            $result->setSql($sql);
+
+            $statement = $this->model->db()->getPdo()->query($sql);
+            ArkHelper::quickNotEmptyAssert('Cannot build a valid PDO Statement: ' . $sql);
+
+            $result->setResultRowStream($statement);
+            $result->setStatus(ArkDatabaseQueryResult::STATUS_STREAMING);
 
             return $result;
         } catch (Exception $exception) {

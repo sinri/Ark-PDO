@@ -205,6 +205,7 @@ class ArkSQLCondition
     /**
      * @param string $rawExpression
      * @return ArkSQLCondition
+     * @since 2.0
      */
     public static function makeRawConditionExpression(string $rawExpression)
     {
@@ -291,6 +292,7 @@ class ArkSQLCondition
      * @param ArkSQLCondition[] $conditions
      * @return string
      * @throws Exception
+     * @since 2.0
      */
     public static function generateConditionSQLComponent(array $conditions)
     {

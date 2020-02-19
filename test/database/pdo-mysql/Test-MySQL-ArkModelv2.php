@@ -7,6 +7,7 @@ use sinri\ark\database\model\query\ArkDatabaseQueryResult;
 use sinri\ark\database\model\query\ArkDatabaseSelectFieldMeta;
 use sinri\ark\database\pdo\ArkPDO;
 use sinri\ark\database\pdo\ArkPDOConfig;
+use sinri\ark\database\test\database\entity\ArkTestTableRow;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 //require_once __DIR__ . '/../../../autoload.php';
@@ -92,7 +93,7 @@ try {
         ->setGroupByFields(['id'])
         ->setLimit(10)
         ->setOffset(0)
-        ->queryForRows();
+        ->queryForRows(ArkTestTableRow::class);
     $logger->smartLogLite(
         $result->getStatus() === ArkDatabaseQueryResult::STATUS_QUERIED,
         'SELECTED',
@@ -103,12 +104,29 @@ try {
             'data' => $result->getRawMatrix(),
         ]
     );
-    foreach ($result->getResultRows() as $resultRow) {
+    foreach (ArkTestTableRow::washRowsArray($result->getResultRows()) as $resultRow) {
         $logger->info("row", [
-            'score' => $resultRow->score,
+            'score' => $resultRow->getScore(),
             'mixed' => $resultRow->getField('mixed', false),
             'all' => $resultRow->getRawRow()
         ]);
+    }
+
+    // stream
+    $result = $model->selectInTable()
+        ->addSelectFieldByDetail('value')
+        ->addSelectFieldByDetail('concat(value,"=",score)', 'mixed')
+        ->addSelectFields([
+            new ArkDatabaseSelectFieldMeta('score'),
+            new ArkDatabaseSelectFieldMeta('score*2', 'twice'),
+        ])
+        //->addCondition(\sinri\ark\database\model\ArkSQLCondition::makeIsNotNull('score'))
+        ->setGroupByFields(['id'])
+        ->setLimit(10)
+        ->setOffset(0)
+        ->queryForStream();
+    while (($nextRow = $result->readNextRow()) !== false) {
+        $logger->info("Streaming and fetching", $nextRow->getRawRow());
     }
 
     // drop

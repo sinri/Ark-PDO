@@ -3,6 +3,9 @@
 
 namespace sinri\ark\database\model\query;
 
+use PDO;
+use PDOStatement;
+
 /**
  * Class ArkDatabaseQueryResult
  * @package sinri\ark\database\model
@@ -13,6 +16,7 @@ class ArkDatabaseQueryResult
     const STATUS_INIT = "INIT";
     const STATUS_QUERIED = "QUERIED";
     const STATUS_EXECUTED = "EXECUTED";
+    const STATUS_STREAMING = "STREAMING";
     const STATUS_ERROR = "ERROR";
     /**
      * @var string
@@ -75,6 +79,9 @@ class ArkDatabaseQueryResult
      * @var ArkDatabaseQueryResultRow[]
      */
     protected $resultRows;
+    /**
+     * @var PDOStatement|null
+     */
     protected $resultRowStream;
 
     public function __construct()
@@ -180,5 +187,39 @@ class ArkDatabaseQueryResult
             $matrix[] = $resultRow->getRawRow();
         }
         return $matrix;
+    }
+
+    /**
+     * @return PDOStatement|null
+     */
+    public function getResultRowStream()
+    {
+        return $this->resultRowStream;
+    }
+
+    /**
+     * @param PDOStatement|null $resultRowStream
+     */
+    public function setResultRowStream(PDOStatement $resultRowStream)
+    {
+        $this->resultRowStream = $resultRowStream;
+    }
+
+    /**
+     * @return false|ArkDatabaseQueryResultRow
+     */
+    public function readNextRow()
+    {
+        if ($this->status !== self::STATUS_STREAMING) {
+            return false;
+        }
+        $fetchedRow = $this->resultRowStream->fetch(PDO::FETCH_ASSOC);
+        if ($fetchedRow === false) {
+            $this->status = self::STATUS_QUERIED;
+            $this->resultRowStream->closeCursor();
+            $this->resultRowStream = null;
+            return false;
+        }
+        return new ArkDatabaseQueryResultRow($fetchedRow);
     }
 }
