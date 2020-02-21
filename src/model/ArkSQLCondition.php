@@ -170,7 +170,7 @@ class ArkSQLCondition
      */
     public static function makeConditionsIntersect(array $conditions)
     {
-        return new ArkSQLCondition(null, self::OP_PARENTHESES_AND, $conditions);
+        return new ArkSQLCondition('', self::OP_PARENTHESES_AND, $conditions);
     }
 
     /**
@@ -179,7 +179,7 @@ class ArkSQLCondition
      */
     public static function makeConditionsUnion(array $conditions)
     {
-        return new ArkSQLCondition(null, self::OP_PARENTHESES_OR, $conditions);
+        return new ArkSQLCondition('', self::OP_PARENTHESES_OR, $conditions);
     }
 
     /**
