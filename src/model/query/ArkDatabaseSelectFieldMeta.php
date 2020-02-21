@@ -66,7 +66,7 @@ class ArkDatabaseSelectFieldMeta
      */
     public function generateSQLComponent(): string
     {
-        return $this->getFieldExpression() . ($this->alias === '' ? '' : ' as ' . $this->alias);
+        return $this->fieldExpression . ($this->alias === '' ? '' : (' as ' . $this->alias));
     }
 
     /**
