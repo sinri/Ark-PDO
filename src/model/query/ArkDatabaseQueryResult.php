@@ -130,6 +130,9 @@ class ArkDatabaseQueryResult
     public function setStatus(string $status)
     {
         $this->status = $status;
+        if (in_array($status, [self::STATUS_QUERIED, self::STATUS_STREAMING, self::STATUS_STREAMED, self::STATUS_EXECUTED])) {
+            $this->error = 'No Error';
+        }
         return $this;
     }
 
