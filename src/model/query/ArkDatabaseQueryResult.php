@@ -4,6 +4,7 @@
 namespace sinri\ark\database\model\query;
 
 use Exception;
+use OutOfBoundsException;
 use PDO;
 use PDOStatement;
 
@@ -180,6 +181,23 @@ class ArkDatabaseQueryResult
             throw new Exception("Illegal Call");
         }
         return $this->resultRows;
+    }
+
+    /**
+     * @param int $index Since 0
+     * @return mixed|ArkDatabaseQueryResultRow
+     * @throws Exception
+     * @since 2.0.1
+     */
+    public function getResultRowByIndex($index)
+    {
+        if ($this->status !== self::STATUS_QUERIED) {
+            throw new Exception("Illegal Call");
+        }
+        if ($index < 0 || $index >= count($this->resultRows)) {
+            throw new OutOfBoundsException("Out of Bounds");
+        }
+        return $this->resultRows[$index];
     }
 
     /**
