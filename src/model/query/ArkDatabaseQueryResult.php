@@ -185,7 +185,7 @@ class ArkDatabaseQueryResult
 
     /**
      * @param int $index Since 0
-     * @return mixed|ArkDatabaseQueryResultRow
+     * @return ArkDatabaseQueryResultRow
      * @throws Exception
      * @since 2.0.1
      */
@@ -198,6 +198,25 @@ class ArkDatabaseQueryResult
             throw new OutOfBoundsException("Out of Bounds");
         }
         return $this->resultRows[$index];
+    }
+
+    /**
+     * @param string $columnName
+     * @param null|mixed $default
+     * @return array
+     * @throws Exception
+     * @since 2.0.1
+     */
+    public function getResultColumn($columnName, $default = null)
+    {
+        if ($this->status !== self::STATUS_QUERIED) {
+            throw new Exception("Illegal Call");
+        }
+        $column = [];
+        foreach ($this->resultRows as $resultRow) {
+            $column[] = $resultRow->getField($columnName, $default);
+        }
+        return $column;
     }
 
     /**
