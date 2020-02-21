@@ -139,6 +139,22 @@ class ArkDatabaseSelectTableQuery
     }
 
     /**
+     * Lazier Better!
+     * @param string[] $fieldNames
+     * @return $this
+     * @since 2.0.1
+     */
+    public function addSelectFieldNames(array $fieldNames)
+    {
+        foreach ($fieldNames as $item) {
+            if (is_string($item)) {
+                $this->selectFields[] = new ArkDatabaseSelectFieldMeta($item);
+            }
+        }
+        return $this;
+    }
+
+    /**
      * @param ArkSQLCondition $condition
      * @return $this
      */
