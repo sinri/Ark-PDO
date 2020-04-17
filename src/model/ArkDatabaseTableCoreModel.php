@@ -111,6 +111,27 @@ abstract class ArkDatabaseTableCoreModel
     }
 
     /**
+     * @param array $simpleConditions ['field_1'=>3,'field_2'=>[3,4]]
+     * @param array $modification
+     * @return ArkDatabaseQueryResult
+     * @since 2.0.6
+     */
+    public function quickUpdateRowsWithSimpleConditions(array $simpleConditions, array $modification)
+    {
+        $conditions = [];
+        foreach ($simpleConditions as $fieldName => $value) {
+            if (is_array($value)) {
+                $conditions[] = ArkSQLCondition::makeInArray($fieldName, $value);
+            } elseif ($value === null) {
+                $conditions[] = ArkSQLCondition::makeIsNull($fieldName);
+            } else {
+                $conditions[] = ArkSQLCondition::makeEqual($fieldName, $value);
+            }
+        }
+        return $this->updateRows($conditions, $modification);
+    }
+
+    /**
      * @param ArkSQLCondition[] $conditions
      * @return ArkDatabaseQueryResult
      * @since 2.0
@@ -133,6 +154,26 @@ abstract class ArkDatabaseTableCoreModel
             $result->setError("Exception: " . $e->getMessage() . "; PDO Last Error: " . $this->db()->getPDOErrorDescription());
         }
         return $result;
+    }
+
+    /**
+     * @param array $simpleConditions ['field_1'=>3,'field_2'=>[3,4]]
+     * @return ArkDatabaseQueryResult
+     * @since 2.0.6
+     */
+    public function quickDeleteRowsWithSimpleConditions(array $simpleConditions)
+    {
+        $conditions = [];
+        foreach ($simpleConditions as $fieldName => $value) {
+            if (is_array($value)) {
+                $conditions[] = ArkSQLCondition::makeInArray($fieldName, $value);
+            } elseif ($value === null) {
+                $conditions[] = ArkSQLCondition::makeIsNull($fieldName);
+            } else {
+                $conditions[] = ArkSQLCondition::makeEqual($fieldName, $value);
+            }
+        }
+        return $this->deleteRows($conditions);
     }
 
     /**

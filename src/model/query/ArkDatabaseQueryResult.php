@@ -89,7 +89,7 @@ class ArkDatabaseQueryResult
     }
 
     /**
-     * @return int
+     * @return int If equals to -1, something wrong
      */
     public function getLastInsertedID(): int
     {
@@ -107,7 +107,7 @@ class ArkDatabaseQueryResult
     }
 
     /**
-     * @return int
+     * @return int If equals to -1, something wrong
      */
     public function getAffectedRowsCount(): int
     {
@@ -326,8 +326,8 @@ class ArkDatabaseQueryResult
     }
 
     /**
-     * @param $fieldName
-     * @param null $default
+     * @param string $fieldName
+     * @param mixed $default
      * @return array|bool
      * @since 2.0.5
      */
@@ -337,6 +337,21 @@ class ArkDatabaseQueryResult
             return $this->getResultColumn($fieldName, $default);
         } catch (Exception $e) {
             return false;
+        }
+    }
+
+    /**
+     * @param string $fieldName
+     * @param mixed $default
+     * @return mixed
+     * @since 2.0.6
+     */
+    public function tryGetRawCellFromResultRowSet($fieldName, $default = null)
+    {
+        try {
+            return $this->getResultRowByIndex(0)->getField($fieldName, $default);
+        } catch (Exception $e) {
+            return $default;
         }
     }
 }
