@@ -139,6 +139,19 @@ class ArkDatabaseSelectTableQuery
     }
 
     /**
+     * @param string[] $fieldNameList such as ['field_1','field_2']
+     * @return $this
+     * @since 2.0.5
+     */
+    public function addSelectFieldsWithoutAlias(array $fieldNameList)
+    {
+        foreach ($fieldNameList as $fieldName) {
+            $this->selectFields[] = new ArkDatabaseSelectFieldMeta($fieldName);
+        }
+        return $this;
+    }
+
+    /**
      * Lazier Better!
      * @param string[] $fieldNames
      * @return $this
@@ -173,6 +186,23 @@ class ArkDatabaseSelectTableQuery
         foreach ($conditions as $condition) {
             if (is_a($condition, ArkSQLCondition::class)) {
                 $this->conditions[] = $condition;
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @param array $simpleConditions such as ['field_1'=>1,'field_2'=>['a','b']]
+     * @return $this
+     * @since 2.0.5
+     */
+    public function quickAddSimpleConditions(array $simpleConditions)
+    {
+        foreach ($simpleConditions as $fieldName => $value) {
+            if (is_array($value)) {
+                $this->addCondition(ArkSQLCondition::makeInArray($fieldName, $value));
+            } else {
+                $this->addCondition(ArkSQLCondition::makeEqual($fieldName, $value));
             }
         }
         return $this;
@@ -269,6 +299,5 @@ class ArkDatabaseSelectTableQuery
             }
         }
         return $sql;
-
     }
 }

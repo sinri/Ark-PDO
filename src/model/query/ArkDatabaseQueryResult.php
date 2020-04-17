@@ -62,6 +62,33 @@ class ArkDatabaseQueryResult
     }
 
     /**
+     * @return bool
+     * @since 2.0.5
+     */
+    public function isStatusAsQueried()
+    {
+        return $this->status === self::STATUS_QUERIED;
+    }
+
+    /**
+     * @return bool
+     * @since 2.0.5
+     */
+    public function isStatusAsExecuted()
+    {
+        return $this->status === self::STATUS_EXECUTED;
+    }
+
+    /**
+     * @return bool
+     * @since 2.0.5
+     */
+    public function isStatusAsStreamed()
+    {
+        return $this->status === self::STATUS_STREAMED;
+    }
+
+    /**
      * @return int
      */
     public function getLastInsertedID(): int
@@ -270,5 +297,46 @@ class ArkDatabaseQueryResult
             return false;
         }
         return new ArkDatabaseQueryResultRow($fetchedRow);
+    }
+
+    /**
+     * @return array[]|bool
+     * @since 2.0.5
+     */
+    public function tryGetRawRowsFromResultRowSet()
+    {
+        try {
+            return $this->getRawMatrix();
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * @return array|bool
+     * @since 2.0.5
+     */
+    public function tryGetFirstRawRowFromResultRowSet()
+    {
+        try {
+            return $this->getResultRowByIndex(0)->getRawRow();
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * @param $fieldName
+     * @param null $default
+     * @return array|bool
+     * @since 2.0.5
+     */
+    public function tryGetRawColumnsFromResultRowSet($fieldName, $default = null)
+    {
+        try {
+            return $this->getResultColumn($fieldName, $default);
+        } catch (Exception $e) {
+            return false;
+        }
     }
 }
