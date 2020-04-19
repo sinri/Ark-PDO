@@ -45,6 +45,21 @@ class ArkDatabaseSelectTableQuery
      * @var int
      */
     protected $offset;
+    /**
+     * @var string[]
+     * @since 2.0.7
+     */
+    protected $listOfUseIndexItems;
+    /**
+     * @var string[]
+     * @since 2.0.7
+     */
+    protected $listOfForceIndexItems;
+    /**
+     * @var string[]
+     * @since 2.0.7
+     */
+    protected $listOfIgnoreIndexItems;
 
     public function __construct(ArkDatabaseTableCoreModel $model)
     {
@@ -219,6 +234,33 @@ class ArkDatabaseSelectTableQuery
     }
 
     /**
+     * @param string $indexKey
+     * @since 2.0.7
+     */
+    public function useIndex(string $indexKey)
+    {
+        $this->listOfUseIndexItems[] = $indexKey;
+    }
+
+    /**
+     * @param string $indexKey
+     * @since 2.0.7
+     */
+    public function forceIndex(string $indexKey)
+    {
+        $this->listOfForceIndexItems[] = $indexKey;
+    }
+
+    /**
+     * @param string $indexKey
+     * @since 2.0.7
+     */
+    public function ignoreIndex(string $indexKey)
+    {
+        $this->listOfIgnoreIndexItems[] = $indexKey;
+    }
+
+    /**
      * @param string $resultRowCustomizedClass // I wonder if it is useful.
      * @return ArkDatabaseQueryResult
      */
@@ -282,7 +324,18 @@ class ArkDatabaseSelectTableQuery
         $fields = ArkDatabaseSelectFieldMeta::generateFieldSQLComponent($this->selectFields);
         $condition_sql = ArkSQLCondition::generateConditionSQLComponent($this->conditions);
 
-        $sql = "SELECT {$fields} FROM {$table} WHERE {$condition_sql} ";
+        $indexSql = "";
+        if (!empty($this->listOfUseIndexItems)) {
+            $indexSql .= " USE INDEX (" . implode(',', $this->listOfUseIndexItems) . ") ";
+        }
+        if (!empty($this->listOfForceIndexItems)) {
+            $indexSql .= " FORCE INDEX (" . implode(',', $this->listOfForceIndexItems) . ") ";
+        }
+        if (!empty($this->listOfIgnoreIndexItems)) {
+            $indexSql .= " IGNORE INDEX (" . implode(',', $this->listOfIgnoreIndexItems) . ") ";
+        }
+
+        $sql = "SELECT {$fields} FROM {$table} " . $indexSql . " WHERE {$condition_sql} ";
 
         if (!empty($this->groupByFields)) {
             $sql .= "group by " . implode(",", $this->groupByFields) . " ";

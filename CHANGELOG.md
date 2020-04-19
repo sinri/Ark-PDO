@@ -2,7 +2,11 @@
 
 ## 2.x
 
-## 2.0.6
+### 2.0.7
+
+Select with INDEX!
+
+### 2.0.6
 Simple way to reach data again
 
 ### 2.0.5
