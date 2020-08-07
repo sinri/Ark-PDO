@@ -165,6 +165,39 @@ class ArkSQLCondition
     }
 
     /**
+     * @param string $field
+     * @param string $value
+     * @return ArkSQLCondition
+     * @since 2.0.8
+     */
+    public static function makeStringDoesNotHavePrefix(string $field, $value)
+    {
+        return new ArkSQLCondition($field, self::OP_NOT_LIKE, $value, self::LIKE_RIGHT_WILDCARD);
+    }
+
+    /**
+     * @param string $field
+     * @param string $value
+     * @return ArkSQLCondition
+     * @since 2.0.8
+     */
+    public static function makeStringDoesNotHaveSuffix(string $field, $value)
+    {
+        return new ArkSQLCondition($field, self::OP_NOT_LIKE, $value, self::LIKE_LEFT_WILDCARD);
+    }
+
+    /**
+     * @param string $field
+     * @param string $value
+     * @return ArkSQLCondition
+     * @since 2.0.8
+     */
+    public static function makeStringDoesNotContainText(string $field, $value)
+    {
+        return new ArkSQLCondition($field, self::OP_NOT_LIKE, $value, self::LIKE_BOTH_WILDCARD);
+    }
+
+    /**
      * @param ArkSQLCondition[] $conditions
      * @return ArkSQLCondition
      */
