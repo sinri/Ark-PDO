@@ -60,7 +60,7 @@ class ArkSQLCondition
      * @param string|int|array $value
      * @param null|string $addition
      */
-    public function __construct($field, $operate, $value, $addition = null)
+    public function __construct(string $field, string $operate, $value, $addition = null)
     {
         $this->field = $field;
         $this->operate = $operate;
@@ -79,6 +79,36 @@ class ArkSQLCondition
                     $this->value = "concat('%'," . $this->value . ",'%')";
                     break;
             }
+        }
+    }
+
+    /**
+     * @param string $field
+     * @param int|string|array $value
+     * @return ArkSQLCondition
+     * @since 2.0.9
+     */
+    public static function makeEqualOrInArray($field, $value)
+    {
+        if (is_array($value)) {
+            return self::makeInArray($field, $value);
+        } else {
+            return self::makeEqual($field, $value);
+        }
+    }
+
+    /**
+     * @param string $field
+     * @param int|string|array $value
+     * @return ArkSQLCondition
+     * @since 2.0.9
+     */
+    public static function makeNotEqualNorInArray($field, $value)
+    {
+        if (is_array($value)) {
+            return self::makeNotInArray($field, $value);
+        } else {
+            return self::makeNotEqual($field, $value);
         }
     }
 
