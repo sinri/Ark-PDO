@@ -84,6 +84,36 @@ class ArkSQLCondition
         }
     }
 
+    /**
+     * @param string $field
+     * @param int|string|array $value
+     * @return ArkSQLCondition
+     * @since 2.0.9
+     */
+    public static function makeEqualOrInArray(string $field, $value)
+    {
+        if (is_array($value)) {
+            return self::makeInArray($field, $value);
+        } else {
+            return self::makeEqual($field, $value);
+        }
+    }
+
+    /**
+     * @param string $field
+     * @param int|string|array $value
+     * @return ArkSQLCondition
+     * @since 2.0.9
+     */
+    public static function makeNotEqualNorInArray(string $field, $value)
+    {
+        if (is_array($value)) {
+            return self::makeNotInArray($field, $value);
+        } else {
+            return self::makeNotEqual($field, $value);
+        }
+    }
+
     public static function makeEqual(string $field, $value)
     {
         return new ArkSQLCondition($field, self::OP_EQ, $value);
