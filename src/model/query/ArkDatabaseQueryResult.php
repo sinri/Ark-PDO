@@ -62,6 +62,17 @@ class ArkDatabaseQueryResult
     }
 
     /**
+     * @param string $errorMessage
+     * @return ArkDatabaseQueryResult
+     */
+    public static function makeErrorResult(string $errorMessage)
+    {
+        return (new ArkDatabaseQueryResult())
+            ->setStatus(ArkDatabaseQueryResult::STATUS_ERROR)
+            ->setError($errorMessage);
+    }
+
+    /**
      * @return bool
      * @since 2.0.5
      */
@@ -173,10 +184,13 @@ class ArkDatabaseQueryResult
 
     /**
      * @param string $error
+     * @return ArkDatabaseQueryResult
+     * @since 2.0.10 Fixed the return design.
      */
     public function setError(string $error)
     {
         $this->error = $error;
+        return $this;
     }
 
     /**

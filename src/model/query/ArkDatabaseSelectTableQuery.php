@@ -171,6 +171,7 @@ class ArkDatabaseSelectTableQuery
      * @param string[] $fieldNames
      * @return $this
      * @since 2.0.1
+     * @deprecated use `addSelectFieldsWithoutAlias` instead, which is more simple.
      */
     public function addSelectFieldNames(array $fieldNames)
     {

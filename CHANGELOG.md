@@ -2,6 +2,19 @@
 
 ## 2.x
 
+### 2.0.10
+
+New model class `ArkDatabaseViewModel` for view, a.k.a. the read only table like entity;
+New method `fetchByPaging` for one table paging. 
+
+### 2.0.9
+
+Merge = and in
+
+### 2.0.8
+
+String NOT LIKE
+
 ### 2.0.7
 
 Select with INDEX!

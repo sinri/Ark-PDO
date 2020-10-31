@@ -6,6 +6,7 @@ namespace sinri\ark\database\model;
 
 use Exception;
 use sinri\ark\database\model\query\ArkDatabaseQueryResult;
+use sinri\ark\database\model\query\ArkDatabaseSelectFieldMeta;
 use sinri\ark\database\model\query\ArkDatabaseSelectTableQuery;
 use sinri\ark\database\pdo\ArkPDO;
 
@@ -309,4 +310,36 @@ abstract class ArkDatabaseTableCoreModel
         return $result;
     }
 
+    /**
+     * @param int $page from 1 to infinite
+     * @param int $pageSize
+     * @param ArkDatabaseSelectFieldMeta[] $fieldMataList
+     * @param ArkSQLCondition[] $conditions
+     * @param string $sortExpression
+     * @param int $totalRows
+     * @return array[]
+     * @throws Exception
+     * @since 2.0.10
+     */
+    public function fetchByPaging(int $page, int $pageSize, array $fieldMataList, array $conditions, string $sortExpression = '', int &$totalRows = 0)
+    {
+        if ($page < 1 || $pageSize <= 0) {
+            throw new Exception("Page number or page size is not correct.");
+        }
+        $rowsForOnePage = $this->selectInTable()
+            ->addSelectFields($fieldMataList)
+            ->addConditions($conditions)
+            ->setSortExpression($sortExpression)
+            ->setLimit($pageSize)
+            ->setOffset($pageSize * ($page - 1))
+            ->queryForRows()
+            ->getRawMatrix();
+        $totalRows = $this->selectInTable()
+            ->addSelectFieldByDetail('count(*)', 'total')
+            ->addConditions($conditions)
+            ->queryForRows()
+            ->getResultRowByIndex(0)
+            ->getField('total');
+        return $rowsForOnePage;
+    }
 }
