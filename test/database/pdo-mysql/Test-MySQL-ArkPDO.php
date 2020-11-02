@@ -7,6 +7,7 @@
  */
 
 use sinri\ark\core\ArkLogger;
+use sinri\ark\database\model\ArkDatabaseTableFieldDefinition;
 use sinri\ark\database\model\ArkDatabaseTableModel;
 use sinri\ark\database\pdo\ArkPDO;
 use sinri\ark\database\pdo\ArkPDOConfig;
@@ -30,8 +31,8 @@ $config = new ArkPDOConfig();
 
 require __DIR__ . '/config.php';
 
+$db = new ArkPDO();
 try {
-    $db = new ArkPDO();
     $db->setPdoConfig($config);
     $db->setLogger($logger);
     $db->connect();
@@ -77,7 +78,6 @@ try {
 
         public function __construct($db)
         {
-            parent::__construct();
             $this->tmpDB = $db;
         }
 
@@ -97,7 +97,7 @@ try {
             return $this->tmpDB;
         }
     };
-    $model->devShowFieldsForPHPDoc();
+    ArkDatabaseTableFieldDefinition::devShowFieldsForPHPDoc($model);
 
     $r = $db->exec(
         "DROP TABLE `ark_test_table`;"

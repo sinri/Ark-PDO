@@ -109,7 +109,6 @@ class ArkPDO
                 break;
             default:
                 throw new Exception("Ark PDO: unsupported engine " . $engine);
-                break;
         }
     }
 
@@ -134,7 +133,7 @@ class ArkPDO
      * @return array
      * @throws Exception
      */
-    public function getAll($sql)
+    public function getAll(string $sql)
     {
         $stmt = $this->buildPDOStatement($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -146,7 +145,7 @@ class ArkPDO
      * @return PDOStatement
      * @throws Exception
      */
-    protected function buildPDOStatement($sql, $usePrepare = false)
+    protected function buildPDOStatement(string $sql, $usePrepare = false)
     {
         if ($usePrepare) {
             $statement = $this->pdo->prepare($sql);
@@ -168,13 +167,12 @@ class ArkPDO
      * @return array
      * @throws Exception
      */
-    public function getCol($sql, $field = null)
+    public function getCol(string $sql, $field = null)
     {
         $stmt = $this->buildPDOStatement($sql);
         $rows = $stmt->fetchAll(PDO::FETCH_BOTH);
         if ($field === null) $field = 0;
-        $col = array_column($rows, $field);
-        return $col;
+        return array_column($rows, $field);
     }
 
     /**
@@ -195,7 +193,7 @@ class ArkPDO
      * @return mixed|bool
      * @throws Exception
      */
-    public function getOne($sql)
+    public function getOne(string $sql)
     {
         $stmt = $this->buildPDOStatement($sql);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -208,13 +206,13 @@ class ArkPDO
 
     /**
      * @param string $sql
-     * @param callable $callback function($row,$index):bool; format of $row is decided by fetchStyle and $index starts since 1; return false would stop fetching next row.
+     * @param callable|array $callback function($row,$index):bool; format of $row is decided by fetchStyle and $index starts since 1; return false would stop fetching next row.
      * @param int $fetchStyle
      * @return int How many rows fetched and processed
      * @throws Exception
      * @since 1.6.0
      */
-    public function getAllAsStream($sql, $callback, $fetchStyle = PDO::FETCH_ASSOC)
+    public function getAllAsStream(string $sql, $callback, $fetchStyle = PDO::FETCH_ASSOC)
     {
         $stmt = $this->buildPDOStatement($sql);
         $index = 0;
@@ -232,7 +230,7 @@ class ArkPDO
      * @param string $sql
      * @return int|false affected row count(might be zero anyway), or false on error
      */
-    public function exec($sql)
+    public function exec(string $sql)
     {
         $this->logger->debug("Ready to execute sql", ["sql" => $sql]);
         return $this->pdo->exec($sql);
@@ -243,7 +241,7 @@ class ArkPDO
      * @param null $pk
      * @return bool|string
      */
-    public function insert($sql, $pk = null)
+    public function insert(string $sql, $pk = null)
     {
         $this->logger->debug("Ready to execute insert sql", ["sql" => $sql]);
         $rows = $this->pdo->exec($sql);
@@ -286,7 +284,7 @@ class ArkPDO
     }
 
     /**
-     * @param callable $callback such as function(...$parameters)
+     * @param callable|array $callback such as function(...$parameters)
      * @param array $parameters
      * @return mixed only return when success
      * @throws Exception throw any exception when error
@@ -333,13 +331,13 @@ class ArkPDO
     /**
      * @param string $sql
      * @param array $values
-     * @param callable $callback function($row,$index):bool; format of $row is decided by fetchStyle and $index starts since 1; return false would stop fetching next row.
+     * @param callable|array $callback function($row,$index):bool; format of $row is decided by fetchStyle and $index starts since 1; return false would stop fetching next row.
      * @param int $fetchStyle
      * @return int How many rows fetched and processed
      * @throws Exception
      * @since 1.6.0
      */
-    public function safeQueryAllAsStream($sql, $values, $callback, $fetchStyle = PDO::FETCH_ASSOC)
+    public function safeQueryAllAsStream(string $sql, array $values, $callback, $fetchStyle = PDO::FETCH_ASSOC)
     {
         $stmt = $this->buildPDOStatement($sql, true);
         $stmt->execute($values);
@@ -361,7 +359,7 @@ class ArkPDO
      * @return array
      * @throws Exception
      */
-    public function safeQueryAll($sql, $values = array(), $fetchStyle = PDO::FETCH_ASSOC)
+    public function safeQueryAll(string $sql, $values = array(), $fetchStyle = PDO::FETCH_ASSOC)
     {
         $sth = $this->buildPDOStatement($sql, true);
         $sth->execute($values);
@@ -374,7 +372,7 @@ class ArkPDO
      * @return mixed
      * @throws Exception
      */
-    public function safeQueryRow($sql, $values = array())
+    public function safeQueryRow(string $sql, $values = array())
     {
         $sth = $this->buildPDOStatement($sql, true);
         if ($sth->execute($values)) {
@@ -389,7 +387,7 @@ class ArkPDO
      * @return string
      * @throws Exception
      */
-    public function safeQueryOne($sql, $values = array())
+    public function safeQueryOne(string $sql, $values = array())
     {
         $sth = $this->buildPDOStatement($sql, true);
         if ($sth->execute($values)) {
@@ -406,7 +404,7 @@ class ArkPDO
      * @return bool
      * @throws Exception
      */
-    public function safeInsertOne($sql, $values = array(), &$insertedId = 0, $pk = null)
+    public function safeInsertOne(string $sql, $values = array(), &$insertedId = 0, $pk = null)
     {
         $sth = $this->buildPDOStatement($sql, true);
         $done = $sth->execute($values);
@@ -422,11 +420,10 @@ class ArkPDO
      * @return bool
      * @throws Exception
      */
-    public function safeExecute($sql, $values = array(), &$sth = null)
+    public function safeExecute(string $sql, $values = array(), &$sth = null)
     {
         $sth = $this->buildPDOStatement($sql, true);
-        $done = $sth->execute($values);
-        return $done;
+        return $sth->execute($values);
     }
 
     /**
@@ -440,13 +437,13 @@ class ArkPDO
     }
 
     /**
-     * PDOStatement::rowCount() 返回上一个由对应的 PDOStatement 对象执行DELETE、 INSERT、或 UPDATE 语句受影响的行数。
+     * PDOStatement::rowCount() 返回上一个由对应的 PDOStatement 对象执行 DELETE 、 INSERT 、或 UPDATE 语句受影响的行数。
      * 如果上一条由相关 PDOStatement 执行的 SQL 语句是一条 SELECT 语句，有些数据可能返回由此语句返回的行数。
      * 但这种方式不能保证对所有数据有效，且对于可移植的应用不应依赖于此方式。
      * @param PDOStatement $statement
      * @return int
      */
-    public function getAffectedRowCount($statement)
+    public function getAffectedRowCount(PDOStatement $statement)
     {
         return $statement->rowCount();
     }
@@ -457,7 +454,7 @@ class ArkPDO
      * @param array $parameters
      * @return string
      * @throws Exception
-     *@since 2.1.11
+     * @since 2.1.11
      *  Sample SQL:
      * select key_field,value,`?`
      * from `?`.`?`
@@ -467,7 +464,7 @@ class ArkPDO
      *  RULE:
      * (1) `?` => $p
      * (2)  ?  => quote($p)
-     * (3) (?) => (quote($p[]),...)
+     * (3) (?) => (quote($p[]), ...)
      * (4) [?] => integer_value($p)
      * (5) {?} => float_value($p)
      */

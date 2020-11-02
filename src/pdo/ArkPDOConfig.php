@@ -37,6 +37,7 @@ class ArkPDOConfig
     const CONFIG_OPTIONS = "options";
 
     const CHARSET_UTF8 = "utf8";
+    const CHARSET_UTF8MB4 = "utf8mb4";
 
     const ENGINE_MYSQL = "mysql";
 
@@ -136,7 +137,7 @@ class ArkPDOConfig
      * @param string $value
      * @return $this
      */
-    public function setTitle($value)
+    public function setTitle(string $value)
     {
         $field = self::CONFIG_TITLE;
         $this->$field = $value;

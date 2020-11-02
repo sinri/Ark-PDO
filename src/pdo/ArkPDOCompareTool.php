@@ -213,7 +213,7 @@ class ArkPDOCompareTool
      * @return string[]
      * @throws Exception
      */
-    protected function getTableNames($db, $tables = null)
+    protected function getTableNames(ArkPDO $db, $tables = null)
     {
         $rows = $db->safeQueryAll("show tables", [], PDO::FETCH_NUM);
         $ddl = array_column($rows, 0);
@@ -230,7 +230,7 @@ class ArkPDOCompareTool
      * @param string $code
      * @return ArkPDO|null
      */
-    protected function getDB($code)
+    protected function getDB(string $code)
     {
         return ArkHelper::readTarget($this->dbs, [$code]);
     }
@@ -239,7 +239,7 @@ class ArkPDOCompareTool
      * @param string $code
      * @return string
      */
-    protected function getName($code)
+    protected function getName(string $code)
     {
         return $this->getDB($code)->getPdoConfig()->title;
     }
@@ -250,7 +250,7 @@ class ArkPDOCompareTool
      * @return bool|mixed
      * @throws Exception
      */
-    protected function getTableCreation($db, $table)
+    protected function getTableCreation(ArkPDO $db, string $table)
     {
         $creation = $db->safeQueryAll("show create table " . $table, [], PDO::FETCH_NUM);
         $creation = ArkHelper::readTarget($creation, [0, 1]);
@@ -264,10 +264,9 @@ class ArkPDOCompareTool
      * @return array
      * @throws Exception
      */
-    protected function getTableFields($db, $table)
+    protected function getTableFields(ArkPDO $db, string $table)
     {
-        $fields = $db->safeQueryAll("desc $table");
-        return $fields;
+        return $db->safeQueryAll("desc $table");
     }
 
     /**
@@ -278,7 +277,7 @@ class ArkPDOCompareTool
      * @param array $inBothButDiff
      * @return bool
      */
-    protected function checkTablesHaveSameFields($fieldsA, $fieldsB, &$onlyInA = [], &$onlyInB = [], &$inBothButDiff = [])
+    protected function checkTablesHaveSameFields(array $fieldsA, array $fieldsB, &$onlyInA = [], &$onlyInB = [], &$inBothButDiff = [])
     {
         $hashA = [];
         $hashB = [];
@@ -324,7 +323,7 @@ class ArkPDOCompareTool
      * @param string $table
      * @return int
      */
-    protected function getTableRowCount($db, $table)
+    protected function getTableRowCount(ArkPDO $db, string $table)
     {
         try {
             $count = $db->getOne("select count(*) from $table");

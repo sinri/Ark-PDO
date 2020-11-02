@@ -9,7 +9,9 @@
 namespace sinri\ark\database\model;
 
 
+use Exception;
 use sinri\ark\core\ArkHelper;
+use sinri\ark\database\pdo\ArkPDO;
 
 class ArkDatabaseTableFieldDefinition
 {
@@ -135,4 +137,37 @@ class ArkDatabaseTableFieldDefinition
         $this->nullable = $nullable;
     }
 
+    /**
+     * @param ArkPDO $db
+     * @param string $tableExpression
+     * @return ArkDatabaseTableFieldDefinition[]
+     * @throws Exception
+     */
+    public static function loadTableDesc(ArkPDO $db, string $tableExpression)
+    {
+        $fieldDefinition = [];
+        $field_list = $db->getAll("desc " . $tableExpression);
+        if (empty($field_list)) {
+            throw new Exception("Seems no such table " . $tableExpression);
+        }
+        foreach ($field_list as $field) {
+            $fieldDefinition[$field['Field']] = ArkDatabaseTableFieldDefinition::makeInstanceWithDescResultRow($field);
+        }
+        return $fieldDefinition;
+    }
+
+    /**
+     * When you design a model for a certain table which is eventually designed,
+     * you might run this method to get `@property` lines for the model class PHPDoc.
+     * @param ArkDatabaseTableCoreModel $model
+     * @throws Exception
+     */
+    public static function devShowFieldsForPHPDoc(ArkDatabaseTableCoreModel $model)
+    {
+        echo "THIS IS A HELPER FOR DEV." . PHP_EOL;
+        $fieldDefinition = self::loadTableDesc($model->db(), $model->getTableExpressForSQL());
+        foreach ($fieldDefinition as $definition) {
+            echo " * @property " . $definition->getTypeCategory() . ' ' . $definition->getName() . PHP_EOL;
+        }
+    }
 }
