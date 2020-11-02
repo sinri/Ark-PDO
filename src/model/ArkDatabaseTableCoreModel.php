@@ -316,12 +316,13 @@ abstract class ArkDatabaseTableCoreModel
      * @param ArkDatabaseSelectFieldMeta[] $fieldMataList
      * @param ArkSQLCondition[] $conditions
      * @param string $sortExpression
-     * @param int $totalRows
+     * @param int|null $totalRows
      * @return array[]
      * @throws Exception
      * @since 2.0.10
+     * @since 2.0.11 loose $totalRows type check, allow unassigned variable to be there
      */
-    public function fetchByPaging(int $page, int $pageSize, array $fieldMataList, array $conditions, string $sortExpression = '', int &$totalRows = 0)
+    public function fetchByPaging(int $page, int $pageSize, array $fieldMataList, array $conditions, string $sortExpression = '', &$totalRows = 0)
     {
         if ($page < 1 || $pageSize <= 0) {
             throw new Exception("Page number or page size is not correct.");

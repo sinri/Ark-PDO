@@ -2,6 +2,11 @@
 
 ## 2.x
 
+### 2.0.11
+
+Loose type check rule for `$totalRows` of `fetchByPaging` , allow unassigned variable to be there.
+
+
 ### 2.0.10
 
 New model class `ArkDatabaseViewModel` for view, a.k.a. the read only table like entity;
