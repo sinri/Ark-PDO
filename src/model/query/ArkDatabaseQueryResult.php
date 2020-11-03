@@ -222,7 +222,11 @@ class ArkDatabaseQueryResult
     public function getResultRows()
     {
         if ($this->status !== self::STATUS_QUERIED) {
-            throw new Exception("Illegal Call");
+            throw new Exception(
+                "Cannot get result rows! "
+                . "Current Status is " . $this->status . " "
+                . "Database Error: " . $this->getError()
+            );
         }
         return $this->resultRows;
     }
@@ -281,7 +285,11 @@ class ArkDatabaseQueryResult
     public function getRawMatrix()
     {
         if ($this->status !== self::STATUS_QUERIED) {
-            throw new Exception("Illegal Call");
+            throw new Exception(
+                "Cannot get raw matrix! "
+                . "Current Status is " . $this->status . " "
+                . "Database Error: " . $this->getError()
+            );
         }
         $matrix = [];
         foreach ($this->resultRows as $resultRow) {
@@ -312,7 +320,11 @@ class ArkDatabaseQueryResult
     public function getResultRowByIndex(int $index)
     {
         if ($this->status !== self::STATUS_QUERIED) {
-            throw new Exception("Illegal Call");
+            throw new Exception(
+                "Cannot get result row by index! "
+                . "Current Status is " . $this->status . " "
+                . "Database Error: " . $this->getError()
+            );
         }
         if ($index < 0 || $index >= count($this->resultRows)) {
             throw new OutOfBoundsException("Out of Bounds");
@@ -345,7 +357,11 @@ class ArkDatabaseQueryResult
     public function getResultColumn(string $columnName, $default = null)
     {
         if ($this->status !== self::STATUS_QUERIED) {
-            throw new Exception("Illegal Call");
+            throw new Exception(
+                "Cannot get result column! "
+                . "Current Status is " . $this->status . " "
+                . "Database Error: " . $this->getError()
+            );
         }
         $column = [];
         foreach ($this->resultRows as $resultRow) {
