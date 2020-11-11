@@ -221,13 +221,7 @@ class ArkDatabaseQueryResult
      */
     public function getResultRows()
     {
-        if ($this->status !== self::STATUS_QUERIED) {
-            throw new Exception(
-                "Cannot get result rows! "
-                . "Current Status is " . $this->status . " "
-                . "Database Error: " . $this->getError()
-            );
-        }
+        $this->assertStatusIsQueried(__METHOD__);
         return $this->resultRows;
     }
 
@@ -284,13 +278,7 @@ class ArkDatabaseQueryResult
      */
     public function getRawMatrix()
     {
-        if ($this->status !== self::STATUS_QUERIED) {
-            throw new Exception(
-                "Cannot get raw matrix! "
-                . "Current Status is " . $this->status . " "
-                . "Database Error: " . $this->getError()
-            );
-        }
+        $this->assertStatusIsQueried(__METHOD__);
         $matrix = [];
         foreach ($this->resultRows as $resultRow) {
             $matrix[] = $resultRow->getRawRow();
@@ -319,13 +307,7 @@ class ArkDatabaseQueryResult
      */
     public function getResultRowByIndex(int $index)
     {
-        if ($this->status !== self::STATUS_QUERIED) {
-            throw new Exception(
-                "Cannot get result row by index! "
-                . "Current Status is " . $this->status . " "
-                . "Database Error: " . $this->getError()
-            );
-        }
+        $this->assertStatusIsQueried(__METHOD__ . "({$index})");
         if ($index < 0 || $index >= count($this->resultRows)) {
             throw new OutOfBoundsException("Out of Bounds");
         }
@@ -356,13 +338,7 @@ class ArkDatabaseQueryResult
      */
     public function getResultColumn(string $columnName, $default = null)
     {
-        if ($this->status !== self::STATUS_QUERIED) {
-            throw new Exception(
-                "Cannot get result column! "
-                . "Current Status is " . $this->status . " "
-                . "Database Error: " . $this->getError()
-            );
-        }
+        $this->assertStatusIsQueried(__METHOD__ . "({$columnName})");
         $column = [];
         foreach ($this->resultRows as $resultRow) {
             $column[] = $resultRow->getField($columnName, $default);
@@ -382,6 +358,56 @@ class ArkDatabaseQueryResult
             return $this->getResultRowByIndex(0)->getField($fieldName, $default);
         } catch (Exception $e) {
             return $default;
+        }
+    }
+
+    /**
+     * @param string $fieldName the name of the key field
+     * @return ArkDatabaseQueryResultRow[][] [key_filed_name=>ROW, ...]
+     * @throws Exception
+     * @since 2.0.12
+     */
+    public function getResultKeyRowMap(string $fieldName)
+    {
+        $this->assertStatusIsQueried(__METHOD__ . "({$fieldName})");
+        $map = [];
+        foreach ($this->resultRows as $resultRow) {
+            $map[$resultRow->getField($fieldName, '')] = $resultRow;
+        }
+        return $map;
+    }
+
+    /**
+     * @param string $keyFieldName
+     * @param string $valueFieldName
+     * @param mixed $defaultValue
+     * @return array [key_filed_name=>value_field_value, ...]
+     * @throws Exception
+     * @since 2.0.12
+     */
+    public function getResultKeyValueMap(string $keyFieldName, string $valueFieldName, $defaultValue = null)
+    {
+        $this->assertStatusIsQueried(__METHOD__ . "({$keyFieldName}=>{$valueFieldName})");
+        $map = [];
+        foreach ($this->resultRows as $resultRow) {
+            $map[$resultRow->getField($keyFieldName, '')] = $resultRow->getField($valueFieldName, $defaultValue);
+        }
+        return $map;
+    }
+
+    /**
+     * @param string $action
+     * @throws Exception
+     * @since 2.0.12
+     */
+    protected function assertStatusIsQueried(string $action)
+    {
+        if ($this->status !== self::STATUS_QUERIED) {
+            throw new Exception(
+                "Action Failed: " . $action . " | "
+                . "Current Status is " . $this->status . " | "
+                . "Database Error: " . $this->getError()
+            );
         }
     }
 }

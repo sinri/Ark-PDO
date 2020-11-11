@@ -2,6 +2,11 @@
 
 ## 2.x
 
+### 2.0.12 
+
+Support: Turn SQL Queried Matrix to Mapping
+Refine: Error Reporting
+
 ### 2.0.11
 
 Loose type check rule for `$totalRows` of `fetchByPaging` , allow unassigned variable to be there.
