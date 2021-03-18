@@ -9,7 +9,7 @@
 namespace sinri\ark\database\model;
 
 
-use Exception;
+use sinri\ark\database\Exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\pdo\ArkPDO;
 
 class ArkSQLCondition
@@ -277,7 +277,7 @@ class ArkSQLCondition
 
     /**
      * @return string
-     * @throws Exception
+     * @throws ArkPDOSQLBuilderError
      */
     public function makeConditionSQL()
     {
@@ -293,13 +293,19 @@ class ArkSQLCondition
             case self::OP_IS:
             case self::OP_IS_NOT:
                 if (!in_array($this->value, [self::CONST_FALSE, self::CONST_TRUE, self::CONST_NULL])) {
-                    throw new Exception("ERROR, YOU MUST USE CONSTANT FOR IS COMPARISION!");
+                    throw new ArkPDOSQLBuilderError(
+                        "ERROR, YOU MUST USE CONSTANT FOR IS COMPARISON!",
+                        "{$this->field} {$this->operate} " . json_encode($this->value)
+                    );
                 }
                 return "`{$this->field}` " . $this->operate . " " . $this->value;
             case self::OP_IN:
             case self::OP_NOT_IN:
                 if (!is_array($this->value) || empty($this->value)) {
-                    throw new Exception("ERROR, YOU MUST GIVE AN ARRAY OF STRING FOR IN OPERATION!");
+                    throw new ArkPDOSQLBuilderError(
+                        "ERROR, YOU MUST GIVE AN ARRAY OF STRING FOR IN OPERATION!",
+                        "{$this->field} {$this->operate} (" . json_encode($this->value) . ")"
+                    );
                 }
                 $group = [];
                 foreach ($this->value as $item) {
@@ -327,7 +333,10 @@ class ArkSQLCondition
                     }
                 }
                 if (empty($parts)) {
-                    throw new Exception("Condition Set Empty");
+                    throw new ArkPDOSQLBuilderError(
+                        "Condition Set Empty",
+                        "{$this->operate} ()"
+                    );
                 }
                 return '(' . implode(" " . $this->operate . " ", $parts) . ')';
             case self::MACRO_IS_NULL_OR_EMPTY_STRING:
@@ -337,14 +346,14 @@ class ArkSQLCondition
             case self::MACRO_RAW_EXPRESSION:
                 return $this->value;
             default:
-                throw new Exception("ERROR, UNKNOWN OPERATE");
+                throw new ArkPDOSQLBuilderError("ERROR, UNKNOWN OPERATE", json_encode($this->operate));
         }
     }
 
     /**
      * @param ArkSQLCondition[] $conditions
      * @return string
-     * @throws Exception
+     * @throws ArkPDOSQLBuilderError
      * @since 2.0
      */
     public static function generateConditionSQLComponent(array $conditions)

@@ -3,10 +3,10 @@
 
 namespace sinri\ark\database\model\query;
 
-use Exception;
 use OutOfBoundsException;
 use PDO;
 use PDOStatement;
+use sinri\ark\database\Exception\ArkPDOQueryResultIsNotQueriedError;
 
 /**
  * Class ArkDatabaseQueryResult
@@ -217,7 +217,7 @@ class ArkDatabaseQueryResult
 
     /**
      * @return ArkDatabaseQueryResultRow[]
-     * @throws Exception
+     * @throws ArkPDOQueryResultIsNotQueriedError
      */
     public function getResultRows()
     {
@@ -267,14 +267,14 @@ class ArkDatabaseQueryResult
     {
         try {
             return $this->getRawMatrix();
-        } catch (Exception $e) {
+        } catch (ArkPDOQueryResultIsNotQueriedError $e) {
             return false;
         }
     }
 
     /**
      * @return array[]
-     * @throws Exception
+     * @throws ArkPDOQueryResultIsNotQueriedError
      */
     public function getRawMatrix()
     {
@@ -294,7 +294,7 @@ class ArkDatabaseQueryResult
     {
         try {
             return $this->getResultRowByIndex(0)->getRawRow();
-        } catch (Exception $e) {
+        } catch (ArkPDOQueryResultIsNotQueriedError $e) {
             return false;
         }
     }
@@ -302,7 +302,8 @@ class ArkDatabaseQueryResult
     /**
      * @param int $index Since 0
      * @return ArkDatabaseQueryResultRow
-     * @throws Exception
+     * @throws ArkPDOQueryResultIsNotQueriedError
+     * @throws OutOfBoundsException
      * @since 2.0.1
      */
     public function getResultRowByIndex(int $index)
@@ -324,7 +325,7 @@ class ArkDatabaseQueryResult
     {
         try {
             return $this->getResultColumn($fieldName, $default);
-        } catch (Exception $e) {
+        } catch (ArkPDOQueryResultIsNotQueriedError $e) {
             return false;
         }
     }
@@ -333,7 +334,7 @@ class ArkDatabaseQueryResult
      * @param string $columnName
      * @param null|mixed $default
      * @return array
-     * @throws Exception
+     * @throws ArkPDOQueryResultIsNotQueriedError
      * @since 2.0.1
      */
     public function getResultColumn(string $columnName, $default = null)
@@ -356,15 +357,15 @@ class ArkDatabaseQueryResult
     {
         try {
             return $this->getResultRowByIndex(0)->getField($fieldName, $default);
-        } catch (Exception $e) {
-            return $default;
+        } catch (ArkPDOQueryResultIsNotQueriedError $e) {
+            return false;
         }
     }
 
     /**
      * @param string $fieldName the name of the key field
      * @return ArkDatabaseQueryResultRow[][] [key_filed_name=>ROW, ...]
-     * @throws Exception
+     * @throws ArkPDOQueryResultIsNotQueriedError
      * @since 2.0.12
      */
     public function getResultKeyRowMap(string $fieldName)
@@ -382,7 +383,7 @@ class ArkDatabaseQueryResult
      * @param string $valueFieldName
      * @param mixed $defaultValue
      * @return array [key_filed_name=>value_field_value, ...]
-     * @throws Exception
+     * @throws ArkPDOQueryResultIsNotQueriedError
      * @since 2.0.12
      */
     public function getResultKeyValueMap(string $keyFieldName, string $valueFieldName, $defaultValue = null)
@@ -397,17 +398,13 @@ class ArkDatabaseQueryResult
 
     /**
      * @param string $action
-     * @throws Exception
+     * @throws ArkPDOQueryResultIsNotQueriedError
      * @since 2.0.12
      */
     protected function assertStatusIsQueried(string $action)
     {
         if ($this->status !== self::STATUS_QUERIED) {
-            throw new Exception(
-                "Action Failed: " . $action . " | "
-                . "Current Status is " . $this->status . " | "
-                . "Database Error: " . $this->getError()
-            );
+            throw new ArkPDOQueryResultIsNotQueriedError($action, $this->status, $this->getError());
         }
     }
 }

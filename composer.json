@@ -14,7 +14,7 @@
     "php": "~7.0",
     "ext-json": "*",
     "ext-pdo": "*",
-    "sinri/ark-core": "~2.0"
+    "sinri/ark-core": ">=2.7.9"
   },
   "autoload": {
     "psr-4": {

@@ -82,7 +82,7 @@ class ArkPDOConfig
     public function setPort($value)
     {
         $field = self::CONFIG_PORT;
-        $this->$field = intval($value, 10);
+        $this->$field = intval($value);
         return $this;
     }
 

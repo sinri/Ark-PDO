@@ -5,6 +5,9 @@ namespace sinri\ark\database\model;
 
 
 use Exception;
+use sinri\ark\database\Exception\ArkPDODatabaseQueryError;
+use sinri\ark\database\Exception\ArkPDOMatrixRowsLengthDifferError;
+use sinri\ark\database\Exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\model\query\ArkDatabaseQueryResult;
 use sinri\ark\database\model\query\ArkDatabaseSelectFieldMeta;
 use sinri\ark\database\model\query\ArkDatabaseSelectTableQuery;
@@ -70,7 +73,7 @@ abstract class ArkDatabaseTableCoreModel
      */
     public function insertOneRow(array $data, $pk = null)
     {
-        return $this->writeInto($data, $pk, false);
+        return $this->writeInto($data, $pk);
     }
 
     /**
@@ -100,13 +103,22 @@ abstract class ArkDatabaseTableCoreModel
             $result->setSql($sql);
             $afx = $this->db()->exec($sql);
             if ($afx === false) {
-                throw new Exception("Error in updating");
+                throw new ArkPDODatabaseQueryError(
+                    "Error in updating: " . $this->db()->getPDOErrorInfo(),
+                    $this->db()->getPDOErrorCode()
+                );
             }
             $result->setAffectedRowsCount($afx);
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
-        } catch (Exception $e) {
+        } catch (ArkPDODatabaseQueryError $e) {
             $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
-            $result->setError("Exception: " . $e->getMessage() . "; PDO Last Error: " . $this->db()->getPDOErrorDescription());
+            $result->setError(
+                "DatabaseOperationError: " . $e->getMessage()
+                . " Code: " . $e->getCode()
+            );
+        } catch (ArkPDOSQLBuilderError $e) {
+            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
+            $result->setError("ArkPDOConditionError: " . $e->getMessage() . ' SQL: ' . $e->getWrongSQLPiece());
         }
         return $result;
     }
@@ -146,13 +158,23 @@ abstract class ArkDatabaseTableCoreModel
             $sql = "DELETE FROM {$table} WHERE {$condition_sql}";
             $afx = $this->db()->exec($sql);
             if ($afx === false) {
-                throw new Exception("Error in updating");
+                throw new ArkPDODatabaseQueryError(
+                    "Error in updating: " . $this->db()->getPDOErrorInfo(),
+                    $this->db()->getPDOErrorCode()
+                );
             }
             $result->setAffectedRowsCount($afx);
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
-        } catch (Exception $e) {
+        } catch (ArkPDODatabaseQueryError $e) {
             $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
-            $result->setError("Exception: " . $e->getMessage() . "; PDO Last Error: " . $this->db()->getPDOErrorDescription());
+            $result->setError(
+                "DatabaseOperationError: " . $e->getMessage()
+                . " Code: " . $e->getCode()
+            );
+        } catch (ArkPDOSQLBuilderError $e) {
+            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
+            $result->setError("ArkPDOSQLBuilderError: " . $e->getMessage() . ' SQL: ' . $e->getWrongSQLPiece());
+
         }
         return $result;
     }
@@ -185,7 +207,7 @@ abstract class ArkDatabaseTableCoreModel
      */
     public function batchInsertRows(array $dataList, $pk = null)
     {
-        return $this->batchWriteInto($dataList, $pk, false);
+        return $this->batchWriteInto($dataList, $pk);
     }
 
     /**
@@ -215,13 +237,19 @@ abstract class ArkDatabaseTableCoreModel
             $result->setSql($sql);
             $afx = $this->db()->insert($sql, $pk);
             if ($afx === false) {
-                throw new Exception("Cannot write into table");
+                throw new ArkPDODatabaseQueryError(
+                    "Cannot write into table: " . $this->db()->getPDOErrorInfo(),
+                    $this->db()->getPDOErrorCode()
+                );
             }
             $result->setLastInsertedID($afx);
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
-        } catch (Exception $e) {
+        } catch (ArkPDODatabaseQueryError $e) {
             $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
-            $result->setError("Exception: " . $e->getMessage() . "; PDO Last Error: " . $this->db()->getPDOErrorDescription());
+            $result->setError(
+                "DatabaseOperationError: " . $e->getMessage()
+                . " Code: " . $e->getCode()
+            );
         }
         return $result;
     }
@@ -285,10 +313,14 @@ abstract class ArkDatabaseTableCoreModel
                 $fields[] = "`{$key}`";
             }
             foreach ($dataList as $data) {
-                if (count($data) != count($fields)) {
-                    throw new Exception("Data List Format Error");
+                $x = "(" . $this->buildRowValuesForWrite($data) . ")";
+                if (count($data) !== count($fields)) {
+                    throw new ArkPDOMatrixRowsLengthDifferError(
+                        count($fields) . ' fields expected but ' . count($data) . ' fields found in this row',
+                        $x
+                    );
                 }
-                $values[] = "(" . $this->buildRowValuesForWrite($data) . ")";
+                $values[] = $x;
             }
             $fields = implode(",", $fields);
             $values = implode(",", $values);
@@ -298,14 +330,26 @@ abstract class ArkDatabaseTableCoreModel
 
             $afx = $this->db()->insert($sql, $pk);
             if ($afx == false) {
-                throw new Exception("Error in batch writing");
+                throw new ArkPDODatabaseQueryError(
+                    "Error in batch writing: " . $this->db()->getPDOErrorInfo(),
+                    $this->db()->getPDOErrorCode()
+                );
             }
 
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
             $result->setLastInsertedID($afx);
-        } catch (Exception $exception) {
+        } catch (ArkPDODatabaseQueryError $exception) {
             $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
-            $result->setError("Exception: " . $exception->getMessage() . "; PDO Last Error: " . $this->db()->getPDOErrorDescription());
+            $result->setError(
+                "DatabaseOperationError: " . $exception->getMessage()
+                . " Code: " . $exception->getCode()
+            );
+        } catch (ArkPDOMatrixRowsLengthDifferError $exception) {
+            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
+            $result->setError(
+                "LengthDiffersInMatrixError: " . $exception->getMessage()
+                . " SQL: " . $exception->getWrongSQLPiece()
+            );
         }
         return $result;
     }

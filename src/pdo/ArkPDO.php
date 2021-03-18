@@ -12,8 +12,10 @@ namespace sinri\ark\database\pdo;
 use Exception;
 use PDO;
 use PDOStatement;
-use sinri\ark\core\ArkHelper;
 use sinri\ark\core\ArkLogger;
+use sinri\ark\database\Exception\ArkPDOConfigError;
+use sinri\ark\database\Exception\ArkPDOSQLBuilderError;
+use sinri\ark\database\Exception\ArkPDOStatementException;
 
 class ArkPDO
 {
@@ -58,12 +60,12 @@ class ArkPDO
 
     /**
      * Connect to Database and make self::pdo an instance.
-     * @throws Exception
+     * @throws ArkPDOConfigError
      */
     public function connect()
     {
         if (!is_a($this->pdoConfig, ArkPDOConfig::class)) {
-            throw new Exception("Ark PDO Config not given!");
+            throw new ArkPDOConfigError();
         }
 
         $engine = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_ENGINE, ArkPDOConfig::ENGINE_MYSQL);
@@ -73,14 +75,20 @@ class ArkPDO
         $password = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_PASSWORD);
         $database = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_DATABASE);
         $charset = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_CHARSET, ArkPDOConfig::CHARSET_UTF8);
-        $options = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_OPTIONS, null);
+        $options = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_OPTIONS);
 
-        ArkHelper::assertItem($host, 'Ark PDO: Host is empty.');
-        ArkHelper::assertItem($port, 'Ark PDO: Port is empty.');
-        ArkHelper::assertItem($username, 'Ark PDO: Username is empty.');
-        ArkHelper::assertItem($password, 'Ark PDO: Password is empty.');
-        //ArkHelper::assertItem($database, 'Ark PDO: Database is empty.');
-        ArkHelper::assertItem($charset, 'Ark PDO: CharSet is empty.');
+        $pairs = [
+            ArkPDOConfig::CONFIG_HOST => $host,
+            ArkPDOConfig::CONFIG_PORT => $port,
+            ArkPDOConfig::CONFIG_USERNAME => $username,
+            ArkPDOConfig::CONFIG_PASSWORD => $password,
+            ArkPDOConfig::CONFIG_CHARSET => $charset,
+        ];
+        foreach ($pairs as $fieldName => $fieldValue) {
+            if (empty($fieldValue)) {
+                throw new ArkPDOConfigError($fieldName, $fieldValue);
+            }
+        }
 
         $engine = strtolower($engine);
         switch ($engine) {
@@ -108,7 +116,7 @@ class ArkPDO
                 }
                 break;
             default:
-                throw new Exception("Ark PDO: unsupported engine " . $engine);
+                throw new ArkPDOConfigError(ArkPDOConfig::CONFIG_ENGINE, $engine);
         }
     }
 
@@ -131,7 +139,7 @@ class ArkPDO
     /**
      * @param string $sql
      * @return array
-     * @throws Exception
+     * @throws ArkPDOStatementException
      */
     public function getAll(string $sql)
     {
@@ -143,7 +151,7 @@ class ArkPDO
      * @param string $sql
      * @param bool $usePrepare
      * @return PDOStatement
-     * @throws Exception
+     * @throws ArkPDOStatementException
      */
     protected function buildPDOStatement(string $sql, $usePrepare = false)
     {
@@ -154,7 +162,7 @@ class ArkPDO
         }
         if (!$statement) {
             $this->logger->error("PDO Statement Building Failure Occurred.", ["sql" => $sql]);
-            throw new Exception("PDO Statement Building Failure Occurred: " . $sql);
+            throw new ArkPDOStatementException("PDO Statement Building Failure Occurred For SQL", $sql);
         } else {
             $this->logger->debug("PDO Statement Generated.", ["sql" => $sql]);
         }
@@ -165,7 +173,7 @@ class ArkPDO
      * @param string $sql
      * @param null|string|int $field
      * @return array
-     * @throws Exception
+     * @throws ArkPDOStatementException
      */
     public function getCol(string $sql, $field = null)
     {
@@ -176,11 +184,11 @@ class ArkPDO
     }
 
     /**
-     * @param $sql
+     * @param string $sql
      * @return array|bool
-     * @throws Exception
+     * @throws ArkPDOStatementException
      */
-    public function getRow($sql)
+    public function getRow(string $sql)
     {
         $stmt = $this->buildPDOStatement($sql);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -191,7 +199,7 @@ class ArkPDO
     /**
      * @param string $sql
      * @return mixed|bool
-     * @throws Exception
+     * @throws ArkPDOStatementException
      */
     public function getOne(string $sql)
     {
@@ -209,21 +217,12 @@ class ArkPDO
      * @param callable|array $callback function($row,$index):bool; format of $row is decided by fetchStyle and $index starts since 1; return false would stop fetching next row.
      * @param int $fetchStyle
      * @return int How many rows fetched and processed
-     * @throws Exception
+     * @throws ArkPDOStatementException
      * @since 1.6.0
      */
     public function getAllAsStream(string $sql, $callback, $fetchStyle = PDO::FETCH_ASSOC)
     {
-        $stmt = $this->buildPDOStatement($sql);
-        $index = 0;
-        while (true) {
-            $row = $stmt->fetch($fetchStyle);
-            if ($row === false) break;
-            $index += 1;
-            $shouldContinue = call_user_func_array($callback, [$row, $index]);
-            if (!$shouldContinue) break;
-        }
-        return $index;
+        return $this->safeQueryAllAsStream($sql, [], $callback, $fetchStyle);
     }
 
     /**
@@ -334,7 +333,7 @@ class ArkPDO
      * @param callable|array $callback function($row,$index):bool; format of $row is decided by fetchStyle and $index starts since 1; return false would stop fetching next row.
      * @param int $fetchStyle
      * @return int How many rows fetched and processed
-     * @throws Exception
+     * @throws ArkPDOStatementException
      * @since 1.6.0
      */
     public function safeQueryAllAsStream(string $sql, array $values, $callback, $fetchStyle = PDO::FETCH_ASSOC)
@@ -357,7 +356,7 @@ class ArkPDO
      * @param array $values
      * @param int $fetchStyle
      * @return array
-     * @throws Exception
+     * @throws ArkPDOStatementException
      */
     public function safeQueryAll(string $sql, $values = array(), $fetchStyle = PDO::FETCH_ASSOC)
     {
@@ -370,7 +369,7 @@ class ArkPDO
      * @param string $sql
      * @param array $values
      * @return mixed
-     * @throws Exception
+     * @throws ArkPDOStatementException
      */
     public function safeQueryRow(string $sql, $values = array())
     {
@@ -385,13 +384,13 @@ class ArkPDO
      * @param string $sql
      * @param array $values
      * @return string
-     * @throws Exception
+     * @throws ArkPDOStatementException
      */
     public function safeQueryOne(string $sql, $values = array())
     {
         $sth = $this->buildPDOStatement($sql, true);
         if ($sth->execute($values)) {
-            return $sth->fetchColumn(0);
+            return $sth->fetchColumn();
         }
         return false;
     }
@@ -402,7 +401,7 @@ class ArkPDO
      * @param int $insertedId
      * @param null $pk
      * @return bool
-     * @throws Exception
+     * @throws ArkPDOStatementException
      */
     public function safeInsertOne(string $sql, $values = array(), &$insertedId = 0, $pk = null)
     {
@@ -418,7 +417,7 @@ class ArkPDO
      * @param array $values
      * @param null $sth @since 1.3.3
      * @return bool
-     * @throws Exception
+     * @throws ArkPDOStatementException
      */
     public function safeExecute(string $sql, $values = array(), &$sth = null)
     {
@@ -427,9 +426,9 @@ class ArkPDO
     }
 
     /**
-     * @since 1.3.3
      * @param null|string $pk
      * @return string
+     * @since 1.3.3
      */
     public function getLastInsertID($pk = null)
     {
@@ -453,7 +452,7 @@ class ArkPDO
      * @param $template
      * @param array $parameters
      * @return string
-     * @throws Exception
+     * @throws ArkPDOSQLBuilderError
      * @since 2.1.11
      *  Sample SQL:
      * select key_field,value,`?`
@@ -471,16 +470,19 @@ class ArkPDO
     public function safeBuildSQL($template, $parameters = [])
     {
         $this->logger->debug($template, ['parameters' => $parameters]);
-        $count = preg_match_all('/\?|`\?`|\(\?\)|\[\?\]|\{\?\}/', $template, $matches, PREG_OFFSET_CAPTURE);
+        $count = preg_match_all('/\?|`\?`|\(\?\)|\[\?]|{\?}/', $template, $matches, PREG_OFFSET_CAPTURE);
         $this->logger->debug("preg_match_all count=" . json_encode($count), ['matches' => $matches]);
         if ($count === 0) {
             return $template;
         }
-        if (!$count) {
-            throw new Exception("The sql template is not correct.");
-        }
-        if ($count != count($parameters)) {
-            throw new Exception("The sql template has not correct number of parameters.");
+//        if (!$count) {
+//            throw new ArkPDOSQLBuilderError("The sql template is not correct.",$template);
+//        }
+        if ($count !== count($parameters)) {
+            throw new ArkPDOSQLBuilderError(
+                "The sql template has not correct number of parameters.",
+                $template . ' <--- ' . json_encode($parameters)
+            );
         }
 
         $parts = [];
@@ -547,7 +549,7 @@ class ArkPDO
                 // (4) [?] => int val of ($p)
                 case '[?]':
                     {
-                        $sql .= intval($parameters[$ptr], 10);
+                        $sql .= intval($parameters[$ptr]);
                         $ptr++;
                     }
                     break;
@@ -583,9 +585,9 @@ class ArkPDO
     }
 
     /**
-     * @since 2.1.11
      * @param $inp
      * @return array|mixed
+     * @since 2.1.11
      */
     public static function dryQuote($inp)
     {

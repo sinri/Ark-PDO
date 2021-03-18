@@ -4,8 +4,8 @@
 namespace sinri\ark\database\model\query;
 
 
-use Exception;
-use sinri\ark\core\ArkHelper;
+use sinri\ark\database\Exception\ArkPDOSQLBuilderError;
+use sinri\ark\database\Exception\ArkPDOStatementException;
 use sinri\ark\database\model\ArkDatabaseTableCoreModel;
 use sinri\ark\database\model\ArkSQLCondition;
 
@@ -273,27 +273,29 @@ class ArkDatabaseSelectTableQuery
             $result->setSql($sql);
 
             $all = $this->model->db()->getAll($sql);
-
-            if (!is_array($all)) {
-                throw new Exception("Non-Array Fetched From Database");
-            }
-
-            foreach ($all as $row) {
-                $result->addResultRow(new $resultRowCustomizedClass($row));
+            if (is_array($all)) {
+                foreach ($all as $row) {
+                    $result->addResultRow(new $resultRowCustomizedClass($row));
+                }
             }
             $result->setStatus(ArkDatabaseQueryResult::STATUS_QUERIED);
-
-            return $result;
-        } catch (Exception $exception) {
+        } catch (ArkPDOStatementException $e) {
             $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
-            $result->setError('Exception: ' . $exception->getMessage() . '; PDO Last Error: ' . $this->model->db()->getPDOErrorDescription());
-            return $result;
+            $result->setError(
+                'ArkPDOStatementException: ' . $e->getMessage() . ';'
+                . ' SQL: ' . $e->getSql()
+                . ' PDO Last Error: ' . $this->model->db()->getPDOErrorDescription()
+            );
+        } catch (ArkPDOSQLBuilderError $e) {
+            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
+            $result->setError('ArkPDOSQLBuilderError: ' . $e->getMessage() . ' SQL: ' . $e->getWrongSQLPiece());
         }
+        return $result;
     }
 
     /**
      * @return string
-     * @throws Exception
+     * @throws ArkPDOSQLBuilderError
      */
     public function generateSQL()
     {
@@ -342,16 +344,24 @@ class ArkDatabaseSelectTableQuery
             $result->setSql($sql);
 
             $statement = $this->model->db()->getPdo()->query($sql);
-            ArkHelper::quickNotEmptyAssert('Cannot build a valid PDO Statement: ' . $sql);
+            if ($statement === false) {
+                throw new ArkPDOStatementException('Cannot build a valid PDO Statement', $sql);
+            }
 
             $result->setResultRowStream($statement);
             $result->setStatus(ArkDatabaseQueryResult::STATUS_STREAMING);
 
-            return $result;
-        } catch (Exception $exception) {
+        } catch (ArkPDOSQLBuilderError $e) {
             $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
-            $result->setError('Exception: ' . $exception->getMessage() . '; PDO Last Error: ' . $this->model->db()->getPDOErrorDescription());
-            return $result;
+            $result->setError('ArkPDOSQLBuilderError: ' . $e->getMessage() . ' SQL: ' . $e->getWrongSQLPiece());
+        } catch (ArkPDOStatementException $e) {
+            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
+            $result->setError(
+                'ArkPDOStatementException: ' . $e->getMessage() . ';'
+                . ' SQL: ' . $e->getSql()
+                . ' PDO Last Error: ' . $this->model->db()->getPDOErrorDescription()
+            );
         }
+        return $result;
     }
 }
