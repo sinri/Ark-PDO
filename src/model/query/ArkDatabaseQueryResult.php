@@ -3,9 +3,9 @@
 
 namespace sinri\ark\database\model\query;
 
-use OutOfBoundsException;
 use PDO;
 use PDOStatement;
+use sinri\ark\database\Exception\ArkPDOInvalidIndexError;
 use sinri\ark\database\Exception\ArkPDOQueryResultIsNotQueriedError;
 
 /**
@@ -175,25 +175,6 @@ class ArkDatabaseQueryResult
     }
 
     /**
-     * @return string
-     */
-    public function getError(): string
-    {
-        return $this->error;
-    }
-
-    /**
-     * @param string $error
-     * @return ArkDatabaseQueryResult
-     * @since 2.0.10 Fixed the return design.
-     */
-    public function setError(string $error)
-    {
-        $this->error = $error;
-        return $this;
-    }
-
-    /**
      * @param array[] $matrix
      * @return $this
      */
@@ -223,6 +204,37 @@ class ArkDatabaseQueryResult
     {
         $this->assertStatusIsQueried(__METHOD__);
         return $this->resultRows;
+    }
+
+    /**
+     * @param string $action
+     * @throws ArkPDOQueryResultIsNotQueriedError
+     * @since 2.0.12
+     */
+    protected function assertStatusIsQueried(string $action)
+    {
+        if ($this->status !== self::STATUS_QUERIED) {
+            throw new ArkPDOQueryResultIsNotQueriedError($action, $this->status, $this->getError());
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getError(): string
+    {
+        return $this->error;
+    }
+
+    /**
+     * @param string $error
+     * @return ArkDatabaseQueryResult
+     * @since 2.0.10 Fixed the return design.
+     */
+    public function setError(string $error)
+    {
+        $this->error = $error;
+        return $this;
     }
 
     /**
@@ -296,6 +308,8 @@ class ArkDatabaseQueryResult
             return $this->getResultRowByIndex(0)->getRawRow();
         } catch (ArkPDOQueryResultIsNotQueriedError $e) {
             return false;
+        } catch (ArkPDOInvalidIndexError $e) {
+            return false;
         }
     }
 
@@ -303,14 +317,14 @@ class ArkDatabaseQueryResult
      * @param int $index Since 0
      * @return ArkDatabaseQueryResultRow
      * @throws ArkPDOQueryResultIsNotQueriedError
-     * @throws OutOfBoundsException
+     * @throws ArkPDOInvalidIndexError
      * @since 2.0.1
      */
     public function getResultRowByIndex(int $index)
     {
         $this->assertStatusIsQueried(__METHOD__ . "({$index})");
         if ($index < 0 || $index >= count($this->resultRows)) {
-            throw new OutOfBoundsException("Out of Bounds");
+            throw new ArkPDOInvalidIndexError("Out of Bounds", $index);
         }
         return $this->resultRows[$index];
     }
@@ -359,6 +373,8 @@ class ArkDatabaseQueryResult
             return $this->getResultRowByIndex(0)->getField($fieldName, $default);
         } catch (ArkPDOQueryResultIsNotQueriedError $e) {
             return false;
+        } catch (ArkPDOInvalidIndexError $e) {
+            return false;
         }
     }
 
@@ -394,17 +410,5 @@ class ArkDatabaseQueryResult
             $map[$resultRow->getField($keyFieldName, '')] = $resultRow->getField($valueFieldName, $defaultValue);
         }
         return $map;
-    }
-
-    /**
-     * @param string $action
-     * @throws ArkPDOQueryResultIsNotQueriedError
-     * @since 2.0.12
-     */
-    protected function assertStatusIsQueried(string $action)
-    {
-        if ($this->status !== self::STATUS_QUERIED) {
-            throw new ArkPDOQueryResultIsNotQueriedError($action, $this->status, $this->getError());
-        }
     }
 }
