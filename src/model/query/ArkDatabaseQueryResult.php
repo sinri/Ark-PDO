@@ -272,7 +272,7 @@ class ArkDatabaseQueryResult
     }
 
     /**
-     * @return array[]|bool
+     * @return array[]|false False for Error
      * @since 2.0.5
      */
     public function tryGetRawRowsFromResultRowSet()
@@ -299,7 +299,7 @@ class ArkDatabaseQueryResult
     }
 
     /**
-     * @return array|bool
+     * @return array|false|null False for Error, Null for Empty
      * @since 2.0.5
      */
     public function tryGetFirstRawRowFromResultRowSet()
@@ -309,7 +309,7 @@ class ArkDatabaseQueryResult
         } catch (ArkPDOQueryResultIsNotQueriedError $e) {
             return false;
         } catch (ArkPDOInvalidIndexError $e) {
-            return false;
+            return null;
         }
     }
 
@@ -332,7 +332,7 @@ class ArkDatabaseQueryResult
     /**
      * @param string $fieldName
      * @param mixed $default
-     * @return array|bool
+     * @return array|false False for Error
      * @since 2.0.5
      */
     public function tryGetRawColumnsFromResultRowSet(string $fieldName, $default = null)
@@ -364,7 +364,7 @@ class ArkDatabaseQueryResult
     /**
      * @param string $fieldName
      * @param mixed $default
-     * @return mixed
+     * @return scalar|false|null False for Error, Null for Empty
      * @since 2.0.6
      */
     public function tryGetRawCellFromResultRowSet(string $fieldName, $default = null)
@@ -374,7 +374,7 @@ class ArkDatabaseQueryResult
         } catch (ArkPDOQueryResultIsNotQueriedError $e) {
             return false;
         } catch (ArkPDOInvalidIndexError $e) {
-            return false;
+            return null;
         }
     }
 
