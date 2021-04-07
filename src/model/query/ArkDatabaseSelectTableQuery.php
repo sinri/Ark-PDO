@@ -4,8 +4,8 @@
 namespace sinri\ark\database\model\query;
 
 
-use sinri\ark\database\Exception\ArkPDOSQLBuilderError;
-use sinri\ark\database\Exception\ArkPDOStatementException;
+use sinri\ark\database\exception\ArkPDOSQLBuilderError;
+use sinri\ark\database\exception\ArkPDOStatementException;
 use sinri\ark\database\model\ArkDatabaseTableCoreModel;
 use sinri\ark\database\model\ArkSQLCondition;
 

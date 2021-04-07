@@ -5,9 +5,9 @@ namespace sinri\ark\database\model;
 
 
 use Exception;
-use sinri\ark\database\Exception\ArkPDODatabaseQueryError;
-use sinri\ark\database\Exception\ArkPDOMatrixRowsLengthDifferError;
-use sinri\ark\database\Exception\ArkPDOSQLBuilderError;
+use sinri\ark\database\exception\ArkPDODatabaseQueryError;
+use sinri\ark\database\exception\ArkPDOMatrixRowsLengthDifferError;
+use sinri\ark\database\exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\model\query\ArkDatabaseQueryResult;
 use sinri\ark\database\model\query\ArkDatabaseSelectFieldMeta;
 use sinri\ark\database\model\query\ArkDatabaseSelectTableQuery;

@@ -11,9 +11,9 @@ namespace sinri\ark\database\pdo;
 
 use PDO;
 use sinri\ark\core\ArkHelper;
-use sinri\ark\database\Exception\ArkPDOConfigError;
-use sinri\ark\database\Exception\ArkPDODatabaseQueryError;
-use sinri\ark\database\Exception\ArkPDOStatementException;
+use sinri\ark\database\exception\ArkPDOConfigError;
+use sinri\ark\database\exception\ArkPDODatabaseQueryError;
+use sinri\ark\database\exception\ArkPDOStatementException;
 
 class ArkPDOCompareTool
 {

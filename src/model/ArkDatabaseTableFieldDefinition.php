@@ -10,8 +10,8 @@ namespace sinri\ark\database\model;
 
 
 use sinri\ark\core\ArkHelper;
-use sinri\ark\core\Exception\LookUpTargetException;
-use sinri\ark\database\Exception\ArkPDOStatementException;
+use sinri\ark\core\exception\LookUpTargetException;
+use sinri\ark\database\exception\ArkPDOStatementException;
 use sinri\ark\database\pdo\ArkPDO;
 
 class ArkDatabaseTableFieldDefinition

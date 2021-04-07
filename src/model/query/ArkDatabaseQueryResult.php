@@ -5,8 +5,8 @@ namespace sinri\ark\database\model\query;
 
 use PDO;
 use PDOStatement;
-use sinri\ark\database\Exception\ArkPDOInvalidIndexError;
-use sinri\ark\database\Exception\ArkPDOQueryResultIsNotQueriedError;
+use sinri\ark\database\exception\ArkPDOInvalidIndexError;
+use sinri\ark\database\exception\ArkPDOQueryResultIsNotQueriedError;
 
 /**
  * Class ArkDatabaseQueryResult

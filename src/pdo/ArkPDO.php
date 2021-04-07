@@ -13,9 +13,9 @@ use Exception;
 use PDO;
 use PDOStatement;
 use sinri\ark\core\ArkLogger;
-use sinri\ark\database\Exception\ArkPDOConfigError;
-use sinri\ark\database\Exception\ArkPDOSQLBuilderError;
-use sinri\ark\database\Exception\ArkPDOStatementException;
+use sinri\ark\database\exception\ArkPDOConfigError;
+use sinri\ark\database\exception\ArkPDOSQLBuilderError;
+use sinri\ark\database\exception\ArkPDOStatementException;
 
 class ArkPDO
 {

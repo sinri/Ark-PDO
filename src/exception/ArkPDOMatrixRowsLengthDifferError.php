@@ -1,7 +1,7 @@
 <?php
 
 
-namespace sinri\ark\database\Exception;
+namespace sinri\ark\database\exception;
 
 
 /**
