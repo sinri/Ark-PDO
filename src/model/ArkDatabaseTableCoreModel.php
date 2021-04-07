@@ -104,7 +104,7 @@ abstract class ArkDatabaseTableCoreModel
             $afx = $this->db()->exec($sql);
             if ($afx === false) {
                 throw new ArkPDODatabaseQueryError(
-                    "Error in updating: " . $this->db()->getPDOErrorInfo(),
+                    "Error in updating: " . $this->db()->getPDOErrorDescription(),
                     $this->db()->getPDOErrorCode()
                 );
             }
@@ -159,7 +159,7 @@ abstract class ArkDatabaseTableCoreModel
             $afx = $this->db()->exec($sql);
             if ($afx === false) {
                 throw new ArkPDODatabaseQueryError(
-                    "Error in updating: " . $this->db()->getPDOErrorInfo(),
+                    "Error in updating: " . $this->db()->getPDOErrorDescription(),
                     $this->db()->getPDOErrorCode()
                 );
             }
@@ -238,7 +238,7 @@ abstract class ArkDatabaseTableCoreModel
             $afx = $this->db()->insert($sql, $pk);
             if ($afx === false) {
                 throw new ArkPDODatabaseQueryError(
-                    "Cannot write into table: " . $this->db()->getPDOErrorInfo(),
+                    "Cannot write into table: " . $this->db()->getPDOErrorDescription(),
                     $this->db()->getPDOErrorCode()
                 );
             }
@@ -331,7 +331,7 @@ abstract class ArkDatabaseTableCoreModel
             $afx = $this->db()->insert($sql, $pk);
             if ($afx == false) {
                 throw new ArkPDODatabaseQueryError(
-                    "Error in batch writing: " . $this->db()->getPDOErrorInfo(),
+                    "Error in batch writing: " . $this->db()->getPDOErrorDescription(),
                     $this->db()->getPDOErrorCode()
                 );
             }

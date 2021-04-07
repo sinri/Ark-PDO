@@ -321,10 +321,11 @@ class ArkPDO
     /**
      * @return string
      * @since 1.6.0
+     * @since 2.0.16 changed format
      */
     public function getPDOErrorDescription()
     {
-        return "PDO ERROR #" . $this->getPDOErrorCode() . ": " . implode(";", $this->getPDOErrorInfo());
+        return "PDO ERROR: " . implode(";", $this->getPDOErrorInfo());
     }
 
     /**
