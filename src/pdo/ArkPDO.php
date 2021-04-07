@@ -9,11 +9,11 @@
 namespace sinri\ark\database\pdo;
 
 
-use Exception;
 use PDO;
 use PDOStatement;
-use sinri\ark\core\ArkHelper;
 use sinri\ark\core\ArkLogger;
+use sinri\ark\database\exception\ArkPDOConfigError;
+use sinri\ark\database\exception\ArkPDOStatementException;
 
 class ArkPDO
 {
@@ -58,12 +58,12 @@ class ArkPDO
 
     /**
      * Connect to Database and make self::pdo an instance.
-     * @throws Exception
+     * @throws ArkPDOConfigError
      */
     public function connect()
     {
         if (!is_a($this->pdoConfig, ArkPDOConfig::class)) {
-            throw new Exception("Ark PDO Config not given!");
+            throw new ArkPDOConfigError();
         }
 
         $engine = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_ENGINE, ArkPDOConfig::ENGINE_MYSQL);
@@ -75,12 +75,21 @@ class ArkPDO
         $charset = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_CHARSET, ArkPDOConfig::CHARSET_UTF8);
         $options = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_OPTIONS, null);
 
-        ArkHelper::assertItem($host, 'Ark PDO: Host is empty.');
-        ArkHelper::assertItem($port, 'Ark PDO: Port is empty.');
-        ArkHelper::assertItem($username, 'Ark PDO: Username is empty.');
-        ArkHelper::assertItem($password, 'Ark PDO: Password is empty.');
-        //ArkHelper::assertItem($database, 'Ark PDO: Database is empty.');
-        ArkHelper::assertItem($charset, 'Ark PDO: CharSet is empty.');
+        if (empty($host)) {
+            throw new ArkPDOConfigError(ArkPDOConfig::CONFIG_HOST, $host);
+        }
+        if (empty($port)) {
+            throw new ArkPDOConfigError(ArkPDOConfig::CONFIG_PORT, $port);
+        }
+        if (empty($username)) {
+            throw new ArkPDOConfigError(ArkPDOConfig::CONFIG_USERNAME, $username);
+        }
+        if (empty($password)) {
+            throw new ArkPDOConfigError(ArkPDOConfig::CONFIG_PASSWORD, $password);
+        }
+        if (empty($charset)) {
+            throw new ArkPDOConfigError(ArkPDOConfig::CONFIG_CHARSET, $charset);
+        }
 
         $engine = strtolower($engine);
         switch ($engine) {
@@ -103,12 +112,10 @@ class ArkPDO
                 if (!empty($database)) {
                     $this->pdo->exec("use `{$database}`;");
                 }
-                if (!empty($charset)) {
                     $this->pdo->query("set names " . $charset);
-                }
                 break;
             default:
-                throw new Exception("Ark PDO: unsupported engine " . $engine);
+                throw new ArkPDOConfigError(ArkPDOConfig::CONFIG_ENGINE, $engine);
                 break;
         }
     }
@@ -144,7 +151,7 @@ class ArkPDO
      * @param string $sql
      * @param bool $usePrepare
      * @return PDOStatement
-     * @throws Exception
+     * @throws ArkPDOStatementException
      */
     protected function buildPDOStatement($sql, $usePrepare = false)
     {
@@ -155,7 +162,7 @@ class ArkPDO
         }
         if (!$statement) {
             $this->logger->error("PDO Statement Building Failure Occurred.", ["sql" => $sql]);
-            throw new Exception("PDO Statement Building Failure Occurred: " . $sql);
+            throw new ArkPDOStatementException("PDO Statement Building Failure Occurred.", $sql);
         } else {
             $this->logger->debug("PDO Statement Generated.", ["sql" => $sql]);
         }
@@ -166,15 +173,14 @@ class ArkPDO
      * @param string $sql
      * @param null|string|int $field
      * @return array
-     * @throws Exception
+     * @throws ArkPDOStatementException
      */
     public function getCol($sql, $field = null)
     {
         $stmt = $this->buildPDOStatement($sql);
         $rows = $stmt->fetchAll(PDO::FETCH_BOTH);
         if ($field === null) $field = 0;
-        $col = array_column($rows, $field);
-        return $col;
+        return array_column($rows, $field);
     }
 
     /**
@@ -193,7 +199,6 @@ class ArkPDO
     /**
      * @param string $sql
      * @return mixed|bool
-     * @throws Exception
      */
     public function getOne($sql)
     {

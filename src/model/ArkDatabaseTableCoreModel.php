@@ -4,8 +4,8 @@
 namespace sinri\ark\database\model;
 
 
-use Exception;
 use sinri\ark\core\ArkHelper;
+use sinri\ark\database\exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\pdo\ArkPDO;
 
 /**
@@ -68,7 +68,7 @@ abstract class ArkDatabaseTableCoreModel
                 if (is_a($value, ArkSQLCondition::class)) {
                     try {
                         $c[] = $value->makeConditionSQL();
-                    } catch (Exception $e) {
+                    } catch (ArkPDOSQLBuilderError $e) {
                         // ignore the error
                     }
                 } else {

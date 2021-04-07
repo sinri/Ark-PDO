@@ -9,7 +9,7 @@
 namespace sinri\ark\database\model;
 
 
-use Exception;
+use sinri\ark\database\exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\pdo\ArkPDO;
 
 class ArkSQLCondition
@@ -232,7 +232,7 @@ class ArkSQLCondition
 
     /**
      * @return string
-     * @throws Exception
+     * @throws ArkPDOSQLBuilderError
      */
     public function makeConditionSQL()
     {
@@ -245,39 +245,33 @@ class ArkSQLCondition
             case self::OP_NEQ:
             case self::OP_NULL_SAFE_EQUAL:
                 return "`{$this->field}` " . $this->operate . " " . ArkPDO::dryQuote($this->value);
-                break;
             case self::OP_IS:
             case self::OP_IS_NOT:
                 if (!in_array($this->value, [self::CONST_FALSE, self::CONST_TRUE, self::CONST_NULL])) {
-                    throw new Exception("ERROR, YOU MUST USE CONSTANT FOR IS COMPARISION!");
+                    throw new ArkPDOSQLBuilderError("ERROR, YOU MUST USE CONSTANT FOR IS COMPARISON!");
                 }
                 return "`{$this->field}` " . $this->operate . " " . $this->value;
-                break;
             case self::OP_IN:
             case self::OP_NOT_IN:
                 if (!is_array($this->value) || empty($this->value)) {
-                    throw new Exception("ERROR, YOU MUST GIVE AN ARRAY OF STRING FOR IN OPERATION!");
+                    throw new ArkPDOSQLBuilderError("ERROR, YOU MUST GIVE AN ARRAY OF STRING FOR IN OPERATION!");
                 }
                 $group = [];
                 foreach ($this->value as $item) {
                     $group[] = ArkPDO::dryQuote($item);
                 }
                 return "`{$this->field}` " . $this->operate . " (" . implode(",", $group) . ")";
-                break;
             case self::OP_LIKE:
             case self::OP_NOT_LIKE:
                 // NOTE: value is preprocessed in constructor
                 return "`{$this->field}` " . $this->operate . " " . ($this->value);
-                break;
             case self::OP_BETWEEN:
             case self::OP_NOT_BETWEEN:
                 return "`{$this->field}` " . $this->operate . " " . ArkPDO::dryQuote($this->value[0]) . " AND " . ArkPDO::dryQuote($this->value[1]);
-                break;
             case self::OP_EXISTS:
             case self::OP_NOT_EXISTS:
                 // NOTE: only value is used as raw sql string @since 1.5
                 return "{$this->operate} (" . $this->value . ")";
-                break;
             case self::OP_PARENTHESES_AND:
             case self::OP_PARENTHESES_OR:
                 // NOTE: to support the parentheses @since 1.7.1
@@ -288,18 +282,15 @@ class ArkSQLCondition
                     }
                 }
                 if (empty($parts)) {
-                    throw new Exception("Condition Set Empty");
+                    throw new ArkPDOSQLBuilderError("Condition Set Empty");
                 }
                 return '(' . implode(" " . $this->operate . " ", $parts) . ')';
-                break;
             case self::MACRO_IS_NULL_OR_EMPTY_STRING:
                 return "(`{$this->field}` IS NULL OR `{$this->field}` = '')";
-                break;
             case self::MACRO_IS_NOT_NULL_NOR_EMPTY_STRING:
                 return "(`{$this->field}` IS NOT NULL AND `{$this->field}` <> '')";
-                break;
             default:
-                throw new Exception("ERROR, UNKNOWN OPERATE");
+                throw new ArkPDOSQLBuilderError("ERROR, UNKNOWN OPERATE");
         }
     }
 }
