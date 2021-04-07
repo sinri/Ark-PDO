@@ -67,54 +67,54 @@ class ArkPDOConfig
         return ArkHelper::readTarget($this->dict, $name);
     }
 
-    public function __isset($name)
+    public function __isset($name): bool
     {
         return (isset($this->dict) && isset($this->dict[$name]));
     }
 
-    public function setHost($value)
+    public function setHost($value): ArkPDOConfig
     {
         $field = self::CONFIG_HOST;
         $this->$field = $value;
         return $this;
     }
 
-    public function setPort($value)
+    public function setPort($value): ArkPDOConfig
     {
         $field = self::CONFIG_PORT;
         $this->$field = intval($value);
         return $this;
     }
 
-    public function setUsername($value)
+    public function setUsername($value): ArkPDOConfig
     {
         $field = self::CONFIG_USERNAME;
         $this->$field = $value;
         return $this;
     }
 
-    public function setPassword($value)
+    public function setPassword($value): ArkPDOConfig
     {
         $field = self::CONFIG_PASSWORD;
         $this->$field = $value;
         return $this;
     }
 
-    public function setDatabase($value)
+    public function setDatabase($value): ArkPDOConfig
     {
         $field = self::CONFIG_DATABASE;
         $this->$field = $value;
         return $this;
     }
 
-    public function setCharset($value)
+    public function setCharset($value): ArkPDOConfig
     {
         $field = self::CONFIG_CHARSET;
         $this->$field = $value;
         return $this;
     }
 
-    public function setEngine($value)
+    public function setEngine($value): ArkPDOConfig
     {
         $field = self::CONFIG_ENGINE;
         $this->$field = $value;
@@ -126,7 +126,7 @@ class ArkPDOConfig
      * @param $value
      * @return $this
      */
-    public function setOptions($value)
+    public function setOptions($value): ArkPDOConfig
     {
         $field = self::CONFIG_OPTIONS;
         $this->$field = $value;
@@ -137,7 +137,7 @@ class ArkPDOConfig
      * @param string $value
      * @return $this
      */
-    public function setTitle(string $value)
+    public function setTitle(string $value): ArkPDOConfig
     {
         $field = self::CONFIG_TITLE;
         $this->$field = $value;

@@ -18,12 +18,12 @@ abstract class ArkDatabaseTableModel extends ArkDatabaseTableCoreModel
 {
 
     /**
-     * @return null|string
+     * @return string
      * @since 1.6.2
      */
-    public function mappingSchemeName()
+    public function mappingSchemeName(): string
     {
-        return null;
+        return '';
     }
 
 }

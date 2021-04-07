@@ -47,7 +47,7 @@ class ArkPDOQueryResultIsNotQueriedError extends Exception
      * @param mixed $action
      * @return ArkPDOQueryResultIsNotQueriedError
      */
-    public function setAction($action)
+    public function setAction($action): ArkPDOQueryResultIsNotQueriedError
     {
         $this->action = $action;
         return $this;
@@ -65,7 +65,7 @@ class ArkPDOQueryResultIsNotQueriedError extends Exception
      * @param mixed $status
      * @return ArkPDOQueryResultIsNotQueriedError
      */
-    public function setStatus($status)
+    public function setStatus($status): ArkPDOQueryResultIsNotQueriedError
     {
         $this->status = $status;
         return $this;
@@ -83,7 +83,7 @@ class ArkPDOQueryResultIsNotQueriedError extends Exception
      * @param mixed $databaseError
      * @return ArkPDOQueryResultIsNotQueriedError
      */
-    public function setDatabaseError($databaseError)
+    public function setDatabaseError($databaseError): ArkPDOQueryResultIsNotQueriedError
     {
         $this->databaseError = $databaseError;
         return $this;

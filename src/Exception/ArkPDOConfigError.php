@@ -40,7 +40,7 @@ class ArkPDOConfigError extends Exception
         return $this->invalidFieldValue;
     }
 
-    public function setInvalidFieldValue($invalidFieldValue)
+    public function setInvalidFieldValue($invalidFieldValue): ArkPDOConfigError
     {
         $this->invalidFieldValue = $invalidFieldValue;
         return $this;

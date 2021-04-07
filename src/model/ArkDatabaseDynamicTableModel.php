@@ -21,9 +21,9 @@ class ArkDatabaseDynamicTableModel extends ArkDatabaseTableCoreModel
      * ArkDatabaseDynamicTableModel constructor.
      * @param ArkPDO $pdo
      * @param string $table
-     * @param string|null $scheme
+     * @param string $scheme
      */
-    public function __construct(ArkPDO $pdo, string $table, $scheme = null)
+    public function __construct(ArkPDO $pdo, string $table, string $scheme = '')
     {
         $this->pdo = $pdo;
         $this->scheme = $scheme;
@@ -31,10 +31,10 @@ class ArkDatabaseDynamicTableModel extends ArkDatabaseTableCoreModel
     }
 
     /**
-     * @return null|string
+     * @return string
      * @since 1.6.2
      */
-    public function mappingSchemeName()
+    public function mappingSchemeName(): string
     {
         return $this->scheme;
     }
@@ -43,7 +43,7 @@ class ArkDatabaseDynamicTableModel extends ArkDatabaseTableCoreModel
      * @return string
      * @since 1.6.2
      */
-    public function mappingTableName()
+    public function mappingTableName(): string
     {
         return $this->table;
     }
@@ -51,7 +51,7 @@ class ArkDatabaseDynamicTableModel extends ArkDatabaseTableCoreModel
     /**
      * @return ArkPDO
      */
-    public function db()
+    public function db(): ArkPDO
     {
         return $this->pdo;
     }

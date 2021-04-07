@@ -23,30 +23,30 @@ abstract class ArkDatabaseTableCoreModel
     /**
      * @return ArkPDO
      */
-    abstract public function db();
+    abstract public function db(): ArkPDO;
 
     /**
      * @return string
      * @since 1.6.2
      */
-    public function getTableExpressForSQL()
+    public function getTableExpressForSQL(): string
     {
-        $e = ($this->mappingSchemeName() === null ? "" : '`' . $this->mappingSchemeName() . "`.");
+        $e = ($this->mappingSchemeName() === '' ? "" : '`' . $this->mappingSchemeName() . "`.");
         $e .= "`" . $this->mappingTableName() . "`";
         return $e;
     }
 
     /**
-     * @return null|string
+     * @return string return empty string for using default schema
      * @since 1.6.2
      */
-    abstract public function mappingSchemeName();
+    abstract public function mappingSchemeName(): string;
 
     /**
      * @return string
      * @since 1.6.2
      */
-    abstract public function mappingTableName();
+    abstract public function mappingTableName(): string;
 
     /**
      * @return false|string
@@ -60,7 +60,7 @@ abstract class ArkDatabaseTableCoreModel
      * @return ArkDatabaseSelectTableQuery
      * @since 2.0
      */
-    public function selectInTable()
+    public function selectInTable(): ArkDatabaseSelectTableQuery
     {
         return new ArkDatabaseSelectTableQuery($this);
     }
@@ -71,7 +71,7 @@ abstract class ArkDatabaseTableCoreModel
      * @return ArkDatabaseQueryResult
      * @since 2.0
      */
-    public function insertOneRow(array $data, $pk = null)
+    public function insertOneRow(array $data, $pk = null): ArkDatabaseQueryResult
     {
         return $this->writeInto($data, $pk);
     }
@@ -81,7 +81,7 @@ abstract class ArkDatabaseTableCoreModel
      * @return ArkDatabaseQueryResult
      * @since 2.0
      */
-    public function replaceOneRow(array $data)
+    public function replaceOneRow(array $data): ArkDatabaseQueryResult
     {
         return $this->writeInto($data, null, true);
     }
@@ -92,7 +92,7 @@ abstract class ArkDatabaseTableCoreModel
      * @return ArkDatabaseQueryResult
      * @since 2.0
      */
-    public function updateRows(array $conditions, array $modification)
+    public function updateRows(array $conditions, array $modification): ArkDatabaseQueryResult
     {
         $result = new ArkDatabaseQueryResult();
         try {
@@ -103,10 +103,7 @@ abstract class ArkDatabaseTableCoreModel
             $result->setSql($sql);
             $afx = $this->db()->exec($sql);
             if ($afx === false) {
-                throw new ArkPDODatabaseQueryError(
-                    "Error in updating: " . $this->db()->getPDOErrorDescription(),
-                    $this->db()->getPDOErrorCode()
-                );
+                throw new ArkPDODatabaseQueryError("Error in updating: " . $this->db()->getPDOErrorDescription());
             }
             $result->setAffectedRowsCount($afx);
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
@@ -129,7 +126,7 @@ abstract class ArkDatabaseTableCoreModel
      * @return ArkDatabaseQueryResult
      * @since 2.0.6
      */
-    public function quickUpdateRowsWithSimpleConditions(array $simpleConditions, array $modification)
+    public function quickUpdateRowsWithSimpleConditions(array $simpleConditions, array $modification): ArkDatabaseQueryResult
     {
         $conditions = [];
         foreach ($simpleConditions as $fieldName => $value) {
@@ -149,7 +146,7 @@ abstract class ArkDatabaseTableCoreModel
      * @return ArkDatabaseQueryResult
      * @since 2.0
      */
-    public function deleteRows(array $conditions)
+    public function deleteRows(array $conditions): ArkDatabaseQueryResult
     {
         $result = new ArkDatabaseQueryResult();
         try {
@@ -158,10 +155,7 @@ abstract class ArkDatabaseTableCoreModel
             $sql = "DELETE FROM {$table} WHERE {$condition_sql}";
             $afx = $this->db()->exec($sql);
             if ($afx === false) {
-                throw new ArkPDODatabaseQueryError(
-                    "Error in updating: " . $this->db()->getPDOErrorDescription(),
-                    $this->db()->getPDOErrorCode()
-                );
+                throw new ArkPDODatabaseQueryError("Error in updating: " . $this->db()->getPDOErrorDescription());
             }
             $result->setAffectedRowsCount($afx);
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
@@ -184,7 +178,7 @@ abstract class ArkDatabaseTableCoreModel
      * @return ArkDatabaseQueryResult
      * @since 2.0.6
      */
-    public function quickDeleteRowsWithSimpleConditions(array $simpleConditions)
+    public function quickDeleteRowsWithSimpleConditions(array $simpleConditions): ArkDatabaseQueryResult
     {
         $conditions = [];
         foreach ($simpleConditions as $fieldName => $value) {
@@ -205,7 +199,7 @@ abstract class ArkDatabaseTableCoreModel
      * @return ArkDatabaseQueryResult
      * @since 2.0
      */
-    public function batchInsertRows(array $dataList, $pk = null)
+    public function batchInsertRows(array $dataList, $pk = null): ArkDatabaseQueryResult
     {
         return $this->batchWriteInto($dataList, $pk);
     }
@@ -215,7 +209,7 @@ abstract class ArkDatabaseTableCoreModel
      * @return ArkDatabaseQueryResult
      * @since 2.0
      */
-    public function batchReplaceRows(array $dataList)
+    public function batchReplaceRows(array $dataList): ArkDatabaseQueryResult
     {
         return $this->batchWriteInto($dataList, null, true);
     }
@@ -226,7 +220,7 @@ abstract class ArkDatabaseTableCoreModel
      * @param bool $shouldReplace
      * @return ArkDatabaseQueryResult
      */
-    protected function writeInto(array $data, $pk = null, bool $shouldReplace = false)
+    protected function writeInto(array $data, $pk = null, bool $shouldReplace = false): ArkDatabaseQueryResult
     {
         $table = $this->getTableExpressForSQL();
         $values = $this->buildRowValuesForWrite($data, $fields);
@@ -237,10 +231,7 @@ abstract class ArkDatabaseTableCoreModel
             $result->setSql($sql);
             $afx = $this->db()->insert($sql, $pk);
             if ($afx === false) {
-                throw new ArkPDODatabaseQueryError(
-                    "Cannot write into table: " . $this->db()->getPDOErrorDescription(),
-                    $this->db()->getPDOErrorCode()
-                );
+                throw new ArkPDODatabaseQueryError("Cannot write into table: " . $this->db()->getPDOErrorDescription());
             }
             $result->setLastInsertedID($afx);
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
@@ -260,7 +251,7 @@ abstract class ArkDatabaseTableCoreModel
      * @return string
      * @since 1.7.4
      */
-    protected function buildRowValuesForWrite(array $valuesForOneRow, &$fields = null)
+    protected function buildRowValuesForWrite(array $valuesForOneRow, &$fields = null): string
     {
         $sql = [];
         $fields = [];
@@ -282,7 +273,7 @@ abstract class ArkDatabaseTableCoreModel
      * @return string
      * @since 1.7.4
      */
-    protected function buildRowValuesForUpdate(array $valuesForOneRow)
+    protected function buildRowValuesForUpdate(array $valuesForOneRow): string
     {
         $sql = [];
         foreach ($valuesForOneRow as $key => $value) {
@@ -302,7 +293,7 @@ abstract class ArkDatabaseTableCoreModel
      * @param bool $shouldReplace
      * @return ArkDatabaseQueryResult
      */
-    protected function batchWriteInto(array $dataList, $pk = null, bool $shouldReplace = false)
+    protected function batchWriteInto(array $dataList, $pk = null, bool $shouldReplace = false): ArkDatabaseQueryResult
     {
         $result = new ArkDatabaseQueryResult();
         try {
@@ -330,10 +321,7 @@ abstract class ArkDatabaseTableCoreModel
 
             $afx = $this->db()->insert($sql, $pk);
             if ($afx == false) {
-                throw new ArkPDODatabaseQueryError(
-                    "Error in batch writing: " . $this->db()->getPDOErrorDescription(),
-                    $this->db()->getPDOErrorCode()
-                );
+                throw new ArkPDODatabaseQueryError("Error in batch writing: " . $this->db()->getPDOErrorDescription());
             }
 
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
@@ -366,7 +354,7 @@ abstract class ArkDatabaseTableCoreModel
      * @since 2.0.10
      * @since 2.0.11 loose $totalRows type check, allow unassigned variable to be there
      */
-    public function fetchByPaging(int $page, int $pageSize, array $fieldMataList, array $conditions, string $sortExpression = '', &$totalRows = 0)
+    public function fetchByPaging(int $page, int $pageSize, array $fieldMataList, array $conditions, string $sortExpression = '', &$totalRows = 0): array
     {
         if ($page < 1 || $pageSize <= 0) {
             throw new Exception("Page number or page size is not correct.");

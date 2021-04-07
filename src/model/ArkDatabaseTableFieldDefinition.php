@@ -9,8 +9,9 @@
 namespace sinri\ark\database\model;
 
 
-use Exception;
 use sinri\ark\core\ArkHelper;
+use sinri\ark\core\Exception\LookUpTargetException;
+use sinri\ark\database\Exception\ArkPDOStatementException;
 use sinri\ark\database\pdo\ArkPDO;
 
 class ArkDatabaseTableFieldDefinition
@@ -28,7 +29,7 @@ class ArkDatabaseTableFieldDefinition
      * @param $row
      * @return ArkDatabaseTableFieldDefinition
      */
-    public static function makeInstanceWithDescResultRow($row)
+    public static function makeInstanceWithDescResultRow($row): ArkDatabaseTableFieldDefinition
     {
         $field = new ArkDatabaseTableFieldDefinition();
         $field->name = ArkHelper::readTarget($row, 'Field');
@@ -44,7 +45,7 @@ class ArkDatabaseTableFieldDefinition
         return $field;
     }
 
-    protected static function determineTypeCategory($type)
+    protected static function determineTypeCategory($type): string
     {
         $type = strtolower($type);
         switch ($type) {
@@ -141,14 +142,15 @@ class ArkDatabaseTableFieldDefinition
      * @param ArkPDO $db
      * @param string $tableExpression
      * @return ArkDatabaseTableFieldDefinition[]
-     * @throws Exception
+     * @throws ArkPDOStatementException
+     * @throws LookUpTargetException
      */
-    public static function loadTableDesc(ArkPDO $db, string $tableExpression)
+    public static function loadTableDesc(ArkPDO $db, string $tableExpression): array
     {
         $fieldDefinition = [];
         $field_list = $db->getAll("desc " . $tableExpression);
         if (empty($field_list)) {
-            throw new Exception("Seems no such table " . $tableExpression);
+            throw new LookUpTargetException("Seems no such table " . $tableExpression);
         }
         foreach ($field_list as $field) {
             $fieldDefinition[$field['Field']] = ArkDatabaseTableFieldDefinition::makeInstanceWithDescResultRow($field);
@@ -160,7 +162,8 @@ class ArkDatabaseTableFieldDefinition
      * When you design a model for a certain table which is eventually designed,
      * you might run this method to get `@property` lines for the model class PHPDoc.
      * @param ArkDatabaseTableCoreModel $model
-     * @throws Exception
+     * @throws ArkPDOStatementException
+     * @throws LookUpTargetException
      */
     public static function devShowFieldsForPHPDoc(ArkDatabaseTableCoreModel $model)
     {

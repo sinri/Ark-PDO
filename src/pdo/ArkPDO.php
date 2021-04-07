@@ -141,7 +141,7 @@ class ArkPDO
      * @return array
      * @throws ArkPDOStatementException
      */
-    public function getAll(string $sql)
+    public function getAll(string $sql): array
     {
         $stmt = $this->buildPDOStatement($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -153,7 +153,7 @@ class ArkPDO
      * @return PDOStatement
      * @throws ArkPDOStatementException
      */
-    protected function buildPDOStatement(string $sql, $usePrepare = false)
+    protected function buildPDOStatement(string $sql, $usePrepare = false): PDOStatement
     {
         if ($usePrepare) {
             $statement = $this->pdo->prepare($sql);
@@ -175,7 +175,7 @@ class ArkPDO
      * @return array
      * @throws ArkPDOStatementException
      */
-    public function getCol(string $sql, $field = null)
+    public function getCol(string $sql, $field = null): array
     {
         $stmt = $this->buildPDOStatement($sql);
         $rows = $stmt->fetchAll(PDO::FETCH_BOTH);
@@ -201,7 +201,7 @@ class ArkPDO
      * @return mixed|bool
      * @throws ArkPDOStatementException
      */
-    public function getOne(string $sql)
+    public function getOne(string $sql): bool
     {
         $stmt = $this->buildPDOStatement($sql);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -220,7 +220,7 @@ class ArkPDO
      * @throws ArkPDOStatementException
      * @since 1.6.0
      */
-    public function getAllAsStream(string $sql, $callback, $fetchStyle = PDO::FETCH_ASSOC)
+    public function getAllAsStream(string $sql, $callback, $fetchStyle = PDO::FETCH_ASSOC): int
     {
         return $this->safeQueryAllAsStream($sql, [], $callback, $fetchStyle);
     }
@@ -253,7 +253,7 @@ class ArkPDO
     /**
      * @return bool
      */
-    public function beginTransaction()
+    public function beginTransaction(): bool
     {
         return $this->pdo->beginTransaction();
     }
@@ -261,7 +261,7 @@ class ArkPDO
     /**
      * @return bool
      */
-    public function commit()
+    public function commit(): bool
     {
         return $this->pdo->commit();
     }
@@ -269,7 +269,7 @@ class ArkPDO
     /**
      * @return bool
      */
-    public function rollBack()
+    public function rollBack(): bool
     {
         return $this->pdo->rollBack();
     }
@@ -277,7 +277,7 @@ class ArkPDO
     /**
      * @return bool
      */
-    public function inTransaction()
+    public function inTransaction(): bool
     {
         return $this->pdo->inTransaction();
     }
@@ -313,7 +313,7 @@ class ArkPDO
     /**
      * @return array
      */
-    public function getPDOErrorInfo()
+    public function getPDOErrorInfo(): array
     {
         return $this->pdo->errorInfo();
     }
@@ -323,7 +323,7 @@ class ArkPDO
      * @since 1.6.0
      * @since 2.0.16 changed format
      */
-    public function getPDOErrorDescription()
+    public function getPDOErrorDescription(): string
     {
         return "PDO ERROR: " . implode(";", $this->getPDOErrorInfo());
     }
@@ -337,7 +337,7 @@ class ArkPDO
      * @throws ArkPDOStatementException
      * @since 1.6.0
      */
-    public function safeQueryAllAsStream(string $sql, array $values, $callback, $fetchStyle = PDO::FETCH_ASSOC)
+    public function safeQueryAllAsStream(string $sql, array $values, $callback, $fetchStyle = PDO::FETCH_ASSOC): int
     {
         $stmt = $this->buildPDOStatement($sql, true);
         $stmt->execute($values);
@@ -359,7 +359,7 @@ class ArkPDO
      * @return array
      * @throws ArkPDOStatementException
      */
-    public function safeQueryAll(string $sql, $values = array(), $fetchStyle = PDO::FETCH_ASSOC)
+    public function safeQueryAll(string $sql, $values = array(), $fetchStyle = PDO::FETCH_ASSOC): array
     {
         $sth = $this->buildPDOStatement($sql, true);
         $sth->execute($values);
@@ -372,7 +372,7 @@ class ArkPDO
      * @return mixed
      * @throws ArkPDOStatementException
      */
-    public function safeQueryRow(string $sql, $values = array())
+    public function safeQueryRow(string $sql, $values = array()): bool
     {
         $sth = $this->buildPDOStatement($sql, true);
         if ($sth->execute($values)) {
@@ -404,7 +404,7 @@ class ArkPDO
      * @return bool
      * @throws ArkPDOStatementException
      */
-    public function safeInsertOne(string $sql, $values = array(), &$insertedId = 0, $pk = null)
+    public function safeInsertOne(string $sql, $values = array(), &$insertedId = 0, $pk = null): bool
     {
         $sth = $this->buildPDOStatement($sql, true);
         $done = $sth->execute($values);
@@ -420,7 +420,7 @@ class ArkPDO
      * @return bool
      * @throws ArkPDOStatementException
      */
-    public function safeExecute(string $sql, $values = array(), &$sth = null)
+    public function safeExecute(string $sql, $values = array(), &$sth = null): bool
     {
         $sth = $this->buildPDOStatement($sql, true);
         return $sth->execute($values);
@@ -431,7 +431,7 @@ class ArkPDO
      * @return string
      * @since 1.3.3
      */
-    public function getLastInsertID($pk = null)
+    public function getLastInsertID($pk = null): string
     {
         return $this->pdo->lastInsertId($pk);
     }
@@ -443,7 +443,7 @@ class ArkPDO
      * @param PDOStatement $statement
      * @return int
      */
-    public function getAffectedRowCount(PDOStatement $statement)
+    public function getAffectedRowCount(PDOStatement $statement): int
     {
         return $statement->rowCount();
     }
@@ -468,7 +468,7 @@ class ArkPDO
      * (4) [?] => integer_value($p)
      * (5) {?} => float_value($p)
      */
-    public function safeBuildSQL($template, $parameters = [])
+    public function safeBuildSQL($template, $parameters = []): string
     {
         $this->logger->debug($template, ['parameters' => $parameters]);
         $count = preg_match_all('/\?|`\?`|\(\?\)|\[\?]|{\?}/', $template, $matches, PREG_OFFSET_CAPTURE);

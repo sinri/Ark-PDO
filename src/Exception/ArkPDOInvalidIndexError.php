@@ -23,7 +23,7 @@ class ArkPDOInvalidIndexError extends Exception
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct($message, $expectedIndex, $code = 0, Throwable $previous = null)
+    public function __construct(string $message, $expectedIndex, $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
         $this->expectedIndex = $expectedIndex;
@@ -41,7 +41,7 @@ class ArkPDOInvalidIndexError extends Exception
      * @param string|int $expectedIndex
      * @return ArkPDOInvalidIndexError
      */
-    public function setExpectedIndex($expectedIndex)
+    public function setExpectedIndex($expectedIndex): ArkPDOInvalidIndexError
     {
         $this->expectedIndex = $expectedIndex;
         return $this;

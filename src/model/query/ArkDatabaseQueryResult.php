@@ -65,7 +65,7 @@ class ArkDatabaseQueryResult
      * @param string $errorMessage
      * @return ArkDatabaseQueryResult
      */
-    public static function makeErrorResult(string $errorMessage)
+    public static function makeErrorResult(string $errorMessage): ArkDatabaseQueryResult
     {
         return (new ArkDatabaseQueryResult())
             ->setStatus(ArkDatabaseQueryResult::STATUS_ERROR)
@@ -76,7 +76,7 @@ class ArkDatabaseQueryResult
      * @return bool
      * @since 2.0.5
      */
-    public function isStatusAsQueried()
+    public function isStatusAsQueried(): bool
     {
         return $this->status === self::STATUS_QUERIED;
     }
@@ -85,7 +85,7 @@ class ArkDatabaseQueryResult
      * @return bool
      * @since 2.0.5
      */
-    public function isStatusAsExecuted()
+    public function isStatusAsExecuted(): bool
     {
         return $this->status === self::STATUS_EXECUTED;
     }
@@ -94,7 +94,7 @@ class ArkDatabaseQueryResult
      * @return bool
      * @since 2.0.5
      */
-    public function isStatusAsStreamed()
+    public function isStatusAsStreamed(): bool
     {
         return $this->status === self::STATUS_STREAMED;
     }
@@ -165,7 +165,7 @@ class ArkDatabaseQueryResult
      * @param string $status
      * @return ArkDatabaseQueryResult
      */
-    public function setStatus(string $status)
+    public function setStatus(string $status): ArkDatabaseQueryResult
     {
         $this->status = $status;
         if (in_array($status, [self::STATUS_QUERIED, self::STATUS_STREAMING, self::STATUS_STREAMED, self::STATUS_EXECUTED])) {
@@ -178,7 +178,7 @@ class ArkDatabaseQueryResult
      * @param array[] $matrix
      * @return $this
      */
-    public function addRowsByRawMatrix(array $matrix)
+    public function addRowsByRawMatrix(array $matrix): ArkDatabaseQueryResult
     {
         foreach ($matrix as $row) {
             $this->addResultRow(new ArkDatabaseQueryResultRow($row));
@@ -190,7 +190,7 @@ class ArkDatabaseQueryResult
      * @param ArkDatabaseQueryResultRow $row
      * @return ArkDatabaseQueryResult
      */
-    public function addResultRow(ArkDatabaseQueryResultRow $row)
+    public function addResultRow(ArkDatabaseQueryResultRow $row): ArkDatabaseQueryResult
     {
         $this->resultRows[] = $row;
         return $this;
@@ -200,7 +200,7 @@ class ArkDatabaseQueryResult
      * @return ArkDatabaseQueryResultRow[]
      * @throws ArkPDOQueryResultIsNotQueriedError
      */
-    public function getResultRows()
+    public function getResultRows(): array
     {
         $this->assertStatusIsQueried(__METHOD__);
         return $this->resultRows;
@@ -231,7 +231,7 @@ class ArkDatabaseQueryResult
      * @return ArkDatabaseQueryResult
      * @since 2.0.10 Fixed the return design.
      */
-    public function setError(string $error)
+    public function setError(string $error): ArkDatabaseQueryResult
     {
         $this->error = $error;
         return $this;
@@ -240,7 +240,7 @@ class ArkDatabaseQueryResult
     /**
      * @return PDOStatement|null
      */
-    public function getResultRowStream()
+    public function getResultRowStream(): PDOStatement
     {
         return $this->resultRowStream;
     }
@@ -288,7 +288,7 @@ class ArkDatabaseQueryResult
      * @return array[]
      * @throws ArkPDOQueryResultIsNotQueriedError
      */
-    public function getRawMatrix()
+    public function getRawMatrix(): array
     {
         $this->assertStatusIsQueried(__METHOD__);
         $matrix = [];
@@ -320,7 +320,7 @@ class ArkDatabaseQueryResult
      * @throws ArkPDOInvalidIndexError
      * @since 2.0.1
      */
-    public function getResultRowByIndex(int $index)
+    public function getResultRowByIndex(int $index): ArkDatabaseQueryResultRow
     {
         $this->assertStatusIsQueried(__METHOD__ . "({$index})");
         if ($index < 0 || $index >= count($this->resultRows)) {
@@ -351,7 +351,7 @@ class ArkDatabaseQueryResult
      * @throws ArkPDOQueryResultIsNotQueriedError
      * @since 2.0.1
      */
-    public function getResultColumn(string $columnName, $default = null)
+    public function getResultColumn(string $columnName, $default = null): array
     {
         $this->assertStatusIsQueried(__METHOD__ . "({$columnName})");
         $column = [];
@@ -384,7 +384,7 @@ class ArkDatabaseQueryResult
      * @throws ArkPDOQueryResultIsNotQueriedError
      * @since 2.0.12
      */
-    public function getResultKeyRowMap(string $fieldName)
+    public function getResultKeyRowMap(string $fieldName): array
     {
         $this->assertStatusIsQueried(__METHOD__ . "({$fieldName})");
         $map = [];
@@ -402,7 +402,7 @@ class ArkDatabaseQueryResult
      * @throws ArkPDOQueryResultIsNotQueriedError
      * @since 2.0.12
      */
-    public function getResultKeyValueMap(string $keyFieldName, string $valueFieldName, $defaultValue = null)
+    public function getResultKeyValueMap(string $keyFieldName, string $valueFieldName, $defaultValue = null): array
     {
         $this->assertStatusIsQueried(__METHOD__ . "({$keyFieldName}=>{$valueFieldName})");
         $map = [];

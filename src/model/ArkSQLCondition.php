@@ -90,7 +90,7 @@ class ArkSQLCondition
      * @return ArkSQLCondition
      * @since 2.0.9
      */
-    public static function makeEqualOrInArray(string $field, $value)
+    public static function makeEqualOrInArray(string $field, $value): ArkSQLCondition
     {
         if (is_array($value)) {
             return self::makeInArray($field, $value);
@@ -105,7 +105,7 @@ class ArkSQLCondition
      * @return ArkSQLCondition
      * @since 2.0.9
      */
-    public static function makeNotEqualNorInArray(string $field, $value)
+    public static function makeNotEqualNorInArray(string $field, $value): ArkSQLCondition
     {
         if (is_array($value)) {
             return self::makeNotInArray($field, $value);
@@ -114,82 +114,82 @@ class ArkSQLCondition
         }
     }
 
-    public static function makeEqual(string $field, $value)
+    public static function makeEqual(string $field, $value): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_EQ, $value);
     }
 
-    public static function makeGreaterThan(string $field, $value)
+    public static function makeGreaterThan(string $field, $value): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_GT, $value);
     }
 
-    public static function makeNoLessThan(string $field, $value)
+    public static function makeNoLessThan(string $field, $value): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_EGT, $value);
     }
 
-    public static function makeLessThan(string $field, $value)
+    public static function makeLessThan(string $field, $value): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_LT, $value);
     }
 
-    public static function makeNoGreaterThan(string $field, $value)
+    public static function makeNoGreaterThan(string $field, $value): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_ELT, $value);
     }
 
-    public static function makeNotEqual(string $field, $value)
+    public static function makeNotEqual(string $field, $value): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_NEQ, $value);
     }
 
-    public static function makeEqualNullSafe(string $field, $value)
+    public static function makeEqualNullSafe(string $field, $value): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_NULL_SAFE_EQUAL, $value);
     }
 
-    public static function makeIsNull(string $field)
+    public static function makeIsNull(string $field): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_IS, self::CONST_NULL);
     }
 
-    public static function makeIsNotNull(string $field)
+    public static function makeIsNotNull(string $field): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_IS_NOT, self::CONST_NULL);
     }
 
-    public static function makeInArray(string $field, $value)
+    public static function makeInArray(string $field, $value): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_IN, $value);
     }
 
-    public static function makeNotInArray(string $field, $value)
+    public static function makeNotInArray(string $field, $value): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_NOT_IN, $value);
     }
 
-    public static function makeBetween(string $field, $value1, $value2)
+    public static function makeBetween(string $field, $value1, $value2): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_BETWEEN, [$value1, $value2]);
     }
 
-    public static function makeNotBetween(string $field, $value1, $value2)
+    public static function makeNotBetween(string $field, $value1, $value2): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_NOT_BETWEEN, [$value1, $value2]);
     }
 
-    public static function makeStringHasPrefix(string $field, $value)
+    public static function makeStringHasPrefix(string $field, $value): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_LIKE, $value, self::LIKE_RIGHT_WILDCARD);
     }
 
-    public static function makeStringHasSuffix(string $field, $value)
+    public static function makeStringHasSuffix(string $field, $value): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_LIKE, $value, self::LIKE_LEFT_WILDCARD);
     }
 
-    public static function makeStringContainsText(string $field, $value)
+    public static function makeStringContainsText(string $field, $value): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_LIKE, $value, self::LIKE_BOTH_WILDCARD);
     }
@@ -200,7 +200,7 @@ class ArkSQLCondition
      * @return ArkSQLCondition
      * @since 2.0.8
      */
-    public static function makeStringDoesNotHavePrefix(string $field, string $value)
+    public static function makeStringDoesNotHavePrefix(string $field, string $value): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_NOT_LIKE, $value, self::LIKE_RIGHT_WILDCARD);
     }
@@ -211,7 +211,7 @@ class ArkSQLCondition
      * @return ArkSQLCondition
      * @since 2.0.8
      */
-    public static function makeStringDoesNotHaveSuffix(string $field, string $value)
+    public static function makeStringDoesNotHaveSuffix(string $field, string $value): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_NOT_LIKE, $value, self::LIKE_LEFT_WILDCARD);
     }
@@ -222,7 +222,7 @@ class ArkSQLCondition
      * @return ArkSQLCondition
      * @since 2.0.8
      */
-    public static function makeStringDoesNotContainText(string $field, string $value)
+    public static function makeStringDoesNotContainText(string $field, string $value): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::OP_NOT_LIKE, $value, self::LIKE_BOTH_WILDCARD);
     }
@@ -231,7 +231,7 @@ class ArkSQLCondition
      * @param ArkSQLCondition[] $conditions
      * @return ArkSQLCondition
      */
-    public static function makeConditionsIntersect(array $conditions)
+    public static function makeConditionsIntersect(array $conditions): ArkSQLCondition
     {
         return new ArkSQLCondition('', self::OP_PARENTHESES_AND, $conditions);
     }
@@ -240,7 +240,7 @@ class ArkSQLCondition
      * @param ArkSQLCondition[] $conditions
      * @return ArkSQLCondition
      */
-    public static function makeConditionsUnion(array $conditions)
+    public static function makeConditionsUnion(array $conditions): ArkSQLCondition
     {
         return new ArkSQLCondition('', self::OP_PARENTHESES_OR, $conditions);
     }
@@ -250,7 +250,7 @@ class ArkSQLCondition
      * @return ArkSQLCondition
      * @since 1.7.3
      */
-    public static function makeFieldIsNullOrEmptyString(string $field)
+    public static function makeFieldIsNullOrEmptyString(string $field): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::MACRO_IS_NULL_OR_EMPTY_STRING, null);
     }
@@ -260,7 +260,7 @@ class ArkSQLCondition
      * @return ArkSQLCondition
      * @since 1.7.3
      */
-    public static function makeFieldIsNotNullNorEmptyString(string $field)
+    public static function makeFieldIsNotNullNorEmptyString(string $field): ArkSQLCondition
     {
         return new ArkSQLCondition($field, self::MACRO_IS_NOT_NULL_NOR_EMPTY_STRING, null);
     }
@@ -270,7 +270,7 @@ class ArkSQLCondition
      * @return ArkSQLCondition
      * @since 2.0
      */
-    public static function makeRawConditionExpression(string $rawExpression)
+    public static function makeRawConditionExpression(string $rawExpression): ArkSQLCondition
     {
         return new ArkSQLCondition('', self::MACRO_RAW_EXPRESSION, $rawExpression);
     }
@@ -279,7 +279,7 @@ class ArkSQLCondition
      * @return string
      * @throws ArkPDOSQLBuilderError
      */
-    public function makeConditionSQL()
+    public function makeConditionSQL(): string
     {
         switch ($this->operate) {
             case self::OP_EQ:
@@ -356,7 +356,7 @@ class ArkSQLCondition
      * @throws ArkPDOSQLBuilderError
      * @since 2.0
      */
-    public static function generateConditionSQLComponent(array $conditions)
+    public static function generateConditionSQLComponent(array $conditions): string
     {
         $condition_sql = [];
         foreach ($conditions as $condition) {

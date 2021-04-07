@@ -123,7 +123,7 @@ class ArkDatabaseSelectTableQuery
      * @param string $alias
      * @return $this
      */
-    public function addSelectFieldByDetail(string $fieldExpression, string $alias = '')
+    public function addSelectFieldByDetail(string $fieldExpression, string $alias = ''): ArkDatabaseSelectTableQuery
     {
         $this->selectFields[] = new ArkDatabaseSelectFieldMeta($fieldExpression, $alias);
         return $this;
@@ -133,7 +133,7 @@ class ArkDatabaseSelectTableQuery
      * @param ArkDatabaseSelectFieldMeta $fieldMeta
      * @return $this
      */
-    public function addSelectField(ArkDatabaseSelectFieldMeta $fieldMeta)
+    public function addSelectField(ArkDatabaseSelectFieldMeta $fieldMeta): ArkDatabaseSelectTableQuery
     {
         $this->selectFields[] = $fieldMeta;
         return $this;
@@ -143,7 +143,7 @@ class ArkDatabaseSelectTableQuery
      * @param ArkDatabaseSelectFieldMeta[] $fieldMetaArray
      * @return ArkDatabaseSelectTableQuery
      */
-    public function addSelectFields(array $fieldMetaArray)
+    public function addSelectFields(array $fieldMetaArray): ArkDatabaseSelectTableQuery
     {
         foreach ($fieldMetaArray as $item) {
             if (is_a($item, ArkDatabaseSelectFieldMeta::class)) {
@@ -158,7 +158,7 @@ class ArkDatabaseSelectTableQuery
      * @return $this
      * @since 2.0.5
      */
-    public function addSelectFieldsWithoutAlias(array $fieldNameList)
+    public function addSelectFieldsWithoutAlias(array $fieldNameList): ArkDatabaseSelectTableQuery
     {
         foreach ($fieldNameList as $fieldName) {
             $this->selectFields[] = new ArkDatabaseSelectFieldMeta($fieldName);
@@ -173,7 +173,7 @@ class ArkDatabaseSelectTableQuery
      * @since 2.0.1
      * @deprecated use `addSelectFieldsWithoutAlias` instead, which is more simple.
      */
-    public function addSelectFieldNames(array $fieldNames)
+    public function addSelectFieldNames(array $fieldNames): ArkDatabaseSelectTableQuery
     {
         foreach ($fieldNames as $item) {
             if (is_string($item)) {
@@ -187,7 +187,7 @@ class ArkDatabaseSelectTableQuery
      * @param ArkSQLCondition[] $conditions
      * @return $this
      */
-    public function addConditions(array $conditions)
+    public function addConditions(array $conditions): ArkDatabaseSelectTableQuery
     {
         foreach ($conditions as $condition) {
             if (is_a($condition, ArkSQLCondition::class)) {
@@ -202,7 +202,7 @@ class ArkDatabaseSelectTableQuery
      * @return $this
      * @since 2.0.5
      */
-    public function quickAddSimpleConditions(array $simpleConditions)
+    public function quickAddSimpleConditions(array $simpleConditions): ArkDatabaseSelectTableQuery
     {
         foreach ($simpleConditions as $fieldName => $value) {
             if (is_array($value)) {
@@ -218,7 +218,7 @@ class ArkDatabaseSelectTableQuery
      * @param ArkSQLCondition $condition
      * @return $this
      */
-    public function addCondition(ArkSQLCondition $condition)
+    public function addCondition(ArkSQLCondition $condition): ArkDatabaseSelectTableQuery
     {
         $this->conditions[] = $condition;
         return $this;
@@ -228,7 +228,7 @@ class ArkDatabaseSelectTableQuery
      * @param string[] $groupByFields
      * @return $this
      */
-    public function setGroupByFields(array $groupByFields)
+    public function setGroupByFields(array $groupByFields): ArkDatabaseSelectTableQuery
     {
         $this->groupByFields = $groupByFields;
         return $this;
@@ -265,7 +265,7 @@ class ArkDatabaseSelectTableQuery
      * @param string $resultRowCustomizedClass // I wonder if it is useful.
      * @return ArkDatabaseQueryResult
      */
-    public function queryForRows($resultRowCustomizedClass = ArkDatabaseQueryResultRow::class)
+    public function queryForRows($resultRowCustomizedClass = ArkDatabaseQueryResultRow::class): ArkDatabaseQueryResult
     {
         $result = new ArkDatabaseQueryResult();
         try {
@@ -297,7 +297,7 @@ class ArkDatabaseSelectTableQuery
      * @return string
      * @throws ArkPDOSQLBuilderError
      */
-    public function generateSQL()
+    public function generateSQL(): string
     {
         $table = $this->model->getTableExpressForSQL();
         $fields = ArkDatabaseSelectFieldMeta::generateFieldSQLComponent($this->selectFields);
@@ -336,7 +336,7 @@ class ArkDatabaseSelectTableQuery
     /**
      * @return ArkDatabaseQueryResult
      */
-    public function queryForStream()
+    public function queryForStream(): ArkDatabaseQueryResult
     {
         $result = new ArkDatabaseQueryResult();
         try {

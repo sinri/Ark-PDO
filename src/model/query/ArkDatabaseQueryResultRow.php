@@ -22,7 +22,7 @@ class ArkDatabaseQueryResultRow
         $this->row = $row;
     }
 
-    public function __isset($name)
+    public function __isset($name): bool
     {
         return isset($this->row[$name]);
     }

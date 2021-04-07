@@ -30,7 +30,7 @@ class ArkDatabaseSelectFieldMeta
      * @return string
      * @since 2.0.1 Updated: if $selectFields is empty, return '*'
      */
-    public static function generateFieldSQLComponent(array $selectFields)
+    public static function generateFieldSQLComponent(array $selectFields): string
     {
         $fields = [];
         foreach ($selectFields as $fieldMeta) {
