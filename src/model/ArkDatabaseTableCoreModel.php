@@ -5,7 +5,10 @@ namespace sinri\ark\database\model;
 
 
 use sinri\ark\core\ArkHelper;
+use sinri\ark\core\exception\EnsureItemException;
+use sinri\ark\database\exception\ArkPDOInvalidIndexError;
 use sinri\ark\database\exception\ArkPDOSQLBuilderError;
+use sinri\ark\database\exception\ArkPDOStatementException;
 use sinri\ark\database\pdo\ArkPDO;
 
 /**
@@ -56,6 +59,7 @@ abstract class ArkDatabaseTableCoreModel
      * @param string|array|ArkSQLCondition[] $conditions It might be the condition sql (the string after WHERE), or the key-value array, with FIELD-VALUE or KEY-ArkSQLCondition format.
      * @param string $glue
      * @return string
+     * @throws ArkPDOSQLBuilderError
      */
     protected final function buildCondition($conditions, $glue = ' AND ')
     {
@@ -66,11 +70,8 @@ abstract class ArkDatabaseTableCoreModel
             $c = [];
             foreach ($conditions as $key => $value) {
                 if (is_a($value, ArkSQLCondition::class)) {
-                    try {
-                        $c[] = $value->makeConditionSQL();
-                    } catch (ArkPDOSQLBuilderError $e) {
-                        // ignore the error
-                    }
+                    // since 1.7.9, mistakes here would be thrown
+                    $c[] = $value->makeConditionSQL();
                 } else {
                     if (is_array($value)) {
                         $x = [];
@@ -146,7 +147,11 @@ abstract class ArkDatabaseTableCoreModel
         try {
             $sql = $this->makeSelectSQL($field, $conditions, $orderBy, $limit, $offset, $groupBy);
             return $this->db()->getOne($sql);
-        } catch (Exception $e) {
+        } catch (ArkPDOSQLBuilderError $e) {
+            return false;
+        } catch (ArkPDOInvalidIndexError $e) {
+            return false;
+        } catch (ArkPDOStatementException $e) {
             return false;
         }
     }
@@ -167,7 +172,9 @@ abstract class ArkDatabaseTableCoreModel
         try {
             $sql = $this->makeSelectSQL($field, $conditions, $orderBy, $limit, $offset, $groupBy);
             return $this->db()->getCol($sql, $useAnotherKeyToFetch);
-        } catch (Exception $e) {
+        } catch (ArkPDOSQLBuilderError $e) {
+            return false;
+        } catch (ArkPDOStatementException $e) {
             return false;
         }
     }
@@ -209,24 +216,28 @@ abstract class ArkDatabaseTableCoreModel
      */
     public function selectRowsForCount($conditions, $countField = '*', $useDistinct = false)
     {
-        $condition_sql = $this->buildCondition($conditions);
-        if ($condition_sql === '') {
-            $condition_sql = "1";
-        }
-
-        if ($countField === '*') {
-            $countTarget = "*";
-        } else {
-            $countTarget = ($useDistinct ? "DISTINCT " : '') . $countField;
-        }
-
-        $table = $this->getTableExpressForSQL();
-        $sql = "SELECT count({$countTarget}) FROM {$table} WHERE {$condition_sql} ";
-
         try {
+            $condition_sql = $this->buildCondition($conditions);
+            if ($condition_sql === '') {
+                $condition_sql = "1";
+            }
+
+            if ($countField === '*') {
+                $countTarget = "*";
+            } else {
+                $countTarget = ($useDistinct ? "DISTINCT " : '') . $countField;
+            }
+
+            $table = $this->getTableExpressForSQL();
+            $sql = "SELECT count({$countTarget}) FROM {$table} WHERE {$condition_sql} ";
+
             $count = $this->db()->getOne($sql);
-            return intval($count, 10);
-        } catch (Exception $e) {
+            return intval($count);
+        } catch (ArkPDOSQLBuilderError $e) {
+            return false;
+        } catch (ArkPDOInvalidIndexError $e) {
+            return false;
+        } catch (ArkPDOStatementException $e) {
             return false;
         }
     }
@@ -259,14 +270,16 @@ abstract class ArkDatabaseTableCoreModel
      */
     public function selectRowsForFieldsWithSort($fields, $conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null, $groupBy = null)
     {
-        $sql = $this->makeSelectSQL($fields, $conditions, $sort, $limit, $offset, $groupBy);
         try {
+            $sql = $this->makeSelectSQL($fields, $conditions, $sort, $limit, $offset, $groupBy);
             $all = $this->db()->getAll($sql);
             if ($refKey) {
                 $all = ArkHelper::turnListToMapping($all, $refKey);
             }
             return $all;
-        } catch (Exception $exception) {
+        } catch (ArkPDOSQLBuilderError $e) {
+            return false;
+        } catch (ArkPDOStatementException $e) {
             return false;
         }
     }
@@ -279,6 +292,7 @@ abstract class ArkDatabaseTableCoreModel
      * @param int $offset
      * @param null|string[] $groupBy
      * @return string
+     * @throws ArkPDOSQLBuilderError
      */
     protected function makeSelectSQL($fields, $conditions, $sort = null, $limit = 0, $offset = 0, $groupBy = null)
     {
@@ -306,8 +320,8 @@ abstract class ArkDatabaseTableCoreModel
             $sql .= "order by " . $sort;
         }
 
-        $limit = intval($limit, 10);
-        $offset = intval($offset, 10);
+        $limit = intval($limit);
+        $offset = intval($offset);
         if ($limit > 0) {
             $sql .= " limit {$limit} ";
             if ($offset > 0) {
@@ -330,16 +344,12 @@ abstract class ArkDatabaseTableCoreModel
         $table = $this->getTableExpressForSQL();
         $values = $this->buildRowValuesForWrite($data, $fields);
 
-        try {
-            if ($shouldReplace) {
-                $sql = "REPLACE INTO {$table} ({$fields}) VALUES ({$values})";
-                return $this->db()->insert($sql);
-            } else {
-                $sql = "INSERT INTO {$table} ({$fields}) VALUES ({$values})";
-                return $this->db()->insert($sql, $pk);
-            }
-        } catch (Exception $e) {
-            return false;
+        if ($shouldReplace) {
+            $sql = "REPLACE INTO {$table} ({$fields}) VALUES ({$values})";
+            return $this->db()->insert($sql);
+        } else {
+            $sql = "INSERT INTO {$table} ({$fields}) VALUES ({$values})";
+            return $this->db()->insert($sql, $pk);
         }
     }
 
@@ -373,7 +383,7 @@ abstract class ArkDatabaseTableCoreModel
      */
     public function insert($data, $pk = null)
     {
-        return $this->writeInto($data, $pk, false);
+        return $this->writeInto($data, $pk);
     }
 
     /**
@@ -392,16 +402,17 @@ abstract class ArkDatabaseTableCoreModel
      */
     public function update($conditions, $data)
     {
-        $condition_sql = $this->buildCondition($conditions, "AND");
-        if ($condition_sql === '') {
-            $condition_sql = "1";
-        }
-        $data_sql = $this->buildRowValuesForUpdate($data);
-        $table = $this->getTableExpressForSQL();
-        $sql = "UPDATE {$table} SET {$data_sql} WHERE {$condition_sql}";
         try {
+            $condition_sql = $this->buildCondition($conditions, "AND");
+            if ($condition_sql === '') {
+                $condition_sql = "1";
+            }
+            $data_sql = $this->buildRowValuesForUpdate($data);
+            $table = $this->getTableExpressForSQL();
+            $sql = "UPDATE {$table} SET {$data_sql} WHERE {$condition_sql}";
+
             return $this->db()->exec($sql);
-        } catch (Exception $e) {
+        } catch (ArkPDOSQLBuilderError $e) {
             return false;
         }
     }
@@ -412,48 +423,45 @@ abstract class ArkDatabaseTableCoreModel
      */
     public function delete($conditions)
     {
-        $condition_sql = $this->buildCondition($conditions, "AND");
-        if ($condition_sql === '') {
-            $condition_sql = "1";
-        }
-        $table = $this->getTableExpressForSQL();
-        $sql = "DELETE FROM {$table} WHERE {$condition_sql}";
         try {
+            $condition_sql = $this->buildCondition($conditions, "AND");
+            if ($condition_sql === '') {
+                $condition_sql = "1";
+            }
+            $table = $this->getTableExpressForSQL();
+            $sql = "DELETE FROM {$table} WHERE {$condition_sql}";
+
             return $this->db()->exec($sql);
-        } catch (Exception $e) {
+        } catch (ArkPDOSQLBuilderError $e) {
             return false;
         }
     }
 
     protected function batchWriteInto($dataList, $pk = null, $shouldReplace = false)
     {
-        try {
-            $fields = [];
-            $values = [];
+        $fields = [];
+        $values = [];
 
-            foreach ($dataList[0] as $key => $value) {
-                $fields[] = "`{$key}`";
-            }
-            foreach ($dataList as $data) {
-                if (count($data) != count($fields)) {
-                    return false;
-                }
-                $values[] = "(" . $this->buildRowValuesForWrite($data) . ")";
-            }
-            $fields = implode(",", $fields);
-            $values = implode(",", $values);
-            $table = $this->getTableExpressForSQL();
-            if ($shouldReplace) {
-                $sql = "REPLACE INTO {$table} ({$fields}) VALUES {$values}";
-                return $this->db()->exec($sql);
-            } else {
-                $sql = "INSERT INTO {$table} ({$fields}) VALUES {$values}";
-                return $this->db()->insert($sql, $pk);
-            }
-
-        } catch (Exception $exception) {
-            return false;
+        foreach ($dataList[0] as $key => $value) {
+            $fields[] = "`{$key}`";
         }
+        foreach ($dataList as $data) {
+            if (count($data) != count($fields)) {
+                return false;
+            }
+            $values[] = "(" . $this->buildRowValuesForWrite($data) . ")";
+        }
+        $fields = implode(",", $fields);
+        $values = implode(",", $values);
+        $table = $this->getTableExpressForSQL();
+        if ($shouldReplace) {
+            $sql = "REPLACE INTO {$table} ({$fields}) VALUES {$values}";
+            return $this->db()->exec($sql);
+        } else {
+            $sql = "INSERT INTO {$table} ({$fields}) VALUES {$values}";
+            return $this->db()->insert($sql, $pk);
+        }
+
     }
 
     /**
@@ -463,7 +471,7 @@ abstract class ArkDatabaseTableCoreModel
      */
     public function batchInsert($dataList, $pk = null)
     {
-        return $this->batchWriteInto($dataList, $pk, false);
+        return $this->batchWriteInto($dataList, $pk);
     }
 
     /**
@@ -478,14 +486,15 @@ abstract class ArkDatabaseTableCoreModel
 
     /**
      * @return ArkDatabaseTableFieldDefinition[]
-     * @throws Exception
+     * @throws EnsureItemException
+     * @throws ArkPDOStatementException
      */
     protected function loadTableDesc()
     {
         $fieldDefinition = [];
         $field_list = $this->db()->getAll("desc " . $this->getTableExpressForSQL());
         if (empty($field_list)) {
-            throw new Exception("Seems no such table " . $this->getTableExpressForSQL());
+            throw new EnsureItemException("Seems no such table " . $this->getTableExpressForSQL());
         }
         foreach ($field_list as $field) {
             $fieldDefinition[$field['Field']] = ArkDatabaseTableFieldDefinition::makeInstanceWithDescResultRow($field);
@@ -496,7 +505,8 @@ abstract class ArkDatabaseTableCoreModel
     /**
      * When you design a model for a certain table which is eventually designed,
      * you might run this method to get `@property` lines for the model class PHPDoc.
-     * @throws Exception
+     * @throws ArkPDOStatementException
+     * @throws EnsureItemException
      */
     public function devShowFieldsForPHPDoc()
     {

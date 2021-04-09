@@ -23,7 +23,7 @@ class ArkDatabaseDynamicTableModel extends ArkDatabaseTableCoreModel
      * @param string $table
      * @param string $scheme
      */
-    public function __construct($pdo, $table, $scheme = null)
+    public function __construct(ArkPDO $pdo, string $table, $scheme = null)
     {
         $this->pdo = $pdo;
         $this->scheme = $scheme;

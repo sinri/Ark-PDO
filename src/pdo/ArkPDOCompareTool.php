@@ -266,8 +266,7 @@ class ArkPDOCompareTool
      */
     protected function getTableFields($db, $table)
     {
-        $fields = $db->safeQueryAll("desc $table");
-        return $fields;
+        return $db->safeQueryAll("desc $table");
     }
 
     /**
@@ -328,7 +327,7 @@ class ArkPDOCompareTool
     {
         try {
             $count = $db->getOne("select count(*) from $table");
-            return intval($count, 10);
+            return intval($count);
         } catch (Exception $exception) {
             return -1;
         }

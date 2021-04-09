@@ -13,7 +13,7 @@
   "require": {
     "ext-json": "*",
     "ext-pdo": "*",
-    "sinri/ark-core": "~2.0"
+    "sinri/ark-core": "~2.7"
   },
   "autoload": {
     "psr-4": {
