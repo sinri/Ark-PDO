@@ -13,6 +13,7 @@ use PDO;
 use sinri\ark\core\ArkHelper;
 use sinri\ark\core\exception\LookUpTargetException;
 use sinri\ark\database\exception\ArkPDOConfigError;
+use sinri\ark\database\exception\ArkPDOExecuteFailedError;
 use sinri\ark\database\exception\ArkPDOInvalidIndexError;
 use sinri\ark\database\exception\ArkPDOStatementException;
 
@@ -113,6 +114,7 @@ class ArkPDOCompareTool
 
     /**
      * @param string[]|null $tables
+     * @throws ArkPDOExecuteFailedError
      * @throws ArkPDOStatementException
      * @throws LookUpTargetException
      */
@@ -216,6 +218,7 @@ class ArkPDOCompareTool
      * @param string[]|null $tables
      * @return string[]
      * @throws ArkPDOStatementException
+     * @throws ArkPDOExecuteFailedError
      */
     protected function getTableNames($db, $tables = null)
     {
@@ -254,6 +257,7 @@ class ArkPDOCompareTool
      * @return bool|mixed
      * @throws ArkPDOStatementException
      * @throws LookUpTargetException
+     * @throws ArkPDOExecuteFailedError
      */
     protected function getTableCreation($db, $table)
     {
@@ -267,6 +271,7 @@ class ArkPDOCompareTool
      * @param ArkPDO $db
      * @param string $table
      * @return array
+     * @throws ArkPDOExecuteFailedError
      * @throws ArkPDOStatementException
      */
     protected function getTableFields($db, $table)

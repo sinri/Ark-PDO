@@ -23,7 +23,7 @@ class ArkDatabaseTableFieldDefinition
     }
 
     /**
-     * @param $row
+     * @param array $row
      * @return ArkDatabaseTableFieldDefinition
      */
     public static function makeInstanceWithDescResultRow($row)
