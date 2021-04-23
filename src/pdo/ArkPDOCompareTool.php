@@ -14,7 +14,7 @@ use sinri\ark\core\ArkHelper;
 use sinri\ark\core\exception\LookUpTargetException;
 use sinri\ark\database\exception\ArkPDOConfigError;
 use sinri\ark\database\exception\ArkPDOExecuteFailedError;
-use sinri\ark\database\exception\ArkPDOInvalidIndexError;
+use sinri\ark\database\exception\ArkPDOExecuteFetchFailedError;
 use sinri\ark\database\exception\ArkPDOStatementException;
 
 class ArkPDOCompareTool
@@ -338,9 +338,9 @@ class ArkPDOCompareTool
         try {
             $count = $db->getOne("select count(*) from $table");
             return intval($count);
-        } catch (ArkPDOInvalidIndexError $e) {
-            return -1;
         } catch (ArkPDOStatementException $e) {
+            return -1;
+        } catch (ArkPDOExecuteFetchFailedError $e) {
             return -1;
         }
     }

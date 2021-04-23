@@ -7,8 +7,8 @@ namespace sinri\ark\database\model;
 use sinri\ark\core\ArkHelper;
 use sinri\ark\core\exception\EnsureItemException;
 use sinri\ark\database\exception\ArkPDOExecuteFailedError;
+use sinri\ark\database\exception\ArkPDOExecuteFetchFailedError;
 use sinri\ark\database\exception\ArkPDOExecuteNotAffectedError;
-use sinri\ark\database\exception\ArkPDOInvalidIndexError;
 use sinri\ark\database\exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\exception\ArkPDOStatementException;
 use sinri\ark\database\pdo\ArkPDO;
@@ -142,9 +142,9 @@ abstract class ArkDatabaseTableCoreModel
      * @param int $limit
      * @param int $offset
      * @return numeric|string|null
-     * @throws ArkPDOInvalidIndexError
      * @throws ArkPDOSQLBuilderError
      * @throws ArkPDOStatementException
+     * @throws ArkPDOExecuteFetchFailedError
      * @since 1.7.6
      * @since 1.8.0 would throw exceptions on failure
      */
@@ -179,7 +179,7 @@ abstract class ArkDatabaseTableCoreModel
      * @param string|string[] $fields "*","f1,f2" or ["f1","f2"] @since 1.2
      * @param null|string[] $groupBy @since 1.5
      * @return array
-     * @throws ArkPDOInvalidIndexError when no row found
+     * @throws ArkPDOExecuteFetchFailedError
      * @throws ArkPDOSQLBuilderError
      * @throws ArkPDOStatementException
      * @since 1.8.0 would throw exceptions on failure
@@ -213,7 +213,7 @@ abstract class ArkDatabaseTableCoreModel
      * @param string $countField @since 1.5.2
      * @param bool $useDistinct @since 1.5.2
      * @return int
-     * @throws ArkPDOInvalidIndexError
+     * @throws ArkPDOExecuteFetchFailedError
      * @throws ArkPDOSQLBuilderError
      * @throws ArkPDOStatementException
      * @since 1.8.0 would throw exceptions on failure
