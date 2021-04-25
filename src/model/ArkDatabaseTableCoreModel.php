@@ -161,7 +161,7 @@ abstract class ArkDatabaseTableCoreModel
      * @param null|string[] $groupBy
      * @param int $limit
      * @param int $offset
-     * @param null|string $useAnotherKeyToFetch maybe you need alias, index, or any others
+     * @param null|int|string $useAnotherKeyToFetch maybe you need field name, alias, index
      * @return array
      * @throws ArkPDOSQLBuilderError
      * @throws ArkPDOStatementException
