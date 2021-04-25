@@ -156,22 +156,23 @@ abstract class ArkDatabaseTableCoreModel
 
     /**
      * @param array|string $conditions
-     * @param string $field
+     * @param string|string[] $field Remove limitation of string for group by situation
      * @param null|string $orderBy
      * @param null|string[] $groupBy
      * @param int $limit
      * @param int $offset
-     * @param null|string $useAnotherKeyToFetch
+     * @param null|string $useAnotherKeyToFetch maybe you need alias, index, or any others
      * @return array
      * @throws ArkPDOSQLBuilderError
      * @throws ArkPDOStatementException
      * @since 1.7.6
      * @since 1.8.0 would throw exceptions on failure
+     * @since 1.8.2 fix the ambiguous point between $useAnotherKeyToFetch and $field
      */
-    public function selectColumn($conditions, string $field, $orderBy = null, $groupBy = null, $limit = 0, $offset = 0, $useAnotherKeyToFetch = null)
+    public function selectColumn($conditions, $field, $orderBy = null, $groupBy = null, $limit = 0, $offset = 0, $useAnotherKeyToFetch = null)
     {
         $sql = $this->makeSelectSQL($field, $conditions, $orderBy, $limit, $offset, $groupBy);
-        return $this->db()->getCol($sql, $useAnotherKeyToFetch);
+        return $this->db()->getCol($sql, ($useAnotherKeyToFetch === null ? $field : $useAnotherKeyToFetch));
     }
 
     /**
