@@ -211,8 +211,9 @@ class ArkDatabaseQueryResult
      * @param string $action
      * @throws ArkPDOQueryResultIsNotQueriedError
      * @since 2.0.12
+     * @since 2.0.19 make it public
      */
-    protected function assertStatusIsQueried(string $action)
+    public function assertStatusIsQueried(string $action)
     {
         if ($this->status !== self::STATUS_QUERIED) {
             throw new ArkPDOQueryResultIsNotQueriedError($action, $this->status, $this->getError(), $this->sql);
@@ -222,9 +223,10 @@ class ArkDatabaseQueryResult
     /**
      * @param string $action
      * @throws ArkPDOQueryResultIsNotExecutedError
-     * @since 2.0.12
+     * @since 2.0.18
+     * @since 2.0.19 make it public
      */
-    protected function assertStatusIsExecuted(string $action)
+    public function assertStatusIsExecuted(string $action)
     {
         if ($this->status !== self::STATUS_EXECUTED) {
             throw new ArkPDOQueryResultIsNotExecutedError($action, $this->status, $this->getError(), $this->sql);
