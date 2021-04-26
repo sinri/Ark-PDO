@@ -8,13 +8,11 @@ use Exception;
 use Throwable;
 
 /**
- * Class QueryResultIsNotQueriedError
- * @package sinri\ark\database\Exception
- * @since 2.0.13
- *
- * When ArkDatabaseQueryResult hold non-QUERIED status after querying.
+ * Class ArkPDOQueryResultIsNotExecutedError
+ * @package sinri\ark\database\exception
+ * @since 2.0.18
  */
-class ArkPDOQueryResultIsNotQueriedError extends Exception
+class ArkPDOQueryResultIsNotExecutedError extends Exception
 {
     /**
      * @var string
@@ -35,7 +33,7 @@ class ArkPDOQueryResultIsNotQueriedError extends Exception
     protected $sql;
 
     /**
-     * ArkPDOQueryResultIsNotQueriedError constructor.
+     * ArkPDOQueryResultIsNotExecutedError constructor.
      * @param string $action
      * @param string $status
      * @param string $databaseError
@@ -69,7 +67,7 @@ class ArkPDOQueryResultIsNotQueriedError extends Exception
 
     /**
      * @param string $sql
-     * @return ArkPDOQueryResultIsNotQueriedError
+     * @return ArkPDOQueryResultIsNotExecutedError
      */
     public function setSql($sql)
     {
@@ -87,9 +85,9 @@ class ArkPDOQueryResultIsNotQueriedError extends Exception
 
     /**
      * @param string $action
-     * @return ArkPDOQueryResultIsNotQueriedError
+     * @return ArkPDOQueryResultIsNotExecutedError
      */
-    public function setAction($action): ArkPDOQueryResultIsNotQueriedError
+    public function setAction($action): ArkPDOQueryResultIsNotExecutedError
     {
         $this->action = $action;
         return $this;
@@ -105,9 +103,9 @@ class ArkPDOQueryResultIsNotQueriedError extends Exception
 
     /**
      * @param string $status
-     * @return ArkPDOQueryResultIsNotQueriedError
+     * @return ArkPDOQueryResultIsNotExecutedError
      */
-    public function setStatus($status): ArkPDOQueryResultIsNotQueriedError
+    public function setStatus($status): ArkPDOQueryResultIsNotExecutedError
     {
         $this->status = $status;
         return $this;
@@ -123,11 +121,12 @@ class ArkPDOQueryResultIsNotQueriedError extends Exception
 
     /**
      * @param string $databaseError
-     * @return ArkPDOQueryResultIsNotQueriedError
+     * @return ArkPDOQueryResultIsNotExecutedError
      */
-    public function setDatabaseError($databaseError): ArkPDOQueryResultIsNotQueriedError
+    public function setDatabaseError($databaseError): ArkPDOQueryResultIsNotExecutedError
     {
         $this->databaseError = $databaseError;
         return $this;
     }
+
 }

@@ -6,6 +6,7 @@ namespace sinri\ark\database\model\query;
 use PDO;
 use PDOStatement;
 use sinri\ark\database\exception\ArkPDOInvalidIndexError;
+use sinri\ark\database\exception\ArkPDOQueryResultIsNotExecutedError;
 use sinri\ark\database\exception\ArkPDOQueryResultIsNotQueriedError;
 
 /**
@@ -214,7 +215,19 @@ class ArkDatabaseQueryResult
     protected function assertStatusIsQueried(string $action)
     {
         if ($this->status !== self::STATUS_QUERIED) {
-            throw new ArkPDOQueryResultIsNotQueriedError($action, $this->status, $this->getError());
+            throw new ArkPDOQueryResultIsNotQueriedError($action, $this->status, $this->getError(), $this->sql);
+        }
+    }
+
+    /**
+     * @param string $action
+     * @throws ArkPDOQueryResultIsNotExecutedError
+     * @since 2.0.12
+     */
+    protected function assertStatusIsExecuted(string $action)
+    {
+        if ($this->status !== self::STATUS_EXECUTED) {
+            throw new ArkPDOQueryResultIsNotExecutedError($action, $this->status, $this->getError(), $this->sql);
         }
     }
 
