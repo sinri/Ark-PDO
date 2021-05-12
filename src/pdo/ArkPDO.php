@@ -14,6 +14,7 @@ use PDO;
 use PDOStatement;
 use sinri\ark\core\ArkLogger;
 use sinri\ark\database\exception\ArkPDOConfigError;
+use sinri\ark\database\exception\ArkPDORollbackSituation;
 use sinri\ark\database\exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\exception\ArkPDOStatementException;
 
@@ -286,8 +287,9 @@ class ArkPDO
      * @param callable|array $callback such as function(...$parameters)
      * @param array $parameters
      * @return mixed only return when success
-     * @throws Exception throw any exception when error
+     * @throws ArkPDORollbackSituation throw one when error, any exception as its `previous`
      * @since 1.1
+     * @since 2.0.20 throw certainly `ArkPDORollbackSituation`
      */
     public function executeInTransaction($callback, $parameters = [])
     {
@@ -298,7 +300,11 @@ class ArkPDO
             return $result;
         } catch (Exception $exception) {
             $this->rollBack();
-            throw $exception;
+            throw new ArkPDORollbackSituation(
+                'ArkPDORollbackSituation for inner exception: ' . $exception->getMessage(),
+                0,
+                $exception
+            );
         }
     }
 

@@ -343,6 +343,77 @@ abstract class ArkDatabaseTableCoreModel
     }
 
     /**
+     * @param ArkDatabaseSelectTableQuery $selection
+     * @param string[] $fields
+     * @return ArkDatabaseQueryResult
+     *
+     * @since 2.0.20
+     */
+    public function insert_into_select(ArkDatabaseSelectTableQuery $selection, array $fields = [])
+    {
+        return $this->write_into_select('INSERT', $selection, $fields);
+    }
+
+    /**
+     * @param ArkDatabaseSelectTableQuery $selection
+     * @param string[] $fields
+     * @return ArkDatabaseQueryResult
+     *
+     * @since 2.0.20
+     */
+    public function replace_into_select(ArkDatabaseSelectTableQuery $selection, array $fields = [])
+    {
+        return $this->write_into_select('REPLACE', $selection, $fields);
+    }
+
+    /**
+     * @param string $method INSERT|REPLACE
+     * @param ArkDatabaseSelectTableQuery $selection
+     * @param string[] $fields
+     * @return ArkDatabaseQueryResult
+     *
+     * @since 2.0.20
+     */
+    protected function write_into_select($method, ArkDatabaseSelectTableQuery $selection, array $fields = [])
+    {
+        $result = new ArkDatabaseQueryResult();
+        try {
+            $sql = $method . ' INTO ' . $this->getTableExpressForSQL() . ' ';
+            if (count($fields) > 0) {
+                $sql .= 'VALUES (' . implode(',', $fields) . ') ';
+            }
+            $sql .= $selection->generateSQL();
+
+            $result->setSql($sql);
+
+            $afx = $this->db()->insert($sql);
+            if ($afx == false) {
+                throw new ArkPDODatabaseQueryError("Error in batch writing with selection: " . $this->db()->getPDOErrorDescription());
+            }
+
+            $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
+            $result->setLastInsertedID($afx);
+
+//            $done = $this->db()->safeExecute($sql, [], $statement);
+//            if ($done) {
+//                $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
+//                $result->setLastInsertedID($this->db()->getLastInsertID());
+//                $result->setAffectedRowsCount($this->db()->getAffectedRowCount($statement));
+//            } else {
+//                $result->setError($this->db()->getPDOErrorDescription());
+//                $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
+//            }
+        } catch (ArkPDOSQLBuilderError $e) {
+            $result->setError($e->getMessage());
+            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
+        } catch (ArkPDODatabaseQueryError $e) {
+            $result->setError($e->getMessage());
+            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
+        }
+        return $result;
+    }
+
+    /**
      * @param int $page from 1 to infinite
      * @param int $pageSize
      * @param ArkDatabaseSelectFieldMeta[] $fieldMataList
