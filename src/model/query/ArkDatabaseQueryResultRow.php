@@ -4,6 +4,8 @@
 namespace sinri\ark\database\model\query;
 
 use sinri\ark\core\ArkHelper;
+use sinri\ark\database\exception\ArkPDOQueryResultIsNotQueriedError;
+use sinri\ark\database\exception\ArkPDOQueryResultIsNotStreamingError;
 
 /**
  * Class ArkDatabaseQueryResultRow
@@ -48,5 +50,29 @@ class ArkDatabaseQueryResultRow
     public function getField(string $fieldName, $default = null)
     {
         return ArkHelper::readTarget($this->row, [$fieldName], $default);
+    }
+
+    /**
+     * @param ArkDatabaseSelectTableQuery $selection
+     * @param ArkDatabaseQueryResult $result
+     * @return static[]
+     * @throws ArkPDOQueryResultIsNotQueriedError
+     * @since 2.0.21
+     */
+    public static function fetchRowsWithSelection(ArkDatabaseSelectTableQuery $selection, &$result)
+    {
+        $result = $selection->queryForRows(static::class);
+        return $result->getResultRows();
+    }
+
+    /**
+     * @param ArkDatabaseQueryResult $result
+     * @return static|null
+     * @throws ArkPDOQueryResultIsNotStreamingError
+     * @since 2.0.21
+     */
+    public static function fetchRowFromStream(ArkDatabaseQueryResult $result)
+    {
+        return $result->readNextRow(static::class);
     }
 }

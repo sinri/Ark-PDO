@@ -12,8 +12,7 @@ use sinri\ark\database\model\ArkDatabaseTableModel;
 use sinri\ark\database\pdo\ArkPDO;
 use sinri\ark\database\pdo\ArkPDOConfig;
 
-//require_once __DIR__ . '/../../../vendor/autoload.php';
-//require_once __DIR__ . '/../../../autoload.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
 $logger = new ArkLogger(__DIR__ . '/../../log', 'pdo-mysql');
 //$logger->setIgnoreLevel(\Psr\Log\LogLevel::INFO);
@@ -84,7 +83,7 @@ try {
         /**
          * @return string
          */
-        public function mappingTableName()
+        public function mappingTableName(): string
         {
             return 'ark_test_table';
         }
@@ -92,7 +91,7 @@ try {
         /**
          * @return ArkPDO
          */
-        public function db()
+        public function db(): ArkPDO
         {
             return $this->tmpDB;
         }

@@ -8,6 +8,7 @@ use PDOStatement;
 use sinri\ark\database\exception\ArkPDOInvalidIndexError;
 use sinri\ark\database\exception\ArkPDOQueryResultIsNotExecutedError;
 use sinri\ark\database\exception\ArkPDOQueryResultIsNotQueriedError;
+use sinri\ark\database\exception\ArkPDOQueryResultIsNotStreamingError;
 
 /**
  * Class ArkDatabaseQueryResult
@@ -269,21 +270,23 @@ class ArkDatabaseQueryResult
     }
 
     /**
-     * @return false|ArkDatabaseQueryResultRow
+     * @param string $rowClass
+     * @return ArkDatabaseQueryResultRow|null When all rows fetched, return null.
+     * @throws ArkPDOQueryResultIsNotStreamingError
      */
-    public function readNextRow()
+    public function readNextRow($rowClass = ArkDatabaseQueryResultRow::class)
     {
         if ($this->status !== self::STATUS_STREAMING) {
-            return false;
+            throw new ArkPDOQueryResultIsNotStreamingError(__METHOD__, $this->getStatus(), $this->getError(), $this->getSql());
         }
         $fetchedRow = $this->resultRowStream->fetch(PDO::FETCH_ASSOC);
         if ($fetchedRow === false) {
             $this->status = self::STATUS_STREAMED;
             $this->resultRowStream->closeCursor();
             $this->resultRowStream = null;
-            return false;
+            return null;
         }
-        return new ArkDatabaseQueryResultRow($fetchedRow);
+        return new $rowClass($fetchedRow);
     }
 
     /**
