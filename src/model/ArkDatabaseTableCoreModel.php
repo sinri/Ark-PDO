@@ -415,7 +415,7 @@ abstract class ArkDatabaseTableCoreModel
      */
     public function update($conditions, $data)
     {
-        $condition_sql = $this->buildCondition($conditions, "AND");
+        $condition_sql = $this->buildCondition($conditions);
         if ($condition_sql === '') {
             $condition_sql = "1";
         }
@@ -436,7 +436,7 @@ abstract class ArkDatabaseTableCoreModel
      */
     public function delete($conditions)
     {
-        $condition_sql = $this->buildCondition($conditions, "AND");
+        $condition_sql = $this->buildCondition($conditions);
         if ($condition_sql === '') {
             $condition_sql = "1";
         }
