@@ -141,6 +141,7 @@ abstract class ArkDatabaseTableCoreModel
      * @param null|string[] $groupBy
      * @param int $limit
      * @param int $offset
+     * @param string|null $having since 1.8.4
      * @return numeric|string|null
      * @throws ArkPDOSQLBuilderError
      * @throws ArkPDOStatementException
@@ -148,9 +149,9 @@ abstract class ArkDatabaseTableCoreModel
      * @since 1.7.6
      * @since 1.8.0 would throw exceptions on failure
      */
-    public function selectOne($conditions, string $field, $orderBy = null, $groupBy = null, $limit = 0, $offset = 0)
+    public function selectOne($conditions, string $field, $orderBy = null, $groupBy = null, $limit = 0, $offset = 0, $having = null)
     {
-        $sql = $this->makeSelectSQL($field, $conditions, $orderBy, $limit, $offset, $groupBy);
+        $sql = $this->makeSelectSQL($field, $conditions, $orderBy, $limit, $offset, $groupBy, $having);
         return $this->db()->getOne($sql);
     }
 
@@ -162,6 +163,7 @@ abstract class ArkDatabaseTableCoreModel
      * @param int $limit
      * @param int $offset
      * @param null|int|string $useAnotherKeyToFetch maybe you need field name, alias, index
+     * @param string|null $having since 1.8.4
      * @return array
      * @throws ArkPDOSQLBuilderError
      * @throws ArkPDOStatementException
@@ -169,9 +171,9 @@ abstract class ArkDatabaseTableCoreModel
      * @since 1.8.0 would throw exceptions on failure
      * @since 1.8.2 fix the ambiguous point between $useAnotherKeyToFetch and $field
      */
-    public function selectColumn($conditions, $field, $orderBy = null, $groupBy = null, $limit = 0, $offset = 0, $useAnotherKeyToFetch = null)
+    public function selectColumn($conditions, $field, $orderBy = null, $groupBy = null, $limit = 0, $offset = 0, $useAnotherKeyToFetch = null, $having = null)
     {
-        $sql = $this->makeSelectSQL($field, $conditions, $orderBy, $limit, $offset, $groupBy);
+        $sql = $this->makeSelectSQL($field, $conditions, $orderBy, $limit, $offset, $groupBy, $having);
         return $this->db()->getCol($sql, ($useAnotherKeyToFetch === null ? $field : $useAnotherKeyToFetch));
     }
 
@@ -179,15 +181,16 @@ abstract class ArkDatabaseTableCoreModel
      * @param array|string $conditions
      * @param string|string[] $fields "*","f1,f2" or ["f1","f2"] @since 1.2
      * @param null|string[] $groupBy @since 1.5
+     * @param null|string $having @since 1.8.4
      * @return array
      * @throws ArkPDOExecuteFetchFailedError
      * @throws ArkPDOSQLBuilderError
      * @throws ArkPDOStatementException
      * @since 1.8.0 would throw exceptions on failure
      */
-    public function selectRow($conditions, $fields = "*", $groupBy = null)
+    public function selectRow($conditions, $fields = "*", $groupBy = null, $having = null)
     {
-        $sql = $this->makeSelectSQL($fields, $conditions, null, 1, 0, $groupBy);
+        $sql = $this->makeSelectSQL($fields, $conditions, null, 1, 0, $groupBy, $having);
         return $this->db()->getRow($sql);
     }
 
@@ -265,15 +268,16 @@ abstract class ArkDatabaseTableCoreModel
      * @param int $offset
      * @param null|string $refKey normally PK or UK if you want to get map rather than list
      * @param null|string[] $groupBy @since 1.5
+     * @param null|string $having @since 1.8.4
      * @return array
      * @throws ArkPDOSQLBuilderError
      * @throws ArkPDOStatementException
      * @since 1.2
      * @since 1.8.0 would throw exceptions on failure
      */
-    public function selectRowsForFieldsWithSort($fields, $conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null, $groupBy = null)
+    public function selectRowsForFieldsWithSort($fields, $conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null, $groupBy = null, $having = null)
     {
-        $sql = $this->makeSelectSQL($fields, $conditions, $sort, $limit, $offset, $groupBy);
+        $sql = $this->makeSelectSQL($fields, $conditions, $sort, $limit, $offset, $groupBy, $having);
         $all = $this->db()->getAll($sql);
         if ($refKey) {
             $all = ArkHelper::turnListToMapping($all, $refKey);
@@ -288,10 +292,11 @@ abstract class ArkDatabaseTableCoreModel
      * @param int $limit
      * @param int $offset
      * @param null|string[] $groupBy
+     * @param string|null $having @since 1.8.4
      * @return string
      * @throws ArkPDOSQLBuilderError
      */
-    protected function makeSelectSQL($fields, $conditions, $sort = null, $limit = 0, $offset = 0, $groupBy = null)
+    protected function makeSelectSQL($fields, $conditions, $sort = null, $limit = 0, $offset = 0, $groupBy = null, $having = null)
     {
         if (is_array($fields)) {
             // $fields = '`' . implode("`,`", $fields) . '`'; // before 1.7.3
@@ -311,6 +316,15 @@ abstract class ArkDatabaseTableCoreModel
 
         if ($groupBy !== null) {
             $sql .= "group by " . implode(",", $groupBy) . " ";
+        }
+
+        // since 1.8.4
+        if ($having !== null) {
+            if (is_string($having)) {
+                $sql .= 'having ' . $having;
+            } else {
+                throw new ArkPDOSQLBuilderError('Having Component should be a string or null.', json_encode($having));
+            }
         }
 
         if ($sort !== null) {
