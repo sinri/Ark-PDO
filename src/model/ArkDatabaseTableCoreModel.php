@@ -320,7 +320,7 @@ abstract class ArkDatabaseTableCoreModel
             $result->setSql($sql);
 
             $afx = $this->db()->insert($sql, $pk);
-            if ($afx == false) {
+            if ($afx === false) {
                 throw new ArkPDODatabaseQueryError("Error in batch writing: " . $this->db()->getPDOErrorDescription());
             }
 
@@ -387,7 +387,7 @@ abstract class ArkDatabaseTableCoreModel
             $result->setSql($sql);
 
             $afx = $this->db()->insert($sql);
-            if ($afx == false) {
+            if ($afx === false) {
                 throw new ArkPDODatabaseQueryError("Error in batch writing with selection: " . $this->db()->getPDOErrorDescription());
             }
 

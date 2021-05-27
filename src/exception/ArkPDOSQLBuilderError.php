@@ -4,17 +4,20 @@
 namespace sinri\ark\database\exception;
 
 
-use Exception;
+use RuntimeException;
 use Throwable;
 
 /**
  * Class ArkPDOSQLBuilderError
  * @package sinri\ark\database\Exception
  * @since 2.0.13
+ * @since 2.0.23 becomes subclass of RuntimeException
  *
  * Before send to database, when the SQL string is in local building progress, something wrong found.
+ *
+ * It could not be fixed by code.
  */
-class ArkPDOSQLBuilderError extends Exception
+class ArkPDOSQLBuilderError extends RuntimeException
 {
     /**
      * @var string

@@ -239,16 +239,15 @@ class ArkPDO
     /**
      * @param string $sql
      * @param null $pk
-     * @return bool|string
+     * @return int|false 0 for no row inserted, false for error
      */
     public function insert(string $sql, $pk = null)
     {
         $this->logger->debug("Ready to execute insert sql", ["sql" => $sql]);
         $rows = $this->pdo->exec($sql);
-        if ($rows) {
-            return $this->pdo->lastInsertId($pk);
-        }
-        return false;
+        if ($rows === false) return false;
+        if ($rows === 0) return 0;
+        return $this->pdo->lastInsertId($pk);
     }
 
     /**

@@ -246,7 +246,7 @@ class ArkSQLCondition
     }
 
     /**
-     * @param $field
+     * @param string $field
      * @return ArkSQLCondition
      * @since 1.7.3
      */
@@ -256,7 +256,7 @@ class ArkSQLCondition
     }
 
     /**
-     * @param $field
+     * @param string $field
      * @return ArkSQLCondition
      * @since 1.7.3
      */

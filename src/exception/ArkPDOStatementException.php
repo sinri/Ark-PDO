@@ -4,17 +4,18 @@
 namespace sinri\ark\database\exception;
 
 
-use Exception;
+use RuntimeException;
 use Throwable;
 
 /**
  * Class ArkPDOStatementException
  * @package sinri\ark\database\Exception
  * @since 2.0.13
+ * @since 2.0.23 becomes subclass of RuntimeException
  *
  * When a SQL cannot be made into a PDO statement
  */
-class ArkPDOStatementException extends Exception
+class ArkPDOStatementException extends RuntimeException
 {
     protected $sql;
 

@@ -6,6 +6,8 @@ namespace sinri\ark\database\model\query;
 use PDO;
 use PDOStatement;
 use sinri\ark\database\exception\ArkPDOInvalidIndexError;
+use sinri\ark\database\exception\ArkPDOQueryResultEmptySituation;
+use sinri\ark\database\exception\ArkPDOQueryResultFinishedStreamingSituation;
 use sinri\ark\database\exception\ArkPDOQueryResultIsNotExecutedError;
 use sinri\ark\database\exception\ArkPDOQueryResultIsNotQueriedError;
 use sinri\ark\database\exception\ArkPDOQueryResultIsNotStreamingError;
@@ -271,8 +273,9 @@ class ArkDatabaseQueryResult
 
     /**
      * @param string $rowClass
-     * @return ArkDatabaseQueryResultRow|null When all rows fetched, return null.
-     * @throws ArkPDOQueryResultIsNotStreamingError
+     * @return ArkDatabaseQueryResultRow
+     * @throws ArkPDOQueryResultFinishedStreamingSituation When all rows fetched
+     * @throws ArkPDOQueryResultIsNotStreamingError When now is not streaming
      */
     public function readNextRow($rowClass = ArkDatabaseQueryResultRow::class)
     {
@@ -284,9 +287,23 @@ class ArkDatabaseQueryResult
             $this->status = self::STATUS_STREAMED;
             $this->resultRowStream->closeCursor();
             $this->resultRowStream = null;
-            return null;
+            throw new ArkPDOQueryResultFinishedStreamingSituation();
         }
         return new $rowClass($fetchedRow);
+    }
+
+    /**
+     * @return $this
+     * @throws ArkPDOQueryResultEmptySituation
+     * @throws ArkPDOQueryResultIsNotQueriedError
+     */
+    public function assertResultMatrixIsNotEmpty()
+    {
+        $this->assertStatusIsQueried(__METHOD__);
+        if (empty($this->resultRows)) {
+            throw new ArkPDOQueryResultEmptySituation(__METHOD__);
+        }
+        return $this;
     }
 
     /**

@@ -34,6 +34,11 @@ class ArkDatabaseSelectTableQuery
      */
     protected $groupByFields;
     /**
+     * @var ArkSQLCondition[]
+     * @since 2.0.23
+     */
+    protected $havingConditions;
+    /**
      * @var string
      */
     protected $sortExpression;
@@ -60,6 +65,14 @@ class ArkDatabaseSelectTableQuery
      * @since 2.0.7
      */
     protected $listOfIgnoreIndexItems;
+    /**
+     * @var string Default as Empty when no locks required;
+     * @since 2.0.23
+     * May be:
+     * * [ For { Update | Share } [ Of TableName[, ...] ] [ NOWAIT | SKIP LOCKED ]
+     * * LOCK IN SHARE MODE
+     */
+    protected $lockMode = '';
 
     public function __construct(ArkDatabaseTableCoreModel $model)
     {
@@ -67,9 +80,20 @@ class ArkDatabaseSelectTableQuery
         $this->selectFields = [];
         $this->conditions = [];
         $this->groupByFields = [];
+        $this->havingConditions = [];
         $this->sortExpression = '';
         $this->limit = 0;
         $this->offset = 0;
+    }
+
+    /**
+     * @param string $lockMode
+     * @return ArkDatabaseSelectTableQuery
+     */
+    public function setLockMode(string $lockMode): ArkDatabaseSelectTableQuery
+    {
+        $this->lockMode = $lockMode;
+        return $this;
     }
 
     /**
@@ -235,6 +259,16 @@ class ArkDatabaseSelectTableQuery
     }
 
     /**
+     * @param array $havingConditions
+     * @return $this
+     */
+    public function setHavingConditions(array $havingConditions): ArkDatabaseSelectTableQuery
+    {
+        $this->havingConditions = $havingConditions;
+        return $this;
+    }
+
+    /**
      * @param string $indexKey
      * @since 2.0.7
      */
@@ -319,6 +353,9 @@ class ArkDatabaseSelectTableQuery
         if (!empty($this->groupByFields)) {
             $sql .= "group by " . implode(",", $this->groupByFields) . " ";
         }
+        if (!empty($this->havingConditions)) {
+            $sql .= "having " . ArkSQLCondition::generateConditionSQLComponent($this->conditions) . ' ';
+        }
 
         if ($this->sortExpression !== '') {
             $sql .= "order by " . $this->sortExpression . ' ';
@@ -330,6 +367,11 @@ class ArkDatabaseSelectTableQuery
                 $sql .= " offset {$this->offset} ";
             }
         }
+
+        if ($this->lockMode !== '') {
+            $sql .= ' ' . $this->lockMode . ' ';
+        }
+
         return $sql;
     }
 

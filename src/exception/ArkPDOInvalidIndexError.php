@@ -4,15 +4,16 @@
 namespace sinri\ark\database\exception;
 
 
-use Exception;
+use RangeException;
 use Throwable;
 
 /**
  * Class ArkPDOInvalidIndexError
  * @package sinri\ark\database\Exception
  * @since 2.0.14
+ * @since 2.0.23 becomes subclass of RangeException
  */
-class ArkPDOInvalidIndexError extends Exception
+class ArkPDOInvalidIndexError extends RangeException
 {
     protected $expectedIndex;
 

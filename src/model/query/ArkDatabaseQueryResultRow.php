@@ -4,6 +4,7 @@
 namespace sinri\ark\database\model\query;
 
 use sinri\ark\core\ArkHelper;
+use sinri\ark\database\exception\ArkPDOQueryResultFinishedStreamingSituation;
 use sinri\ark\database\exception\ArkPDOQueryResultIsNotQueriedError;
 use sinri\ark\database\exception\ArkPDOQueryResultIsNotStreamingError;
 
@@ -73,6 +74,7 @@ class ArkDatabaseQueryResultRow
     /**
      * @param ArkDatabaseQueryResult $result
      * @return static|null
+     * @throws ArkPDOQueryResultFinishedStreamingSituation
      * @throws ArkPDOQueryResultIsNotStreamingError
      * @since 2.0.21
      */

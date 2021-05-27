@@ -261,8 +261,7 @@ class ArkPDOCompareTool
         if ($creation === false) {
             throw new ArkPDODatabaseQueryError(
                 "cannot get create DDL of " . $table . ' but get ' . json_encode($creation)
-                . ' PDO Error: ' . $db->getPDOErrorDescription(),
-                $db->getPDOErrorCode()
+                . ' PDO Error: ' . $db->getPDOErrorDescription()
             );
         }
         return $creation;

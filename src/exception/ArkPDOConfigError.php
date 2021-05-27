@@ -4,17 +4,18 @@
 namespace sinri\ark\database\exception;
 
 
-use Exception;
 use Throwable;
+use UnexpectedValueException;
 
 /**
  * Class ArkPDOConfigError
  * @package sinri\ark\database\Exception
  * @since 2.0.13
+ * @since 2.0.23 becomes subclass of UnexpectedValueException
  *
  * It raises when Ark PDO configuration is not in correct format.
  */
-class ArkPDOConfigError extends Exception
+class ArkPDOConfigError extends UnexpectedValueException
 {
     /**
      * @var string
