@@ -18,6 +18,7 @@ use sinri\ark\database\exception\ArkPDOConfigError;
 use sinri\ark\database\exception\ArkPDOExecuteFailedError;
 use sinri\ark\database\exception\ArkPDOExecuteFetchFailedError;
 use sinri\ark\database\exception\ArkPDOExecuteNotAffectedError;
+use sinri\ark\database\exception\ArkPDORollbackSituation;
 use sinri\ark\database\exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\exception\ArkPDOStatementException;
 
@@ -371,7 +372,7 @@ class ArkPDO
      * @param callable $callback such as function(...$parameters)
      * @param array $parameters
      * @return mixed only return when success
-     * @throws Exception throw any exception when error
+     * @throws ArkPDORollbackSituation @since 1.8.6
      * @since 1.1
      */
     public function executeInTransaction($callback, array $parameters = [])
@@ -383,7 +384,11 @@ class ArkPDO
             return $result;
         } catch (Exception $exception) {
             $this->rollBack();
-            throw $exception;
+            throw new ArkPDORollbackSituation(
+                __METHOD__ . ' Rollback because of [' . get_class($exception) . '] ' . $exception->getMessage(),
+                $exception->getCode(),
+                $exception
+            );
         }
     }
 
