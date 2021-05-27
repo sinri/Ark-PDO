@@ -11,6 +11,8 @@ use Throwable;
  * Class ArkPDOInvalidIndexError
  * @package sinri\ark\database\Exception
  * @since 1.7.9
+ *
+ * Not used yet (till 1.8.5)
  */
 class ArkPDOInvalidIndexError extends Exception
 {
