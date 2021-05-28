@@ -12,15 +12,15 @@ namespace sinri\ark\database\pdo;
 use Exception;
 use PDO;
 use PDOStatement;
-use RuntimeException;
 use sinri\ark\core\ArkLogger;
 use sinri\ark\database\exception\ArkPDOConfigError;
+use sinri\ark\database\exception\ArkPDOExecutedWithEmptyResultSituation;
 use sinri\ark\database\exception\ArkPDOExecuteFailedError;
-use sinri\ark\database\exception\ArkPDOExecuteFetchFailedError;
 use sinri\ark\database\exception\ArkPDOExecuteNotAffectedError;
 use sinri\ark\database\exception\ArkPDORollbackSituation;
 use sinri\ark\database\exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\exception\ArkPDOStatementException;
+use UnexpectedValueException;
 
 class ArkPDO
 {
@@ -154,29 +154,6 @@ class ArkPDO
     }
 
     /**
-     * @param string $sql
-     * @param bool $usePrepare
-     * @return PDOStatement
-     * @throws ArkPDOStatementException
-     * @deprecated @since 1.8.1 use prepareSQLForStatement or querySQLForStatement instead
-     */
-    protected function buildPDOStatement(string $sql, $usePrepare = false): PDOStatement
-    {
-        if ($usePrepare) {
-            $statement = $this->pdo->prepare($sql);
-        } else {
-            $statement = $this->pdo->query($sql);
-        }
-        if (!$statement) {
-            $this->logger->error("PDO Statement Building Failure Occurred.", ["sql" => $sql]);
-            throw new ArkPDOStatementException("PDO Statement Building Failure Occurred.", $sql);
-        } else {
-            $this->logger->debug("PDO Statement Generated.", ["sql" => $sql]);
-        }
-        return $statement;
-    }
-
-    /**
      * Prepares a statement for execution and returns a statement object
      * @param string $sql
      * @return PDOStatement
@@ -230,7 +207,7 @@ class ArkPDO
     /**
      * @param string $sql
      * @return array
-     * @throws ArkPDOExecuteFetchFailedError
+     * @throws ArkPDOExecutedWithEmptyResultSituation
      * @throws ArkPDOStatementException
      * @since 1.8.1 use
      */
@@ -239,7 +216,7 @@ class ArkPDO
         $stmt = $this->querySQLForStatement($sql);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row === false) {
-            throw new ArkPDOExecuteFetchFailedError('Cannot fetch one row');
+            throw new ArkPDOExecutedWithEmptyResultSituation('Cannot fetch one row with sql: ' . $sql);
         }
         return $row;
     }
@@ -247,8 +224,7 @@ class ArkPDO
     /**
      * @param string $sql
      * @return numeric|string|null May be number, string, or NULL
-     * @throws ArkPDOExecuteFetchFailedError
-     * @throws ArkPDOStatementException
+     * @throws ArkPDOExecutedWithEmptyResultSituation
      * @since 1.8.1 use fetch way
      */
     public function getOne(string $sql)
@@ -257,7 +233,7 @@ class ArkPDO
 
         $x = $stmt->fetchColumn();
         if ($x === false) {
-            throw new ArkPDOExecuteFetchFailedError('Cannot fetch one cell from query result');
+            throw new ArkPDOExecutedWithEmptyResultSituation('Cannot fetch one cell from query result with sql: ' . $sql);
         }
         return $x;
     }
@@ -296,9 +272,9 @@ class ArkPDO
         $this->logger->debug("Ready to execute sql", ["sql" => $sql]);
         $afx = $this->pdo->exec($sql);
         if ($afx === false) {
-            throw new ArkPDOExecuteFailedError('Execute with SQL got false.');
+            throw new ArkPDOExecuteFailedError('Execute SQL got false: ' . $this->getPDOErrorDescription());
         } elseif ($afx === 0) {
-            throw new ArkPDOExecuteNotAffectedError('Execute insertion with SQL got 0 row affected.');
+            throw new ArkPDOExecuteNotAffectedError('Execute SQL got 0 row affected.');
         }
         return $afx;
     }
@@ -327,12 +303,26 @@ class ArkPDO
     public function insertIntoTableForRawPK(string $sql, $pk = null): string
     {
         $this->logger->debug("Ready to execute insert sql", ["sql" => $sql]);
+
+//        $sth = $this->prepareSQLForStatement($sql);
+//        $done = $sth->execute();
+//        if ($done === false) {
+//            throw new ArkPDOExecuteFailedError('Execute insertion with SQL got false.');
+//        }
+//        $afx=$sth->rowCount();
+//        if($afx===0){
+//            throw new ArkPDOExecuteNotAffectedError('Execute insertion with SQL got 0 row affected.');
+//        }
+
         $rows = $this->pdo->exec($sql);
         if ($rows === false) {
-            throw new ArkPDOExecuteFailedError('Execute insertion with SQL got false.');
+            // for primary key or unique index conflict
+            throw new ArkPDOExecuteFailedError('Execute insertion with SQL got false: ' . $this->getPDOErrorDescription());
         } elseif ($rows === 0) {
+            // for `insert ignore into ...`
             throw new ArkPDOExecuteNotAffectedError('Execute insertion with SQL got 0 row affected.');
         }
+
         return $this->pdo->lastInsertId($pk);
     }
 
@@ -426,6 +416,13 @@ class ArkPDO
         return "PDO ERROR #" . $this->getPDOErrorCode() . ": " . implode(";", $this->getPDOErrorInfo());
     }
 
+    public static function getPDOStatementErrorDescription(PDOStatement $statement): string
+    {
+        $code = $statement->errorCode();
+        $info = $statement->errorInfo();
+        return "PDO Statement ERROR #" . $code . ": " . implode(";", $info);
+    }
+
     /**
      * @param string $sql
      * @param array $values
@@ -464,7 +461,7 @@ class ArkPDO
         $sth = $this->prepareSQLForStatement($sql);
         $done = $sth->execute($values);
         if ($done === false) {
-            throw new ArkPDOExecuteFailedError('PDO Statement execute failed.');
+            throw new ArkPDOExecuteFailedError('PDO Statement execute failed: ' . self::getPDOStatementErrorDescription($sth));
         }
         return $sth->fetchAll($fetchStyle);
     }
@@ -474,7 +471,7 @@ class ArkPDO
      * @param array $values
      * @return array
      * @throws ArkPDOExecuteFailedError
-     * @throws ArkPDOExecuteFetchFailedError
+     * @throws ArkPDOExecutedWithEmptyResultSituation
      * @throws ArkPDOStatementException
      * @since 1.8.0, failure would throw exceptions
      */
@@ -483,11 +480,11 @@ class ArkPDO
         $sth = $this->prepareSQLForStatement($sql);
         $done = $sth->execute($values);
         if ($done === false) {
-            throw new ArkPDOExecuteFailedError('PDO Statement execute failed.');
+            throw new ArkPDOExecuteFailedError('PDO Statement execute failed: ' . self::getPDOStatementErrorDescription($sth));
         }
         $result = $sth->fetch(PDO::FETCH_ASSOC);
-        if (!$result) {
-            throw new ArkPDOExecuteFetchFailedError('PDO Statement executed but could not fetch a row.');
+        if ($result === false) {
+            throw new ArkPDOExecutedWithEmptyResultSituation('PDO Statement executed but could not fetch a row.');
         }
         return $result;
     }
@@ -497,7 +494,7 @@ class ArkPDO
      * @param array $values
      * @return scalar
      * @throws ArkPDOExecuteFailedError
-     * @throws ArkPDOExecuteFetchFailedError
+     * @throws ArkPDOExecutedWithEmptyResultSituation
      * @throws ArkPDOStatementException
      * @since 1.8.0, failure would throw exceptions
      */
@@ -507,11 +504,11 @@ class ArkPDO
 
         $done = $sth->execute($values);
         if ($done === false) {
-            throw new ArkPDOExecuteFailedError('PDO Statement execute failed.');
+            throw new ArkPDOExecuteFailedError('PDO Statement execute failed: ' . self::getPDOStatementErrorDescription($sth));
         }
         $result = $sth->fetchColumn();
         if ($result === false) {
-            throw new ArkPDOExecuteFetchFailedError('PDO Statement executed but could not fetch a column.');
+            throw new ArkPDOExecutedWithEmptyResultSituation('PDO Statement executed but could not fetch a column.');
         }
         return $result;
     }
@@ -524,6 +521,7 @@ class ArkPDO
      * @return true
      * @throws ArkPDOExecuteFailedError
      * @throws ArkPDOStatementException
+     * @throws ArkPDOExecuteNotAffectedError
      * @since 1.8.0, failure or no affection would throw exceptions, always return true, write int exactly
      */
     public function safeInsertOne(string $sql, array $values = [], int &$insertedId = 0, $pk = null)
@@ -540,6 +538,7 @@ class ArkPDO
      * @return string
      * @throws ArkPDOExecuteFailedError
      * @throws ArkPDOStatementException
+     * @throws ArkPDOExecuteNotAffectedError
      * @since 1.8.0, failure or no affection would throw exceptions
      */
     public function safeInsertOneForRawPK(string $sql, array $values = [], $pk = null)
@@ -548,7 +547,12 @@ class ArkPDO
         $done = $sth->execute($values);
 
         if ($done === false) {
-            throw new ArkPDOExecuteFailedError('Safe Insertion Execute Failed.');
+            throw new ArkPDOExecuteFailedError('Safe Insertion Execute Failed: ' . self::getPDOStatementErrorDescription($sth));
+        }
+
+        $afx = $sth->rowCount();
+        if ($afx === 0) {
+            throw new ArkPDOExecuteNotAffectedError('Execute insertion with SQL got 0 row affected.');
         }
 
         return $this->pdo->lastInsertId($pk);
@@ -568,7 +572,7 @@ class ArkPDO
         $sth = $this->prepareSQLForStatement($sql);
         $done = $sth->execute($values);
         if ($done === false) {
-            throw new ArkPDOExecuteFailedError('Safe Insertion Execute Failed.');
+            throw new ArkPDOExecuteFailedError('Safe Execute Failed: ' . self::getPDOStatementErrorDescription($sth));
         }
         return true;
     }
@@ -742,7 +746,7 @@ class ArkPDO
         $result = $this->pdo->quote($string, $parameterType);
         if ($result === false) {
             // it should not happen in common sense...
-            throw new RuntimeException('Cannot quote with PDO');
+            throw new UnexpectedValueException('Cannot quote this string with PDO: ' . $string);
         }
         return $result;
     }

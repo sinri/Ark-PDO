@@ -10,7 +10,9 @@ use Exception;
  * @package sinri\ark\database\exception
  * @since 1.8.0
  *
- * When PDO Statement `fetch` returns `false`
+ * When PDO Statement `fetch` returns `false`,
+ * such as,
+ * no result row when get row;
  */
 class ArkPDOExecuteFetchFailedError extends Exception
 {
