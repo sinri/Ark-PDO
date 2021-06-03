@@ -37,6 +37,8 @@ class ArkSQLCondition
 
     const MACRO_RAW_EXPRESSION = "MACRO_RAW_EXPRESSION";
 
+    const MACRO_CASE = 'MACRO_CASE';
+
     const OP_EXISTS = "EXISTS";
     const OP_NOT_EXISTS = "NOT EXISTS";
 
@@ -54,6 +56,11 @@ class ArkSQLCondition
     protected $operate;
     protected $field;
     protected $value;
+    protected $addition;
+    /**
+     * @var bool
+     */
+    protected $isFieldAsName;
 
     /**
      * ArkSQLCondition constructor.
@@ -61,12 +68,15 @@ class ArkSQLCondition
      * @param string $operate
      * @param string|int|array $value
      * @param null|string $addition
+     * @param bool $isFieldAsName
      */
-    public function __construct(string $field, string $operate, $value, $addition = null)
+    public function __construct(string $field, string $operate, $value, $addition = null, $isFieldAsName = true)
     {
         $this->field = $field;
         $this->operate = $operate;
         $this->value = $value;
+        $this->addition = $addition;
+        $this->isFieldAsName = $isFieldAsName;
 
         if ($this->operate === self::OP_LIKE || $this->operate === self::OP_NOT_LIKE) {
             $this->value = ArkPDO::dryQuote($this->value);
@@ -86,145 +96,246 @@ class ArkSQLCondition
 
     /**
      * @param string $field
-     * @param int|string|array $value
+     * @param scalar|scalar[] $value
+     * @param bool $isFieldAsName
      * @return ArkSQLCondition
      * @since 2.0.9
      */
-    public static function makeEqualOrInArray(string $field, $value): ArkSQLCondition
+    public static function makeEqualOrInArray(string $field, $value, $isFieldAsName = true): ArkSQLCondition
     {
         if (is_array($value)) {
-            return self::makeInArray($field, $value);
+            return self::makeInArray($field, $value, $isFieldAsName);
         } else {
-            return self::makeEqual($field, $value);
+            return self::makeEqual($field, $value, $isFieldAsName);
         }
     }
 
     /**
      * @param string $field
-     * @param int|string|array $value
+     * @param scalar|scalar[] $value
+     * @param bool $isFieldAsName
      * @return ArkSQLCondition
      * @since 2.0.9
      */
-    public static function makeNotEqualNorInArray(string $field, $value): ArkSQLCondition
+    public static function makeNotEqualNorInArray(string $field, $value, $isFieldAsName = true): ArkSQLCondition
     {
         if (is_array($value)) {
-            return self::makeNotInArray($field, $value);
+            return self::makeNotInArray($field, $value, $isFieldAsName);
         } else {
-            return self::makeNotEqual($field, $value);
+            return self::makeNotEqual($field, $value, $isFieldAsName);
         }
     }
 
-    public static function makeEqual(string $field, $value): ArkSQLCondition
+    /**
+     * @param string $field
+     * @param scalar $value
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     */
+    public static function makeEqual(string $field, $value, $isFieldAsName = true): ArkSQLCondition
     {
-        return new ArkSQLCondition($field, self::OP_EQ, $value);
+        return new ArkSQLCondition($field, self::OP_EQ, $value, null, $isFieldAsName);
     }
 
-    public static function makeGreaterThan(string $field, $value): ArkSQLCondition
+    /**
+     * @param string $field
+     * @param scalar $value
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     */
+    public static function makeGreaterThan(string $field, $value, $isFieldAsName = true): ArkSQLCondition
     {
-        return new ArkSQLCondition($field, self::OP_GT, $value);
+        return new ArkSQLCondition($field, self::OP_GT, $value, null, $isFieldAsName);
     }
 
-    public static function makeNoLessThan(string $field, $value): ArkSQLCondition
+    /**
+     * @param string $field
+     * @param scalar $value
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     */
+    public static function makeNoLessThan(string $field, $value, $isFieldAsName = true): ArkSQLCondition
     {
-        return new ArkSQLCondition($field, self::OP_EGT, $value);
+        return new ArkSQLCondition($field, self::OP_EGT, $value, null, $isFieldAsName);
     }
 
-    public static function makeLessThan(string $field, $value): ArkSQLCondition
+    /**
+     * @param string $field
+     * @param scalar $value
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     */
+    public static function makeLessThan(string $field, $value, $isFieldAsName = true): ArkSQLCondition
     {
-        return new ArkSQLCondition($field, self::OP_LT, $value);
+        return new ArkSQLCondition($field, self::OP_LT, $value, null, $isFieldAsName);
     }
 
-    public static function makeNoGreaterThan(string $field, $value): ArkSQLCondition
+    /**
+     * @param string $field
+     * @param scalar $value
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     */
+    public static function makeNoGreaterThan(string $field, $value, $isFieldAsName = true): ArkSQLCondition
     {
-        return new ArkSQLCondition($field, self::OP_ELT, $value);
+        return new ArkSQLCondition($field, self::OP_ELT, $value, null, $isFieldAsName);
     }
 
-    public static function makeNotEqual(string $field, $value): ArkSQLCondition
+    /**
+     * @param string $field
+     * @param scalar $value
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     */
+    public static function makeNotEqual(string $field, $value, $isFieldAsName = true): ArkSQLCondition
     {
-        return new ArkSQLCondition($field, self::OP_NEQ, $value);
+        return new ArkSQLCondition($field, self::OP_NEQ, $value, null, $isFieldAsName);
     }
 
-    public static function makeEqualNullSafe(string $field, $value): ArkSQLCondition
+    /**
+     * @param string $field
+     * @param scalar $value
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     */
+    public static function makeEqualNullSafe(string $field, $value, $isFieldAsName = true): ArkSQLCondition
     {
-        return new ArkSQLCondition($field, self::OP_NULL_SAFE_EQUAL, $value);
+        return new ArkSQLCondition($field, self::OP_NULL_SAFE_EQUAL, $value, null, $isFieldAsName);
     }
 
-    public static function makeIsNull(string $field): ArkSQLCondition
+    /**
+     * @param string $field
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     */
+    public static function makeIsNull(string $field, $isFieldAsName = true): ArkSQLCondition
     {
-        return new ArkSQLCondition($field, self::OP_IS, self::CONST_NULL);
+        return new ArkSQLCondition($field, self::OP_IS, self::CONST_NULL, null, $isFieldAsName);
     }
 
-    public static function makeIsNotNull(string $field): ArkSQLCondition
+    /**
+     * @param string $field
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     */
+    public static function makeIsNotNull(string $field, $isFieldAsName = true): ArkSQLCondition
     {
-        return new ArkSQLCondition($field, self::OP_IS_NOT, self::CONST_NULL);
+        return new ArkSQLCondition($field, self::OP_IS_NOT, self::CONST_NULL, null, $isFieldAsName);
     }
 
-    public static function makeInArray(string $field, $value): ArkSQLCondition
+    /**
+     * @param string $field
+     * @param scalar[] $value
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     */
+    public static function makeInArray(string $field, $value, $isFieldAsName = true): ArkSQLCondition
     {
-        return new ArkSQLCondition($field, self::OP_IN, $value);
+        return new ArkSQLCondition($field, self::OP_IN, $value, null, $isFieldAsName);
     }
 
-    public static function makeNotInArray(string $field, $value): ArkSQLCondition
+    /**
+     * @param string $field
+     * @param scalar[] $value
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     */
+    public static function makeNotInArray(string $field, $value, $isFieldAsName = true): ArkSQLCondition
     {
-        return new ArkSQLCondition($field, self::OP_NOT_IN, $value);
+        return new ArkSQLCondition($field, self::OP_NOT_IN, $value, null, $isFieldAsName);
     }
 
-    public static function makeBetween(string $field, $value1, $value2): ArkSQLCondition
+    /**
+     * @param string $field
+     * @param scalar $value1
+     * @param scalar $value2
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     */
+    public static function makeBetween(string $field, $value1, $value2, $isFieldAsName = true): ArkSQLCondition
     {
-        return new ArkSQLCondition($field, self::OP_BETWEEN, [$value1, $value2]);
+        return new ArkSQLCondition($field, self::OP_BETWEEN, [$value1, $value2], null, $isFieldAsName);
     }
 
-    public static function makeNotBetween(string $field, $value1, $value2): ArkSQLCondition
+    /**
+     * @param string $field
+     * @param scalar $value1
+     * @param scalar $value2
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     */
+    public static function makeNotBetween(string $field, $value1, $value2, $isFieldAsName = true): ArkSQLCondition
     {
-        return new ArkSQLCondition($field, self::OP_NOT_BETWEEN, [$value1, $value2]);
-    }
-
-    public static function makeStringHasPrefix(string $field, $value): ArkSQLCondition
-    {
-        return new ArkSQLCondition($field, self::OP_LIKE, $value, self::LIKE_RIGHT_WILDCARD);
-    }
-
-    public static function makeStringHasSuffix(string $field, $value): ArkSQLCondition
-    {
-        return new ArkSQLCondition($field, self::OP_LIKE, $value, self::LIKE_LEFT_WILDCARD);
-    }
-
-    public static function makeStringContainsText(string $field, $value): ArkSQLCondition
-    {
-        return new ArkSQLCondition($field, self::OP_LIKE, $value, self::LIKE_BOTH_WILDCARD);
+        return new ArkSQLCondition($field, self::OP_NOT_BETWEEN, [$value1, $value2], null, $isFieldAsName);
     }
 
     /**
      * @param string $field
      * @param string $value
+     * @param bool $isFieldAsName
      * @return ArkSQLCondition
-     * @since 2.0.8
      */
-    public static function makeStringDoesNotHavePrefix(string $field, string $value): ArkSQLCondition
+    public static function makeStringHasPrefix(string $field, string $value, $isFieldAsName = true): ArkSQLCondition
     {
-        return new ArkSQLCondition($field, self::OP_NOT_LIKE, $value, self::LIKE_RIGHT_WILDCARD);
+        return new ArkSQLCondition($field, self::OP_LIKE, $value, self::LIKE_RIGHT_WILDCARD, $isFieldAsName);
     }
 
     /**
      * @param string $field
      * @param string $value
+     * @param bool $isFieldAsName
      * @return ArkSQLCondition
-     * @since 2.0.8
      */
-    public static function makeStringDoesNotHaveSuffix(string $field, string $value): ArkSQLCondition
+    public static function makeStringHasSuffix(string $field, string $value, $isFieldAsName = true): ArkSQLCondition
     {
-        return new ArkSQLCondition($field, self::OP_NOT_LIKE, $value, self::LIKE_LEFT_WILDCARD);
+        return new ArkSQLCondition($field, self::OP_LIKE, $value, self::LIKE_LEFT_WILDCARD, $isFieldAsName);
     }
 
     /**
      * @param string $field
      * @param string $value
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     */
+    public static function makeStringContainsText(string $field, string $value, $isFieldAsName = true): ArkSQLCondition
+    {
+        return new ArkSQLCondition($field, self::OP_LIKE, $value, self::LIKE_BOTH_WILDCARD, $isFieldAsName);
+    }
+
+    /**
+     * @param string $field
+     * @param string $value
+     * @param bool $isFieldAsName
      * @return ArkSQLCondition
      * @since 2.0.8
      */
-    public static function makeStringDoesNotContainText(string $field, string $value): ArkSQLCondition
+    public static function makeStringDoesNotHavePrefix(string $field, string $value, $isFieldAsName = true): ArkSQLCondition
     {
-        return new ArkSQLCondition($field, self::OP_NOT_LIKE, $value, self::LIKE_BOTH_WILDCARD);
+        return new ArkSQLCondition($field, self::OP_NOT_LIKE, $value, self::LIKE_RIGHT_WILDCARD, $isFieldAsName);
+    }
+
+    /**
+     * @param string $field
+     * @param string $value
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     * @since 2.0.8
+     */
+    public static function makeStringDoesNotHaveSuffix(string $field, string $value, $isFieldAsName = true): ArkSQLCondition
+    {
+        return new ArkSQLCondition($field, self::OP_NOT_LIKE, $value, self::LIKE_LEFT_WILDCARD, $isFieldAsName);
+    }
+
+    /**
+     * @param string $field
+     * @param string $value
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     * @since 2.0.8
+     */
+    public static function makeStringDoesNotContainText(string $field, string $value, $isFieldAsName = true): ArkSQLCondition
+    {
+        return new ArkSQLCondition($field, self::OP_NOT_LIKE, $value, self::LIKE_BOTH_WILDCARD, $isFieldAsName);
     }
 
     /**
@@ -276,6 +387,56 @@ class ArkSQLCondition
     }
 
     /**
+     * @param string $expression such as A Sub SQL
+     * @return ArkSQLCondition
+     * @since 1.8.8
+     */
+    public static function makeExists(string $expression): ArkSQLCondition
+    {
+        return new ArkSQLCondition('', self::OP_EXISTS, $expression);
+    }
+
+    /**
+     * @param string $expression such as A Sub SQL
+     * @return ArkSQLCondition
+     * @since 1.8.8
+     */
+    public static function makeNotExists(string $expression): ArkSQLCondition
+    {
+        return new ArkSQLCondition('', self::OP_NOT_EXISTS, $expression);
+    }
+
+    /**
+     *
+     * @see https://dev.mysql.com/doc/refman/8.0/en/flow-control-functions.html#operator_case
+     *
+     * @param string $target
+     * @param array $whenThenPairs
+     * @param string|null $else
+     * @param bool $isFieldAsName
+     * @return ArkSQLCondition
+     *
+     * @since 2.0.24
+     */
+    public static function makeCase(string $target, array $whenThenPairs, $else = null, $isFieldAsName = true)
+    {
+        return new ArkSQLCondition($target, self::MACRO_CASE, $whenThenPairs, $else, $isFieldAsName);
+    }
+
+    /**
+     * @return string
+     */
+    private function getFieldExpression()
+    {
+        if ($this->isFieldAsName) {
+            return "`{$this->field}`";
+        } else {
+            return "{$this->field}";
+        }
+    }
+
+
+    /**
      * @return string
      * @throws ArkPDOSQLBuilderError
      */
@@ -289,7 +450,7 @@ class ArkSQLCondition
             case self::OP_ELT:
             case self::OP_NEQ:
             case self::OP_NULL_SAFE_EQUAL:
-                return "`{$this->field}` " . $this->operate . " " . ArkPDO::dryQuote($this->value);
+                return $this->getFieldExpression() . " " . $this->operate . " " . ArkPDO::dryQuote($this->value);
             case self::OP_IS:
             case self::OP_IS_NOT:
                 if (!in_array($this->value, [self::CONST_FALSE, self::CONST_TRUE, self::CONST_NULL])) {
@@ -298,7 +459,7 @@ class ArkSQLCondition
                         "{$this->field} {$this->operate} " . json_encode($this->value)
                     );
                 }
-                return "`{$this->field}` " . $this->operate . " " . $this->value;
+                return $this->getFieldExpression() . " " . $this->operate . " " . $this->value;
             case self::OP_IN:
             case self::OP_NOT_IN:
                 if (!is_array($this->value) || empty($this->value)) {
@@ -311,14 +472,14 @@ class ArkSQLCondition
                 foreach ($this->value as $item) {
                     $group[] = ArkPDO::dryQuote($item);
                 }
-                return "`{$this->field}` " . $this->operate . " (" . implode(",", $group) . ")";
+            return $this->getFieldExpression() . " " . $this->operate . " (" . implode(",", $group) . ")";
             case self::OP_LIKE:
             case self::OP_NOT_LIKE:
                 // NOTE: value is preprocessed in constructor
-                return "`{$this->field}` " . $this->operate . " " . ($this->value);
+            return $this->getFieldExpression() . " " . $this->operate . " " . ($this->value);
             case self::OP_BETWEEN:
             case self::OP_NOT_BETWEEN:
-                return "`{$this->field}` " . $this->operate . " " . ArkPDO::dryQuote($this->value[0]) . " AND " . ArkPDO::dryQuote($this->value[1]);
+            return $this->getFieldExpression() . " " . $this->operate . " " . ArkPDO::dryQuote($this->value[0]) . " AND " . ArkPDO::dryQuote($this->value[1]);
             case self::OP_EXISTS:
             case self::OP_NOT_EXISTS:
                 // NOTE: only value is used as raw sql string @since 1.5
@@ -338,13 +499,29 @@ class ArkSQLCondition
                         "{$this->operate} ()"
                     );
                 }
-                return '(' . implode(" " . $this->operate . " ", $parts) . ')';
+            return '(' . implode(" " . $this->operate . " ", $parts) . ')';
             case self::MACRO_IS_NULL_OR_EMPTY_STRING:
                 return "(`{$this->field}` IS NULL OR `{$this->field}` = '')";
             case self::MACRO_IS_NOT_NULL_NOR_EMPTY_STRING:
                 return "(`{$this->field}` IS NOT NULL AND `{$this->field}` <> '')";
             case self::MACRO_RAW_EXPRESSION:
                 return $this->value;
+            case self::MACRO_CASE:
+                $x = 'CASE ';
+                if (strlen(trim($this->field)) > 0) {
+                    $x .= $this->getFieldExpression() . " ";
+                }
+                if (!is_array($this->value)) {
+                    throw new ArkPDOSQLBuilderError('CASE branches is not set correctly', json_encode($this->value));
+                }
+                foreach ($this->value as $when => $then) {
+                    $x .= "WHEN " . $when . " THEN " . $then . ' ';
+                }
+                if (is_string($this->addition) && strlen(trim($this->addition)) > 0) {
+                    $x .= "ELSE " . $this->addition . " ";
+                }
+                $x .= "END";
+                return $x;
             default:
                 throw new ArkPDOSQLBuilderError("ERROR, UNKNOWN OPERATE", json_encode($this->operate));
         }
