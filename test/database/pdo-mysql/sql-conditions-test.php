@@ -10,6 +10,7 @@ $x1 = ArkSQLCondition::makeConditionsUnion([
     ArkSQLCondition::makeConditionsIntersect([
         ArkSQLCondition::makeBetween("c", 2, 4),
         ArkSQLCondition::makeInArray("d", [34, 66]),
-    ])
+    ]),
+    ArkSQLCondition::makeEqual('year(a)', 2020, false),
 ]);
 echo $x1->makeConditionSQL() . PHP_EOL;
