@@ -93,6 +93,7 @@ class ArkSQLCondition
     /**
      * @param string $field
      * @param scalar|scalar[] $value
+     * @param bool $isFieldAsName
      * @return ArkSQLCondition
      * @since 2.0.9
      */
@@ -108,6 +109,7 @@ class ArkSQLCondition
     /**
      * @param string $field
      * @param scalar|scalar[] $value
+     * @param bool $isFieldAsName
      * @return ArkSQLCondition
      * @since 2.0.9
      */
@@ -230,7 +232,7 @@ class ArkSQLCondition
 
     /**
      * @param string $field
-     * @param scalar $value
+     * @param scalar[] $value
      * @param bool $isFieldAsName
      * @return ArkSQLCondition
      */
