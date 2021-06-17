@@ -73,4 +73,12 @@ class ArkSQLFunction
         return $this->functionName . "(" . implode(" , ", $this->functionParameterArray) . ")";
     }
 
+    /**
+     * @return string
+     * @since 2.0.25
+     */
+    public function __toString()
+    {
+        return $this->makeFunctionSQL();
+    }
 }

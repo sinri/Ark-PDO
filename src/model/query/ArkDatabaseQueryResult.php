@@ -53,6 +53,20 @@ class ArkDatabaseQueryResult
      * @var PDOStatement|null
      */
     protected $resultRowStream;
+    /**
+     * @var ArkDatabaseQueryResultFieldMeta[]
+     * @since 2.0.25
+     * @experimental
+     */
+    protected $resultRowStreamFieldMetaList;
+
+    /**
+     * @return ArkDatabaseQueryResultFieldMeta[]
+     */
+    public function getResultRowStreamFieldMetaList(): array
+    {
+        return $this->resultRowStreamFieldMetaList;
+    }
 
     public function __construct()
     {
@@ -201,6 +215,16 @@ class ArkDatabaseQueryResult
     }
 
     /**
+     * @param ArkDatabaseQueryResultRow[] $rows
+     * @return ArkDatabaseQueryResult
+     */
+    public function addResultRows(array $rows): ArkDatabaseQueryResult
+    {
+        $this->resultRows += $rows;
+        return $this;
+    }
+
+    /**
      * @return ArkDatabaseQueryResultRow[]
      * @throws ArkPDOQueryResultIsNotQueriedError
      */
@@ -269,6 +293,21 @@ class ArkDatabaseQueryResult
     public function setResultRowStream(PDOStatement $resultRowStream)
     {
         $this->resultRowStream = $resultRowStream;
+        $this->loadStreamResultFieldsMeta();
+    }
+
+    /**
+     * @return $this
+     * @since 2.0.25
+     * @experimental
+     */
+    protected function loadStreamResultFieldsMeta()
+    {
+        $this->resultRowStreamFieldMetaList = [];
+        for ($i = 0; $i < $this->resultRowStream->columnCount(); $i++) {
+            $this->resultRowStreamFieldMetaList[] = new ArkDatabaseQueryResultFieldMeta($this->resultRowStream->getColumnMeta($i));
+        }
+        return $this;
     }
 
     /**
@@ -282,14 +321,51 @@ class ArkDatabaseQueryResult
         if ($this->status !== self::STATUS_STREAMING) {
             throw new ArkPDOQueryResultIsNotStreamingError(__METHOD__, $this->getStatus(), $this->getError(), $this->getSql());
         }
+
+        // old implementation
         $fetchedRow = $this->resultRowStream->fetch(PDO::FETCH_ASSOC);
-        if ($fetchedRow === false) {
-            $this->status = self::STATUS_STREAMED;
-            $this->resultRowStream->closeCursor();
-            $this->resultRowStream = null;
-            throw new ArkPDOQueryResultFinishedStreamingSituation();
+        if ($fetchedRow !== false) {
+            return new $rowClass($fetchedRow);
         }
-        return new $rowClass($fetchedRow);
+
+        // new implementation with raw PDO
+//        $this->resultRowStream->setFetchMode(PDO::FETCH_CLASS,$rowClass);
+//        $rowClassInstance = $this->resultRowStream->fetch(PDO::FETCH_CLASS);
+//        if($rowClassInstance!==false){
+//            return $rowClassInstance;
+//        }
+
+        // FALSE fetched as no more rows...
+        $this->status = self::STATUS_STREAMED;
+        $this->resultRowStream->closeCursor();
+        $this->resultRowStream = null;
+        throw new ArkPDOQueryResultFinishedStreamingSituation();
+    }
+
+    /**
+     * @param ArkDatabaseQueryResultRow $rowClassInstance
+     * @return ArkDatabaseQueryResultRow
+     * @throws ArkPDOQueryResultFinishedStreamingSituation
+     * @throws ArkPDOQueryResultIsNotStreamingError
+     * @since 2.0.25
+     */
+    public function readNextRowAndReloadRowClassInstance($rowClassInstance)
+    {
+        if ($this->status !== self::STATUS_STREAMING) {
+            throw new ArkPDOQueryResultIsNotStreamingError(__METHOD__, $this->getStatus(), $this->getError(), $this->getSql());
+        }
+
+        $this->resultRowStream->setFetchMode(PDO::FETCH_INTO, $rowClassInstance);
+        $rowClassInstance = $this->resultRowStream->fetch(PDO::FETCH_INTO);
+        if ($rowClassInstance !== false) {
+            return $rowClassInstance;
+        }
+
+        // FALSE fetched as no more rows...
+        $this->status = self::STATUS_STREAMED;
+        $this->resultRowStream->closeCursor();
+        $this->resultRowStream = null;
+        throw new ArkPDOQueryResultFinishedStreamingSituation();
     }
 
     /**
@@ -301,7 +377,7 @@ class ArkDatabaseQueryResult
     {
         $this->assertStatusIsQueried(__METHOD__);
         if (empty($this->resultRows)) {
-            throw new ArkPDOQueryResultEmptySituation(__METHOD__);
+            throw new ArkPDOQueryResultEmptySituation($this->getSql());
         }
         return $this;
     }
@@ -335,13 +411,14 @@ class ArkDatabaseQueryResult
 
     /**
      * @return array|false|null False for Error, Null for Empty
+     * @throws ArkPDOQueryResultIsNotQueriedError
      * @since 2.0.5
      */
     public function tryGetFirstRawRowFromResultRowSet()
     {
         try {
             return $this->getResultRowByIndex(0)->getRawRow();
-        } catch (ArkPDOQueryResultIsNotQueriedError $e) {
+        } catch (ArkPDOQueryResultEmptySituation $e) {
             return false;
         } catch (ArkPDOInvalidIndexError $e) {
             return null;
@@ -351,15 +428,19 @@ class ArkDatabaseQueryResult
     /**
      * @param int $index Since 0
      * @return ArkDatabaseQueryResultRow
+     * @throws ArkPDOQueryResultEmptySituation
      * @throws ArkPDOQueryResultIsNotQueriedError
-     * @throws ArkPDOInvalidIndexError
      * @since 2.0.1
      */
     public function getResultRowByIndex(int $index): ArkDatabaseQueryResultRow
     {
         $this->assertStatusIsQueried(__METHOD__ . "({$index})");
-        if ($index < 0 || $index >= count($this->resultRows)) {
-            throw new ArkPDOInvalidIndexError("Out of Bounds", $index);
+        $totalResultRows = count($this->resultRows);
+        if ($totalResultRows === 0) {
+            throw new ArkPDOQueryResultEmptySituation($this->getSql());
+        }
+        if ($index < 0 || $index >= $totalResultRows) {
+            throw new ArkPDOInvalidIndexError("SQL query result actually contains $totalResultRows row(s)", $index);
         }
         return $this->resultRows[$index];
     }
@@ -400,6 +481,7 @@ class ArkDatabaseQueryResult
      * @param string $fieldName
      * @param mixed $default
      * @return scalar|false|null False for Error, Null for Empty
+     * @throws ArkPDOQueryResultEmptySituation
      * @since 2.0.6
      */
     public function tryGetRawCellFromResultRowSet(string $fieldName, $default = null)

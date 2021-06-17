@@ -150,6 +150,18 @@ class ArkPDO
 
     /**
      * @param string $sql
+     * @param string $rowClass
+     * @param array $constructArguments
+     * @return array array of instances of given `row class`
+     */
+    public function getAllAsClassInstanceArray(string $sql, string $rowClass, array $constructArguments = []): array
+    {
+        $statement = $this->buildPDOStatement($sql);
+        return $statement->fetchAll(PDO::FETCH_CLASS, $rowClass, $constructArguments);
+    }
+
+    /**
+     * @param string $sql
      * @param bool $usePrepare
      * @return PDOStatement
      * @throws ArkPDOStatementException
@@ -162,8 +174,11 @@ class ArkPDO
             $statement = $this->pdo->query($sql);
         }
         if (!$statement) {
-            $this->logger->error("PDO Statement Building Failure Occurred.", ["sql" => $sql]);
-            throw new ArkPDOStatementException("PDO Statement Building Failure Occurred For SQL", $sql);
+            $this->logger->error(
+                "PDO Statement Building Failure Occurred.",
+                ["sql" => $sql,]
+            );
+            throw new ArkPDOStatementException($sql);
         } else {
             $this->logger->debug("PDO Statement Generated.", ["sql" => $sql]);
         }
@@ -299,11 +314,7 @@ class ArkPDO
             return $result;
         } catch (Exception $exception) {
             $this->rollBack();
-            throw new ArkPDORollbackSituation(
-                'ArkPDORollbackSituation for inner exception: ' . $exception->getMessage(),
-                0,
-                $exception
-            );
+            throw new ArkPDORollbackSituation($exception);
         }
     }
 

@@ -1,6 +1,7 @@
 <?php
 
 use sinri\ark\core\ArkLogger;
+use sinri\ark\database\exception\ArkPDOQueryResultFinishedStreamingSituation;
 use sinri\ark\database\model\ArkDatabaseDynamicTableModel;
 use sinri\ark\database\model\ArkSQLCondition;
 use sinri\ark\database\model\query\ArkDatabaseQueryResult;
@@ -39,7 +40,7 @@ try {
 
     $table = 'ark_test_table';
 
-    $model = new ArkDatabaseDynamicTableModel($db, $table, 'test');
+    $model = new ArkDatabaseDynamicTableModel($db, $table, 'sinri');
 
     // create
     $sql = "CREATE TABLE `ark_test_table` (
@@ -50,8 +51,11 @@ try {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
     $afx = $model->db()->exec($sql);
-    $logger->info('Created Table: ', ['afx' => $afx]);
-
+    if ($afx === false) {
+        $logger->error('Create the table failed', ['error' => $model->db()->getPDOErrorDescription()]);
+    } else {
+        $logger->info('Created Table: ', ['afx' => $afx]);
+    }
     // insert
     $result = $model->insertOneRow(['value' => 'A', 'score' => 1]);
     $logger->smartLogLite($result->getStatus() === ArkDatabaseQueryResult::STATUS_EXECUTED, 'INSERT ONE RAW', ['id' => $result->getLastInsertedID()]);
@@ -125,8 +129,17 @@ try {
         ->setLimit(10)
         ->setOffset(0)
         ->queryForStream();
-    while (($nextRow = $result->readNextRow()) !== false) {
-        $logger->info("Streaming and fetching", $nextRow->getRawRow());
+
+//    $result->debugGetFieldsMeta();
+    while (true) {
+        try {
+            $nextRow = $result->readNextRow();
+            var_dump($nextRow);
+            $logger->info("Streaming and fetching", $nextRow->getRawRow());
+        } catch (ArkPDOQueryResultFinishedStreamingSituation $e) {
+            $logger->notice('Streaming Finished');
+            break;
+        }
     }
 
     // drop
@@ -135,5 +148,5 @@ try {
     $logger->info('Dropped Table: ', ['afx' => $afx]);
 
 } catch (Exception $e) {
-    $logger->error("Exception: " . $e->getMessage());
+    $logger->error("Exception: " . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
 }

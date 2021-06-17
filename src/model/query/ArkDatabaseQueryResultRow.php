@@ -73,7 +73,7 @@ class ArkDatabaseQueryResultRow
 
     /**
      * @param ArkDatabaseQueryResult $result
-     * @return static|null
+     * @return static
      * @throws ArkPDOQueryResultFinishedStreamingSituation
      * @throws ArkPDOQueryResultIsNotStreamingError
      * @since 2.0.21
@@ -81,5 +81,17 @@ class ArkDatabaseQueryResultRow
     public static function fetchRowFromStream(ArkDatabaseQueryResult $result)
     {
         return $result->readNextRow(static::class);
+    }
+
+    /**
+     * @param ArkDatabaseQueryResult $result
+     * @return static
+     * @throws ArkPDOQueryResultFinishedStreamingSituation
+     * @throws ArkPDOQueryResultIsNotStreamingError
+     * @since 2.0.25
+     */
+    public function fetchRowFromStreamAndReloadThis(ArkDatabaseQueryResult $result)
+    {
+        return $result->readNextRowAndReloadRowClassInstance($this);
     }
 }

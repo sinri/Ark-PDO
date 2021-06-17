@@ -306,12 +306,18 @@ class ArkDatabaseSelectTableQuery
             $sql = $this->generateSQL();
             $result->setSql($sql);
 
+            // old implementation
             $all = $this->model->db()->getAll($sql);
             if (is_array($all)) {
                 foreach ($all as $row) {
                     $result->addResultRow(new $resultRowCustomizedClass($row));
                 }
             }
+
+            // new implementation with raw PDO
+//            $rows=$this->model->db()->getAllAsClassInstanceArray($sql,$resultRowCustomizedClass);
+//            $result->addResultRows($rows);
+
             $result->setStatus(ArkDatabaseQueryResult::STATUS_QUERIED);
         } catch (ArkPDOStatementException $e) {
             $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
@@ -387,7 +393,7 @@ class ArkDatabaseSelectTableQuery
 
             $statement = $this->model->db()->getPdo()->query($sql);
             if ($statement === false) {
-                throw new ArkPDOStatementException('Cannot build a valid PDO Statement', $sql);
+                throw new ArkPDOStatementException($sql);
             }
 
             $result->setResultRowStream($statement);

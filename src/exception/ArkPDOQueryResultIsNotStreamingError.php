@@ -43,7 +43,7 @@ class ArkPDOQueryResultIsNotStreamingError extends Exception
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct($action, $status, $databaseError, $sql = '', $code = 0, Throwable $previous = null)
+    public function __construct(string $action, string $status, string $databaseError, string $sql = '', $code = 0, Throwable $previous = null)
     {
         parent::__construct(
             "Action Failed: " . $action . " | "

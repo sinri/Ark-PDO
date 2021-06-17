@@ -103,7 +103,7 @@ abstract class ArkDatabaseTableCoreModel
             $result->setSql($sql);
             $afx = $this->db()->exec($sql);
             if ($afx === false) {
-                throw new ArkPDODatabaseQueryError("Error in updating: " . $this->db()->getPDOErrorDescription());
+                throw new ArkPDODatabaseQueryError($sql, $this->db()->getPDOErrorDescription());
             }
             $result->setAffectedRowsCount($afx);
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
@@ -155,7 +155,7 @@ abstract class ArkDatabaseTableCoreModel
             $sql = "DELETE FROM {$table} WHERE {$condition_sql}";
             $afx = $this->db()->exec($sql);
             if ($afx === false) {
-                throw new ArkPDODatabaseQueryError("Error in updating: " . $this->db()->getPDOErrorDescription());
+                throw new ArkPDODatabaseQueryError($sql, $this->db()->getPDOErrorDescription());
             }
             $result->setAffectedRowsCount($afx);
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
@@ -231,7 +231,7 @@ abstract class ArkDatabaseTableCoreModel
             $result->setSql($sql);
             $afx = $this->db()->insert($sql, $pk);
             if ($afx === false) {
-                throw new ArkPDODatabaseQueryError("Cannot write into table: " . $this->db()->getPDOErrorDescription());
+                throw new ArkPDODatabaseQueryError($sql, $this->db()->getPDOErrorDescription());
             }
             $result->setLastInsertedID($afx);
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
@@ -303,13 +303,11 @@ abstract class ArkDatabaseTableCoreModel
             foreach ($dataList[0] as $key => $value) {
                 $fields[] = "`{$key}`";
             }
+            $expectedFieldsCount = count($fields);
             foreach ($dataList as $data) {
                 $x = "(" . $this->buildRowValuesForWrite($data) . ")";
-                if (count($data) !== count($fields)) {
-                    throw new ArkPDOMatrixRowsLengthDifferError(
-                        count($fields) . ' fields expected but ' . count($data) . ' fields found in this row',
-                        $x
-                    );
+                if (count($data) !== $expectedFieldsCount) {
+                    throw new ArkPDOMatrixRowsLengthDifferError($expectedFieldsCount, $x);
                 }
                 $values[] = $x;
             }
@@ -321,7 +319,7 @@ abstract class ArkDatabaseTableCoreModel
 
             $afx = $this->db()->insert($sql, $pk);
             if ($afx === false) {
-                throw new ArkPDODatabaseQueryError("Error in batch writing: " . $this->db()->getPDOErrorDescription());
+                throw new ArkPDODatabaseQueryError($sql, $this->db()->getPDOErrorDescription());
             }
 
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
@@ -388,7 +386,7 @@ abstract class ArkDatabaseTableCoreModel
 
             $afx = $this->db()->insert($sql);
             if ($afx === false) {
-                throw new ArkPDODatabaseQueryError("Error in batch writing with selection: " . $this->db()->getPDOErrorDescription());
+                throw new ArkPDODatabaseQueryError($sql, $this->db()->getPDOErrorDescription());
             }
 
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);

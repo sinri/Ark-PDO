@@ -12,39 +12,43 @@ use Throwable;
  * @package sinri\ark\database\Exception
  * @since 2.0.14
  * @since 2.0.23 becomes subclass of RangeException
+ * @since 2.0.25 changed construction and exclude the situation of empty result
  */
 class ArkPDOInvalidIndexError extends RangeException
 {
-    protected $expectedIndex;
+    /**
+     * @var int
+     */
+    protected $givenIndex;
 
     /**
      * ArkPDOInvalidIndexError constructor.
      * @param string $message
-     * @param string|int $expectedIndex
+     * @param int $givenIndex
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct(string $message, $expectedIndex, $code = 0, Throwable $previous = null)
+    public function __construct(string $message, int $givenIndex, $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
-        $this->expectedIndex = $expectedIndex;
+        $this->givenIndex = $givenIndex;
     }
 
     /**
-     * @return string|int
+     * @return int
      */
-    public function getExpectedIndex()
+    public function getGivenIndex()
     {
-        return $this->expectedIndex;
+        return $this->givenIndex;
     }
 
     /**
-     * @param string|int $expectedIndex
+     * @param int $givenIndex
      * @return ArkPDOInvalidIndexError
      */
-    public function setExpectedIndex($expectedIndex): ArkPDOInvalidIndexError
+    public function setGivenIndex($givenIndex): ArkPDOInvalidIndexError
     {
-        $this->expectedIndex = $expectedIndex;
+        $this->givenIndex = $givenIndex;
         return $this;
     }
 }

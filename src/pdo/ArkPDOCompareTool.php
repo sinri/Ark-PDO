@@ -256,13 +256,11 @@ class ArkPDOCompareTool
      */
     protected function getTableCreation(ArkPDO $db, string $table): bool
     {
-        $creation = $db->safeQueryAll("show create table " . $table, [], PDO::FETCH_NUM);
+        $sql = "show create table " . $table;
+        $creation = $db->safeQueryAll($sql, [], PDO::FETCH_NUM);
         $creation = ArkHelper::readTarget($creation, [0, 1], false);
         if ($creation === false) {
-            throw new ArkPDODatabaseQueryError(
-                "cannot get create DDL of " . $table . ' but get ' . json_encode($creation)
-                . ' PDO Error: ' . $db->getPDOErrorDescription()
-            );
+            throw new ArkPDODatabaseQueryError($sql, $db->getPDOErrorDescription());
         }
         return $creation;
     }
