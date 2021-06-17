@@ -4,8 +4,8 @@
 
 use sinri\ark\core\ArkLogger;
 use sinri\ark\database\exception\ArkPDOConfigError;
+use sinri\ark\database\exception\ArkPDOExecutedWithEmptyResultSituation;
 use sinri\ark\database\exception\ArkPDOExecuteFailedError;
-use sinri\ark\database\exception\ArkPDOExecuteFetchFailedError;
 use sinri\ark\database\exception\ArkPDOExecuteNotAffectedError;
 use sinri\ark\database\exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\exception\ArkPDOStatementException;
@@ -36,11 +36,11 @@ try {
     try {
         $result = $table->selectRow(['id' => 100]);
         $logger->info('result', [$result]);
-    } catch (ArkPDOExecuteFetchFailedError $e) {
-        $logger->error(get_class($e) . ' -> ' . $e->getMessage());
     } catch (ArkPDOSQLBuilderError $e) {
         $logger->error(get_class($e) . ' -> ' . $e->getMessage());
     } catch (ArkPDOStatementException $e) {
+        $logger->error(get_class($e) . ' -> ' . $e->getMessage());
+    } catch (ArkPDOExecutedWithEmptyResultSituation $e) {
         $logger->error(get_class($e) . ' -> ' . $e->getMessage());
     }
     try {

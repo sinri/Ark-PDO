@@ -6,8 +6,8 @@ namespace sinri\ark\database\model;
 
 use sinri\ark\core\ArkHelper;
 use sinri\ark\core\exception\EnsureItemException;
+use sinri\ark\database\exception\ArkPDOExecutedWithEmptyResultSituation;
 use sinri\ark\database\exception\ArkPDOExecuteFailedError;
-use sinri\ark\database\exception\ArkPDOExecuteFetchFailedError;
 use sinri\ark\database\exception\ArkPDOExecuteNotAffectedError;
 use sinri\ark\database\exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\exception\ArkPDOStatementException;
@@ -143,9 +143,7 @@ abstract class ArkDatabaseTableCoreModel
      * @param int $offset
      * @param string|null $having since 1.8.4
      * @return numeric|string|null
-     * @throws ArkPDOSQLBuilderError
-     * @throws ArkPDOStatementException
-     * @throws ArkPDOExecuteFetchFailedError
+     * @throws ArkPDOExecutedWithEmptyResultSituation
      * @since 1.7.6
      * @since 1.8.0 would throw exceptions on failure
      */
@@ -183,9 +181,7 @@ abstract class ArkDatabaseTableCoreModel
      * @param null|string[] $groupBy @since 1.5
      * @param null|string $having @since 1.8.4
      * @return array
-     * @throws ArkPDOExecuteFetchFailedError
-     * @throws ArkPDOSQLBuilderError
-     * @throws ArkPDOStatementException
+     * @throws ArkPDOExecutedWithEmptyResultSituation
      * @since 1.8.0 would throw exceptions on failure
      */
     public function selectRow($conditions, $fields = "*", $groupBy = null, $having = null)
@@ -217,9 +213,6 @@ abstract class ArkDatabaseTableCoreModel
      * @param string $countField @since 1.5.2
      * @param bool $useDistinct @since 1.5.2
      * @return int
-     * @throws ArkPDOExecuteFetchFailedError
-     * @throws ArkPDOSQLBuilderError
-     * @throws ArkPDOStatementException
      * @since 1.8.0 would throw exceptions on failure
      */
     public function selectRowsForCount($conditions, $countField = '*', $useDistinct = false)
@@ -238,8 +231,13 @@ abstract class ArkDatabaseTableCoreModel
         $table = $this->getTableExpressForSQL();
         $sql = "SELECT count({$countTarget}) FROM {$table} WHERE {$condition_sql} ";
 
-        $count = $this->db()->getOne($sql);
-        return intval($count);
+        try {
+            $count = $this->db()->getOne($sql);
+            return intval($count);
+        } catch (ArkPDOExecutedWithEmptyResultSituation $e) {
+            // Note: the count sql should not unfetchable unless SQL error.
+            throw new ArkPDOStatementException($e->getRelatedSQL(), $e->getCode(), $e);
+        }
     }
 
     /**

@@ -4,6 +4,7 @@
 namespace sinri\ark\database\exception;
 
 use Exception;
+use Throwable;
 
 /**
  * Class ArkPDOExecuteNotAffectedError
@@ -17,5 +18,31 @@ use Exception;
  */
 class ArkPDOExecuteNotAffectedError extends Exception
 {
+    /**
+     * @var string
+     */
+    protected $relatedSQL;
 
+    /**
+     * @return string
+     */
+    public function getRelatedSQL()
+    {
+        return $this->relatedSQL;
+    }
+
+    public function __construct($relatedSQL = '', $code = 0, Throwable $previous = null)
+    {
+        $message = 'SQL queried but no row(s) affected.';
+        $this->relatedSQL = $relatedSQL;
+        if (!empty($relatedSQL)) {
+            $relatedSQL = " SQL: " . $relatedSQL;
+        }
+
+        parent::__construct(
+            $message . $relatedSQL,
+            $code,
+            $previous
+        );
+    }
 }

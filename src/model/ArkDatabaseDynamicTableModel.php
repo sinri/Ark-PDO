@@ -13,8 +13,17 @@ use sinri\ark\database\pdo\ArkPDO;
  */
 class ArkDatabaseDynamicTableModel extends ArkDatabaseTableCoreModel
 {
+    /**
+     * @var ArkPDO
+     */
     protected $pdo;
+    /**
+     * @var string|null
+     */
     protected $scheme;
+    /**
+     * @var string
+     */
     protected $table;
 
     /**

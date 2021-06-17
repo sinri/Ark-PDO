@@ -13,8 +13,8 @@ use PDO;
 use sinri\ark\core\ArkHelper;
 use sinri\ark\core\exception\LookUpTargetException;
 use sinri\ark\database\exception\ArkPDOConfigError;
+use sinri\ark\database\exception\ArkPDOExecutedWithEmptyResultSituation;
 use sinri\ark\database\exception\ArkPDOExecuteFailedError;
-use sinri\ark\database\exception\ArkPDOExecuteFetchFailedError;
 use sinri\ark\database\exception\ArkPDOStatementException;
 
 class ArkPDOCompareTool
@@ -340,7 +340,7 @@ class ArkPDOCompareTool
             return intval($count);
         } catch (ArkPDOStatementException $e) {
             return -1;
-        } catch (ArkPDOExecuteFetchFailedError $e) {
+        } catch (ArkPDOExecutedWithEmptyResultSituation $e) {
             return -1;
         }
     }
