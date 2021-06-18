@@ -411,7 +411,6 @@ class ArkDatabaseQueryResult
 
     /**
      * @return array|false|null False for Error, Null for Empty
-     * @throws ArkPDOQueryResultIsNotQueriedError
      * @since 2.0.5
      */
     public function tryGetFirstRawRowFromResultRowSet()
@@ -419,9 +418,9 @@ class ArkDatabaseQueryResult
         try {
             return $this->getResultRowByIndex(0)->getRawRow();
         } catch (ArkPDOQueryResultEmptySituation $e) {
-            return false;
-        } catch (ArkPDOInvalidIndexError $e) {
             return null;
+        } catch (ArkPDOQueryResultIsNotQueriedError $e) {
+            return false;
         }
     }
 
@@ -481,17 +480,16 @@ class ArkDatabaseQueryResult
      * @param string $fieldName
      * @param mixed $default
      * @return scalar|false|null False for Error, Null for Empty
-     * @throws ArkPDOQueryResultEmptySituation
      * @since 2.0.6
      */
     public function tryGetRawCellFromResultRowSet(string $fieldName, $default = null)
     {
         try {
             return $this->getResultRowByIndex(0)->getField($fieldName, $default);
+        } catch (ArkPDOQueryResultEmptySituation $e) {
+            return null;
         } catch (ArkPDOQueryResultIsNotQueriedError $e) {
             return false;
-        } catch (ArkPDOInvalidIndexError $e) {
-            return null;
         }
     }
 
