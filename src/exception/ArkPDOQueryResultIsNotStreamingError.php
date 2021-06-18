@@ -4,17 +4,18 @@
 namespace sinri\ark\database\exception;
 
 
-use Exception;
+use RuntimeException;
 use Throwable;
 
 /**
  * Class ArkPDOQueryResultIsNotStreamingError
  * @package sinri\ark\database\exception
  * @since 2.0.21
+ * @since 2.0.26 Changed to extends RuntimeException
  *
  * When ArkDatabaseQueryResult hold non-STREAMING status after querying.
  */
-class ArkPDOQueryResultIsNotStreamingError extends Exception
+class ArkPDOQueryResultIsNotStreamingError extends RuntimeException
 {
     /**
      * @var string

@@ -4,7 +4,7 @@
 namespace sinri\ark\database\exception;
 
 
-use Exception;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -12,11 +12,12 @@ use Throwable;
  * @package sinri\ark\database\Exception
  * @since 2.0.13
  * @since 2.0.25 changed construction
+ * @since 2.0.26 Changed to extends RuntimeException
  *
  * When any operations on database meet error
  * The message is assumed as PDO ERROR DESCRIPTION
  */
-class ArkPDODatabaseQueryError extends Exception
+class ArkPDODatabaseQueryError extends RuntimeException
 {
     /**
      * @var string

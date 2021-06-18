@@ -4,17 +4,18 @@
 namespace sinri\ark\database\exception;
 
 
-use Exception;
+use RuntimeException;
 use Throwable;
 
 /**
  * Class QueryResultIsNotQueriedError
  * @package sinri\ark\database\Exception
  * @since 2.0.13
+ * @since 2.0.26 Changed to extends RuntimeException
  *
  * When ArkDatabaseQueryResult hold non-QUERIED status after querying.
  */
-class ArkPDOQueryResultIsNotQueriedError extends Exception
+class ArkPDOQueryResultIsNotQueriedError extends RuntimeException
 {
     /**
      * @var string

@@ -4,15 +4,16 @@
 namespace sinri\ark\database\exception;
 
 
-use Exception;
+use RuntimeException;
 use Throwable;
 
 /**
  * Class ArkPDOQueryResultIsNotExecutedError
  * @package sinri\ark\database\exception
  * @since 2.0.18
+ * @since 2.0.26 Changed to extends RuntimeException
  */
-class ArkPDOQueryResultIsNotExecutedError extends Exception
+class ArkPDOQueryResultIsNotExecutedError extends RuntimeException
 {
     /**
      * @var string
