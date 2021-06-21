@@ -546,4 +546,13 @@ class ArkSQLCondition
         }
         return $condition_sql;
     }
+
+    /**
+     * @return string
+     * @since 2.0.28
+     */
+    public function __toString()
+    {
+        return $this->makeConditionSQL();
+    }
 }
