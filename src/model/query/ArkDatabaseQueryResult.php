@@ -236,7 +236,7 @@ class ArkDatabaseQueryResult
 
     /**
      * @param string $action
-     * @throws ArkPDOQueryResultIsNotQueriedError
+     * @return ArkDatabaseQueryResult
      * @since 2.0.12
      * @since 2.0.19 make it public
      */
@@ -245,11 +245,12 @@ class ArkDatabaseQueryResult
         if ($this->status !== self::STATUS_QUERIED) {
             throw new ArkPDOQueryResultIsNotQueriedError($action, $this->status, $this->getError(), $this->sql);
         }
+        return $this;
     }
 
     /**
      * @param string $action
-     * @throws ArkPDOQueryResultIsNotExecutedError
+     * @return ArkDatabaseQueryResult
      * @since 2.0.18
      * @since 2.0.19 make it public
      */
@@ -258,6 +259,7 @@ class ArkDatabaseQueryResult
         if ($this->status !== self::STATUS_EXECUTED) {
             throw new ArkPDOQueryResultIsNotExecutedError($action, $this->status, $this->getError(), $this->sql);
         }
+        return $this;
     }
 
     /**
