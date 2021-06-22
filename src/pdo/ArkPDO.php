@@ -432,7 +432,7 @@ class ArkPDO
     /**
      * @param string $sql
      * @param array $values
-     * @param null $sth @since 1.3.3
+     * @param PDOStatement|null $sth @since 1.3.3
      * @return bool
      * @throws ArkPDOStatementException
      */

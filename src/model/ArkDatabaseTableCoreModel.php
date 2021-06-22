@@ -5,6 +5,7 @@ namespace sinri\ark\database\model;
 
 
 use Exception;
+use PDOStatement;
 use sinri\ark\database\exception\ArkPDODatabaseQueryError;
 use sinri\ark\database\exception\ArkPDOMatrixRowsLengthDifferError;
 use sinri\ark\database\exception\ArkPDOSQLBuilderError;
@@ -407,6 +408,68 @@ abstract class ArkDatabaseTableCoreModel
         } catch (ArkPDODatabaseQueryError $e) {
             $result->setError($e->getMessage());
             $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
+        }
+        return $result;
+    }
+
+    /**
+     * @param array[] $dataList
+     * @param array $duplicateModification
+     * @return ArkDatabaseQueryResult
+     * @since 2.0.30
+     * @see https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html
+     */
+    public function insertOnDuplicateKeyUpdate($dataList, $duplicateModification)
+    {
+        $result = new ArkDatabaseQueryResult();
+        try {
+            $fields = [];
+            $values = [];
+
+            foreach ($dataList[0] as $key => $value) {
+                $fields[] = "`{$key}`";
+            }
+            $expectedFieldsCount = count($fields);
+            foreach ($dataList as $data) {
+                $x = "(" . $this->buildRowValuesForWrite($data) . ")";
+                if (count($data) !== $expectedFieldsCount) {
+                    throw new ArkPDOMatrixRowsLengthDifferError($expectedFieldsCount, $x);
+                }
+                $values[] = $x;
+            }
+            $fields = implode(",", $fields);
+            $values = implode(",", $values);
+            $table = $this->getTableExpressForSQL();
+            $sql = "INSERT INTO {$table} ({$fields}) VALUES {$values} ON DUPLICATE KEY UPDATE ";
+
+            $duplicateModificationPairs = [];
+            foreach ($duplicateModification as $k => $v) {
+                $duplicateModificationPairs[] = ($k . ' = ' . $v);
+            }
+            $sql .= implode(",", $duplicateModificationPairs);
+            $result->setSql($sql);
+
+            $statement = new PDOStatement();
+            $afx = $this->db()->safeExecute($sql, [], $statement);
+            if ($afx === false) {
+                throw new ArkPDODatabaseQueryError($sql, $this->db()->getPDOErrorDescription());
+            }
+
+            $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
+            $result->setLastInsertedID($this->db()->getLastInsertID());
+            $result->setAffectedRowsCount($statement->rowCount());
+        } catch (ArkPDODatabaseQueryError $exception) {
+            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
+            $result->setError(
+                "DatabaseOperationError: " . $exception->getMessage()
+                . " Code: " . $exception->getCode()
+            );
+        } catch (ArkPDOMatrixRowsLengthDifferError $exception) {
+            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
+            $result->setError(
+                "LengthDiffersInMatrixError: " . $exception->getMessage()
+                . " SQL: " . $exception->getWrongSQLPiece()
+            );
         }
         return $result;
     }
