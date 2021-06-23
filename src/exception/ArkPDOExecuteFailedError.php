@@ -58,5 +58,7 @@ class ArkPDOExecuteFailedError extends Exception
             $code,
             $previous
         );
+
+        // bug fix in 1.8.12
     }
 }
