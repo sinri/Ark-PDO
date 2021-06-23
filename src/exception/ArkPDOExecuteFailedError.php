@@ -58,7 +58,5 @@ class ArkPDOExecuteFailedError extends Exception
             $code,
             $previous
         );
-
-        parent::__construct($message, $code, $previous);
     }
 }
