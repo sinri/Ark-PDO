@@ -605,13 +605,14 @@ class ArkPDO
      * @param $inp
      * @return array|mixed
      * @since 2.1.11
+     * @since 2.0.31 dry quote '' => "''"
      */
     public static function dryQuote($inp)
     {
         if (is_array($inp))
             return array_map([__CLASS__, __METHOD__], $inp);
 
-        if (!empty($inp) && is_string($inp)) {
+        if (is_string($inp)) {
             $x = str_replace(array('\\', "\0", "\n", "\r", "'", '"', "\x1a"), array('\\\\', '\\0', '\\n', '\\r', "\\'", '\\"', '\\Z'), $inp);
             return "'{$x}'";
         }
