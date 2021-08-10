@@ -522,6 +522,41 @@ abstract class ArkDatabaseTableCoreModel
         return $this->batchWriteInto($dataList, null, true);
     }
 
+    /**
+     * @param array[] $dataList
+     * @param array $duplicateModification
+     * @throws ArkPDOExecuteFailedError
+     * @since 1.8.14
+     */
+    public function insertOnDuplicateKeyUpdate($dataList, $duplicateModification)
+    {
+        $fields = [];
+        $values = [];
+
+        foreach ($dataList[0] as $key => $value) {
+            $fields[] = "`{$key}`";
+        }
+        $expectedFieldsCount = count($fields);
+        foreach ($dataList as $data) {
+            $x = "(" . $this->buildRowValuesForWrite($data) . ")";
+            if (count($data) !== $expectedFieldsCount) {
+                throw new ArkPDOSQLBuilderError("Expected Fields Count is " . $expectedFieldsCount, $x);
+            }
+            $values[] = $x;
+        }
+        $fields = implode(",", $fields);
+        $values = implode(",", $values);
+        $table = $this->getTableExpressForSQL();
+        $sql = "INSERT INTO {$table} ({$fields}) VALUES {$values} ON DUPLICATE KEY UPDATE ";
+
+        $duplicateModificationPairs = [];
+        foreach ($duplicateModification as $k => $v) {
+            $duplicateModificationPairs[] = ($k . ' = ' . $v);
+        }
+        $sql .= implode(",", $duplicateModificationPairs);
+
+        $this->db()->safeExecute($sql, []);
+    }
 
     /**
      * @return ArkDatabaseTableFieldDefinition[]
