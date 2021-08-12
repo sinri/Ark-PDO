@@ -4,6 +4,7 @@
 namespace sinri\ark\database\model\query;
 
 use sinri\ark\core\ArkHelper;
+use sinri\ark\database\exception\ArkPDOQueryResultEmptySituation;
 use sinri\ark\database\exception\ArkPDOQueryResultFinishedStreamingSituation;
 use sinri\ark\database\exception\ArkPDOQueryResultIsNotQueriedError;
 use sinri\ark\database\exception\ArkPDOQueryResultIsNotStreamingError;
@@ -60,12 +61,27 @@ class ArkDatabaseQueryResultRow
 
     /**
      * @param ArkDatabaseSelectTableQuery $selection
-     * @param ArkDatabaseQueryResult $result
+     * @param int $rowIndex
+     * @param ArkDatabaseQueryResult|null $result
+     * @return static
+     * @throws ArkPDOQueryResultEmptySituation
+     * @since 2.0.32
+     */
+    public static function fetchOneRowWithSelection(ArkDatabaseSelectTableQuery $selection, int $rowIndex = 0, &$result = null)
+    {
+        $result = $selection->queryForRows(static::class);
+        return $result->getResultRowByIndex($rowIndex);
+    }
+
+    /**
+     * @param ArkDatabaseSelectTableQuery $selection
+     * @param ArkDatabaseQueryResult|null $result
      * @return static[]
      * @throws ArkPDOQueryResultIsNotQueriedError
      * @since 2.0.21
+     * @since 2.0.32 result became optional
      */
-    public static function fetchRowsWithSelection(ArkDatabaseSelectTableQuery $selection, &$result)
+    public static function fetchRowsWithSelection(ArkDatabaseSelectTableQuery $selection, &$result = null)
     {
         $result = $selection->queryForRows(static::class);
         return $result->getResultRows();
