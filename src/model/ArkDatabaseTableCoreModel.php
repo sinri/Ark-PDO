@@ -4,10 +4,10 @@
 namespace sinri\ark\database\model;
 
 
-use Exception;
 use PDOStatement;
 use sinri\ark\database\exception\ArkPDODatabaseQueryError;
 use sinri\ark\database\exception\ArkPDOMatrixRowsLengthDifferError;
+use sinri\ark\database\exception\ArkPDOQueryResultEmptySituation;
 use sinri\ark\database\exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\model\query\ArkDatabaseQueryResult;
 use sinri\ark\database\model\query\ArkDatabaseSelectFieldMeta;
@@ -482,14 +482,14 @@ abstract class ArkDatabaseTableCoreModel
      * @param string $sortExpression
      * @param int|null $totalRows
      * @return array[]
-     * @throws Exception
      * @since 2.0.10
      * @since 2.0.11 loose $totalRows type check, allow unassigned variable to be there
+     * @deprecated since 2.0.33 use `\sinri\ark\database\model\query\ArkDatabaseSelectTableQuery::queryForMatrixWithPaging` instead
      */
-    public function fetchByPaging(int $page, int $pageSize, array $fieldMataList, array $conditions, string $sortExpression = '', &$totalRows = 0): array
+    public function fetchByPaging(int $page, int $pageSize, array $fieldMataList, array $conditions, string $sortExpression = '', int &$totalRows = 0): array
     {
         if ($page < 1 || $pageSize <= 0) {
-            throw new Exception("Page number or page size is not correct.");
+            throw new ArkPDOSQLBuilderError("Page number or page size is not correct.", "LIMIT $pageSize OFFSET " . ($pageSize * ($page - 1)));
         }
         $rowsForOnePage = $this->selectInTable()
             ->addSelectFields($fieldMataList)
@@ -499,12 +499,16 @@ abstract class ArkDatabaseTableCoreModel
             ->setOffset($pageSize * ($page - 1))
             ->queryForRows()
             ->getRawMatrix();
-        $totalRows = $this->selectInTable()
-            ->addSelectFieldByDetail('count(*)', 'total')
-            ->addConditions($conditions)
-            ->queryForRows()
-            ->getResultRowByIndex(0)
-            ->getField('total');
+        try {
+            $totalRows = $this->selectInTable()
+                ->addSelectFieldByDetail('count(*)', 'total')
+                ->addConditions($conditions)
+                ->queryForRows()
+                ->getResultRowByIndex(0)
+                ->getField('total');
+        } catch (ArkPDOQueryResultEmptySituation $e) {
+            $totalRows = 0;
+        }
         return $rowsForOnePage;
     }
 }

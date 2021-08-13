@@ -4,6 +4,7 @@
 namespace sinri\ark\database\model\query;
 
 
+use sinri\ark\database\exception\ArkPDOQueryResultEmptySituation;
 use sinri\ark\database\exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\exception\ArkPDOStatementException;
 use sinri\ark\database\model\ArkDatabaseTableCoreModel;
@@ -204,6 +205,16 @@ class ArkDatabaseSelectTableQuery
                 $this->selectFields[] = new ArkDatabaseSelectFieldMeta($item);
             }
         }
+        return $this;
+    }
+
+    /**
+     * @return $this
+     * @since 2.0.33
+     */
+    public function clearSelectFields(): ArkDatabaseSelectTableQuery
+    {
+        $this->selectFields = [];
         return $this;
     }
 
@@ -411,5 +422,35 @@ class ArkDatabaseSelectTableQuery
             );
         }
         return $result;
+    }
+
+    /**
+     * @param int $page
+     * @param int $pageSize
+     * @param int|null $total
+     * @return array[]
+     * @since 2.0.33
+     */
+    public function queryForMatrixWithPaging(int $page, int $pageSize, int &$total = null)
+    {
+        $matrix = $this->setLimit($pageSize)
+            ->setOffset($pageSize * ($page - 1))
+            ->queryForRows()
+            ->getRawMatrix();
+
+        if (func_num_args() > 2) {
+            try {
+                $total = $this->clearSelectFields()
+                    ->addSelectFieldByDetail('count(*)', 'total')
+                    ->setLimit(1)
+                    ->setOffset(0)
+                    ->queryForRows()
+                    ->getResultRowByIndex(0)
+                    ->getField('total');
+            } catch (ArkPDOQueryResultEmptySituation $e) {
+                $total = -1;
+            }
+        }
+        return $matrix;
     }
 }
