@@ -497,9 +497,10 @@ class ArkDatabaseQueryResult
 
     /**
      * @param string $fieldName the name of the key field
-     * @return ArkDatabaseQueryResultRow[][] [key_filed_name=>ROW, ...]
+     * @return ArkDatabaseQueryResultRow[] [key_filed_name=>ROW, ...]
      * @throws ArkPDOQueryResultIsNotQueriedError
      * @since 2.0.12
+     * @since 2.0.34 Fix return in PHPDOC
      */
     public function getResultKeyRowMap(string $fieldName): array
     {
@@ -507,6 +508,21 @@ class ArkDatabaseQueryResult
         $map = [];
         foreach ($this->resultRows as $resultRow) {
             $map[$resultRow->getField($fieldName, '')] = $resultRow;
+        }
+        return $map;
+    }
+
+    /**
+     * @param string $fieldName
+     * @return array[]
+     * @since 2.0.34
+     */
+    public function getResultKeyArrayRowMap(string $fieldName): array
+    {
+        $this->assertStatusIsQueried(__METHOD__ . "({$fieldName})");
+        $map = [];
+        foreach ($this->resultRows as $resultRow) {
+            $map[$resultRow->getField($fieldName, '')] = $resultRow->getRawRow();
         }
         return $map;
     }
