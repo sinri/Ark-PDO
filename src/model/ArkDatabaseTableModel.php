@@ -13,6 +13,7 @@ namespace sinri\ark\database\model;
  * Class ArkDatabaseTableModel
  * @package sinri\ark\database\model
  * @since 1.7.0 the general methods are moved into core model
+ * @deprecated since 2.1.x
  */
 abstract class ArkDatabaseTableModel extends ArkDatabaseTableCoreModel
 {

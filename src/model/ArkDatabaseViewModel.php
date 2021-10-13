@@ -10,8 +10,9 @@ use sinri\ark\database\model\query\ArkDatabaseQueryResult;
  * Class ArkDatabaseViewModel
  * @package sinri\ark\database\model
  * @since 2.0.10
+ * @deprecated since 2.1.x
  */
-abstract class ArkDatabaseViewModel extends ArkDatabaseTableModel
+abstract class ArkDatabaseViewModel extends ArkDatabaseTableReaderModel
 {
 
     final public function insertOneRow(array $data, $pk = null): ArkDatabaseQueryResult

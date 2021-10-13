@@ -8,6 +8,7 @@ use sinri\ark\database\exception\ArkPDOQueryResultEmptySituation;
 use sinri\ark\database\exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\exception\ArkPDOStatementException;
 use sinri\ark\database\model\ArkDatabaseTableCoreModel;
+use sinri\ark\database\model\ArkDatabaseTableReaderModel;
 use sinri\ark\database\model\ArkSQLCondition;
 
 /**
@@ -75,7 +76,7 @@ class ArkDatabaseSelectTableQuery
      */
     protected $lockMode = '';
 
-    public function __construct(ArkDatabaseTableCoreModel $model)
+    public function __construct(ArkDatabaseTableReaderModel $model)
     {
         $this->model = $model;
         $this->selectFields = [];

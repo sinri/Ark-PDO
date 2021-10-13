@@ -37,17 +37,6 @@ class ArkSQLCondition
     const OP_PARENTHESES_AND = "AND";
     const OP_PARENTHESES_OR = "OR";
 
-    const CONST_TRUE = "TRUE";
-    const CONST_FALSE = "FALSE";
-    const CONST_NULL = "NULL";
-
-    const QUOTE_TYPE_RAW = 'RAW';
-    const QUOTE_TYPE_FIELD = 'FIELD';
-    const QUOTE_TYPE_VALUE = 'VALUE';
-    const QUOTE_TYPE_INT = 'INT';
-    const QUOTE_TYPE_FLOAT = 'FLOAT';
-    const QUOTE_TYPE_STRING = 'STRING';
-
     protected $leftSide;
     protected $operator;
     protected $rightSide;
@@ -84,55 +73,11 @@ class ArkSQLCondition
      * @param string $quoteType
      * @return ArkSQLCondition
      */
-    public static function for(string $leftSide, string $quoteType = self::QUOTE_TYPE_RAW)
+    public static function for(string $leftSide, string $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
         $x = new self();
-        $x->leftSide = self::quoteScalar($leftSide, $quoteType);
+        $x->leftSide = ArkPDO::quoteScalar($leftSide, $quoteType);
         return $x;
-    }
-
-    /**
-     * @param scalar $x
-     * @param string $quoteType
-     * @return string
-     */
-    protected static function quoteScalar($x, $quoteType): string
-    {
-        if ($quoteType === self::QUOTE_TYPE_RAW) {
-            // $x must be a variable that could be transformed into string
-            return $x;
-        }
-        if ($quoteType === self::QUOTE_TYPE_FIELD) {
-            // $x must be a string
-            return '`' . $x . '`';
-        }
-        if ($quoteType === self::QUOTE_TYPE_VALUE) {
-            if ($x === null) {
-                return self::CONST_NULL;
-            }
-            if ($x === false) {
-                return self::CONST_FALSE;
-            }
-            if ($x === true) {
-                return self::CONST_TRUE;
-            }
-            if (is_int($x)) {
-                $quoteType = self::QUOTE_TYPE_INT;
-            } elseif (is_float($x)) {
-                $quoteType = self::QUOTE_TYPE_FLOAT;
-            } else {
-                $quoteType = self::QUOTE_TYPE_STRING;
-            }
-        }
-        switch ($quoteType) {
-            case self::QUOTE_TYPE_INT:
-                return '' . intval($x);
-            case self::QUOTE_TYPE_FLOAT:
-                return '' . floatval($x);
-            case self::QUOTE_TYPE_STRING:
-            default:
-                return ArkPDO::dryQuote($x);
-        }
     }
 
     public static function raw(string $raw)
@@ -267,14 +212,14 @@ class ArkSQLCondition
      * @param string $quoteType
      * @return $this
      */
-    public function notEqualNullSafe($rightSide, $quoteType = self::QUOTE_TYPE_VALUE)
+    public function notEqualNullSafe($rightSide, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
     {
         $this->operator = self::OP_NULL_SAFE_EQUAL;
-        $this->rightSide = self::quoteScalar($rightSide, $quoteType);
+        $this->rightSide = ArkPDO::quoteScalar($rightSide, $quoteType);
         return $this;
     }
 
-    public function equalOrIn($x, $quoteType = self::QUOTE_TYPE_VALUE)
+    public function equalOrIn($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
     {
         if (is_array($x)) {
             return $this->in($x, $quoteType);
@@ -286,7 +231,7 @@ class ArkSQLCondition
      * @param scalar[] $array
      * @param string $quoteType
      */
-    public function in(array $array, $quoteType = self::QUOTE_TYPE_VALUE)
+    public function in(array $array, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
     {
         $this->operator = self::OP_IN;
         $x = [];
@@ -294,7 +239,7 @@ class ArkSQLCondition
             if (!is_scalar($item)) {
                 throw new ArkPDOSQLBuilderError("ARRAY ITEM NOT SCALAR", json_encode($item));
             }
-            $x[] = self::quoteScalar($item, $quoteType);
+            $x[] = ArkPDO::quoteScalar($item, $quoteType);
         }
         $this->rightSide = $x;
         return $this;
@@ -305,14 +250,14 @@ class ArkSQLCondition
      * @param string $quoteType
      * @return $this
      */
-    public function equal($rightSide, $quoteType = self::QUOTE_TYPE_VALUE)
+    public function equal($rightSide, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
     {
         $this->operator = self::OP_EQ;
-        $this->rightSide = self::quoteScalar($rightSide, $quoteType);
+        $this->rightSide = ArkPDO::quoteScalar($rightSide, $quoteType);
         return $this;
     }
 
-    public function notEqualNorIn($x, $quoteType = self::QUOTE_TYPE_VALUE)
+    public function notEqualNorIn($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
     {
         if (is_array($x)) {
             return $this->notIn($x, $quoteType);
@@ -324,7 +269,7 @@ class ArkSQLCondition
      * @param scalar[] $array
      * @param string $quoteType
      */
-    public function notIn(array $array, $quoteType = self::QUOTE_TYPE_VALUE)
+    public function notIn(array $array, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
     {
         $this->operator = self::OP_NOT_IN;
         $x = [];
@@ -332,7 +277,7 @@ class ArkSQLCondition
             if (!is_scalar($item)) {
                 throw new ArkPDOSQLBuilderError("ARRAY ITEM NOT SCALAR", json_encode($item));
             }
-            $x[] = self::quoteScalar($item, $quoteType);
+            $x[] = ArkPDO::quoteScalar($item, $quoteType);
         }
         $this->rightSide = $x;
         return $this;
@@ -343,52 +288,52 @@ class ArkSQLCondition
      * @param string $quoteType
      * @return $this
      */
-    public function notEqual($rightSide, $quoteType = self::QUOTE_TYPE_VALUE)
+    public function notEqual($rightSide, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
     {
         $this->operator = self::OP_NEQ;
-        $this->rightSide = self::quoteScalar($rightSide, $quoteType);
+        $this->rightSide = ArkPDO::quoteScalar($rightSide, $quoteType);
         return $this;
     }
 
-    public function greaterThan($x, $quoteType = self::QUOTE_TYPE_VALUE)
+    public function greaterThan($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
     {
         $this->operator = self::OP_GT;
-        $this->rightSide = self::quoteScalar($x, $quoteType);
+        $this->rightSide = ArkPDO::quoteScalar($x, $quoteType);
         return $this;
     }
 
-    public function greaterThanOrEqual($x, $quoteType = self::QUOTE_TYPE_VALUE)
+    public function greaterThanOrEqual($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
     {
         $this->operator = self::OP_EGT;
-        $this->rightSide = self::quoteScalar($x, $quoteType);
+        $this->rightSide = ArkPDO::quoteScalar($x, $quoteType);
         return $this;
     }
 
-    public function lessThan($x, $quoteType = self::QUOTE_TYPE_VALUE)
+    public function lessThan($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
     {
         $this->operator = self::OP_LT;
-        $this->rightSide = self::quoteScalar($x, $quoteType);
+        $this->rightSide = ArkPDO::quoteScalar($x, $quoteType);
         return $this;
     }
 
-    public function lessThanOrEqual($x, $quoteType = self::QUOTE_TYPE_VALUE)
+    public function lessThanOrEqual($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
     {
         $this->operator = self::OP_ELT;
-        $this->rightSide = self::quoteScalar($x, $quoteType);
+        $this->rightSide = ArkPDO::quoteScalar($x, $quoteType);
         return $this;
     }
 
     public function isNull()
     {
         $this->operator = self::OP_IS;
-        $this->rightSide = self::CONST_NULL;
+        $this->rightSide = ArkPDO::CONST_NULL;
         return $this;
     }
 
     public function isNotNull()
     {
         $this->operator = self::OP_IS_NOT;
-        $this->rightSide = self::CONST_NULL;
+        $this->rightSide = ArkPDO::CONST_NULL;
         return $this;
     }
 
@@ -448,12 +393,12 @@ class ArkSQLCondition
      * @param string $quoteType
      * @return $this
      */
-    public function between($a, $b, $quoteType = self::QUOTE_TYPE_VALUE)
+    public function between($a, $b, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
     {
         $this->operator = self::OP_BETWEEN;
         $this->rightSide = [
-            self::quoteScalar($a, $quoteType),
-            self::quoteScalar($b, $quoteType),
+            ArkPDO::quoteScalar($a, $quoteType),
+            ArkPDO::quoteScalar($b, $quoteType),
         ];
         return $this;
     }
@@ -464,12 +409,12 @@ class ArkSQLCondition
      * @param string $quoteType
      * @return $this
      */
-    public function notBetween($a, $b, $quoteType = self::QUOTE_TYPE_VALUE)
+    public function notBetween($a, $b, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
     {
         $this->operator = self::OP_NOT_BETWEEN;
         $this->rightSide = [
-            self::quoteScalar($a, $quoteType),
-            self::quoteScalar($b, $quoteType),
+            ArkPDO::quoteScalar($a, $quoteType),
+            ArkPDO::quoteScalar($b, $quoteType),
         ];
         return $this;
     }

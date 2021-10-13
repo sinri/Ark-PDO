@@ -1,10 +1,11 @@
 <?php
 
 
-namespace sinri\ark\database\model\implement;
+namespace sinri\ark\database\model\implement\functions;
 
 
 use sinri\ark\database\model\ArkSQLFunction;
+use sinri\ark\database\pdo\ArkPDO;
 
 /**
  * Class ArkSQLMathematicalFunction
@@ -20,9 +21,9 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string|numeric $x Field name or number
      * @return static
      */
-    public static function makeAbs($x)
+    public static function makeAbs($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('ABS', [$x]);
+        return (new static('ABS'))->appendParameter($x, $quoteType);
     }
 
     // ACOS(x)
@@ -35,9 +36,9 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string|numeric $x
      * @return static
      */
-    public static function makeCeil($x)
+    public static function makeCeil($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return self::makeCeiling($x);
+        return self::makeCeiling($x, $quoteType);
     }
 
     /**
@@ -45,9 +46,9 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string|numeric $x
      * @return static
      */
-    public static function makeCeiling($x)
+    public static function makeCeiling($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('CEILING', [$x]);
+        return (new static('CEILING'))->appendParameter($x, $quoteType);
     }
 
     /**
@@ -63,11 +64,15 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string|numeric $n
      * @param int $fromBase
      * @param int $toBase
+     * @param string $quoteType
      * @return static
      */
-    public static function makeConv($n, int $fromBase, int $toBase)
+    public static function makeConv($n, int $fromBase, int $toBase, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('CONV', [$n, $fromBase, $toBase]);
+        return (new static('CONV'))
+            ->appendParameter($n, $quoteType)
+            ->appendParameter($fromBase)
+            ->appendParameter($toBase);
     }
 
     // COS(X)
@@ -81,9 +86,9 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string|numeric $x
      * @return static
      */
-    public static function makeFloor($x)
+    public static function makeFloor($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('FLOOR', [$x]);
+        return (new static('FLOOR'))->appendParameter($x, $quoteType);
     }
 
     // FORMAT(X,D)
@@ -114,13 +119,13 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string|numeric|null $seed
      * @return static
      */
-    public static function makeRand($seed = null)
+    public static function makeRand($seed = null, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        $p = [];
+        $x = new static('RAND');
         if ($seed !== null) {
-            $p = [$seed];
+            $x->appendParameter($seed, $quoteType);
         }
-        return new static('RAND', $p);
+        return $x;
     }
 
     /**
@@ -136,13 +141,14 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param int|null $d
      * @return static
      */
-    public static function makeRound($x, $d = null)
+    public static function makeRound($x, $d = null, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        $p = [$x];
+        $x = new static('ROUND');
+        $x->appendParameter($x, $quoteType);
         if ($d !== null) {
-            $p[] = $d;
+            $x->appendParameter($d);
         }
-        return new static('ROUND', $p);
+        return $x;
     }
 
     /**
@@ -152,9 +158,9 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string|numeric $x
      * @return static
      */
-    public static function makeSign($x)
+    public static function makeSign($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('SIGN', [$x]);
+        return (new static('SIGN'))->appendParameter($x, $quoteType);
     }
 
     // SIN(X)
@@ -172,8 +178,8 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param int $d
      * @return static
      */
-    public static function makeTruncate($x, $d)
+    public static function makeTruncate($x, $d, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('TRUNCATE', [$x, $d]);
+        return (new static('TRUNCATE'))->appendParameter($x, $quoteType)->appendParameter($d);
     }
 }

@@ -1,10 +1,11 @@
 <?php
 
 
-namespace sinri\ark\database\model\implement;
+namespace sinri\ark\database\model\implement\functions;
 
 
 use sinri\ark\database\model\ArkSQLFunction;
+use sinri\ark\database\pdo\ArkPDO;
 
 /**
  * Class ArkSQLDateTimeFunction
@@ -44,12 +45,13 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
     /**
      * SELECT ADDDATE('2008-01-02', 31); -> '2008-02-02'
      * @param $expr
-     * @param $days
+     * @param int $days
+     * @param string $quoteType
      * @return static
      */
-    public static function makeAddDate($expr, $days)
+    public static function makeAddDate($expr, int $days, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('ADDDATE', [$expr, $days]);
+        return (new static('ADDDATE'))->appendParameter($expr, $quoteType)->appendParameter($days);
     }
 
 
@@ -62,11 +64,15 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      *
      * @param $expr1
      * @param $expr2
+     * @param string $quoteType1
+     * @param string $quoteType2
      * @return static
      */
-    public static function makeAddTime($expr1, $expr2)
+    public static function makeAddTime($expr1, $expr2, $quoteType1 = ArkPDO::QUOTE_TYPE_RAW, $quoteType2 = ArkPDO::QUOTE_TYPE_VALUE)
     {
-        return new static('ADDTIME', [$expr1, $expr2]);
+        return (new static('ADDTIME'))
+            ->appendParameter($expr1, $quoteType1)
+            ->appendParameter($expr2, $quoteType2);
     }
 
     // CONVERT_TZ(dt,from_tz,to_tz)
@@ -82,7 +88,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      */
     public static function makeCurDate()
     {
-        return new static('CURDATE', []);
+        return new static('CURDATE');
     }
 
     // CURRENT_DATE and CURRENT_DATE() are synonyms for CURDATE().
@@ -105,11 +111,11 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      */
     public static function makeCurTime($fsp = null)
     {
-        $p = [];
+        $x = (new static('CURTIME'));
         if ($fsp !== null) {
-            $p = [$fsp];
+            $x->appendParameter(intval($x));
         }
-        return new static('CURTIME', $p);
+        return $x;
     }
 
     /**
@@ -118,9 +124,9 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $expr
      * @return static
      */
-    public static function makeDate($expr)
+    public static function makeDate($expr, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('DATE', [$expr]);
+        return (new static('DATE'))->appendParameter($expr, $quoteType);
     }
 
     /**
@@ -133,11 +139,15 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      *
      * @param $expr1
      * @param $expr2
+     * @param string $quoteType1
+     * @param string $quoteType2
      * @return static
      */
-    public static function makeDateDiff($expr1, $expr2)
+    public static function makeDateDiff($expr1, $expr2, $quoteType1 = ArkPDO::QUOTE_TYPE_RAW, $quoteType2 = ArkPDO::QUOTE_TYPE_VALUE)
     {
-        return new static('DATEDIFF', [$expr1, $expr2]);
+        return (new static('DATEDIFF'))
+            ->appendParameter($expr1, $quoteType1)
+            ->appendParameter($expr2, $quoteType2);
     }
 
     /**
@@ -146,26 +156,32 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @see https://dev.mysql.com/doc/refman/8.0/en/date-and-time-functions.html#function_date-add
      *
      * @param $date
-     * @param $expr
-     * @param $unit
+     * @param string|int $diff
+     * @param string $unit
+     * @param string $quoteType
      * @return static
      */
-    public static function makeDateAdd($date, $expr, $unit)
+    public static function makeDateAdd($date, $diff, string $unit, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('DATE_ADD', [$date, 'INTERVAL ' . $expr . ' ' . $unit]);
+        return (new static('DATE_ADD'))
+            ->appendParameter($date, $quoteType)
+            ->appendParameter('INTERVAL ' . $diff . ' ' . $unit);
     }
 
     /**
      * @see https://dev.mysql.com/doc/refman/8.0/en/date-and-time-functions.html#function_date-add
      *
      * @param $date
-     * @param $expr
-     * @param $unit
+     * @param int|string $diff
+     * @param string $unit
+     * @param string $quoteType
      * @return static
      */
-    public static function makeDateSub($date, $expr, $unit)
+    public static function makeDateSub($date, $diff, string $unit, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('DATE_SUB', [$date, 'INTERVAL ' . $expr . ' ' . $unit]);
+        return (new static('DATE_SUB'))
+            ->appendParameter($date, $quoteType)
+            ->appendParameter('INTERVAL ' . $diff . ' ' . $unit);
     }
 
     /**
@@ -173,11 +189,14 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      *
      * @param string $date
      * @param string $format
+     * @param string $quoteType
      * @return static
      */
-    public static function makeDateFormat(string $date, string $format)
+    public static function makeDateFormat(string $date, string $format, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('DATE_FORMAT', [$date, $format]);
+        return (new static('DATE_FORMAT'))
+            ->appendParameter($date, $quoteType)
+            ->appendParameter($format, ArkPDO::QUOTE_TYPE_VALUE);
     }
 
     /**
@@ -187,9 +206,9 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $date
      * @return static
      */
-    public static function makeDayOfMonth($date)
+    public static function makeDayOfMonth($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('DAYOFMONTH', [$date]);
+        return (new static('DAYOFMONTH'))->appendParameter($date, $quoteType);
     }
 
     // DAY() is a synonym for DAYOFMONTH().
@@ -200,22 +219,24 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * These index values correspond to the ODBC standard.
      *
      * @param $date
+     * @param string $quoteType
      * @return static
      */
-    public static function makeDayOfWeek($date)
+    public static function makeDayOfWeek($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('DAYOFWEEK', [$date]);
+        return (new static('DAYOFWEEK'))->appendParameter($date, $quoteType);
     }
 
     /**
      * Returns the day of the year for date, in the range 1 to 366.
      *
      * @param $date
+     * @param string $quoteType
      * @return static
      */
-    public static function makeDayOfYear($date)
+    public static function makeDayOfYear($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('DAYOFYEAR', [$date]);
+        return (new static('DAYOFYEAR'))->appendParameter($date, $quoteType);
     }
 
     /**
@@ -223,13 +244,16 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * but extracts parts from the date rather than performing date arithmetic.
      * For information on the unit argument, see Temporal Intervals.
      *
-     * @param $unit
+     * @param string $unit
      * @param $date
+     * @param string $quoteType
      * @return static
      */
-    public static function makeExtract($unit, $date)
+    public static function makeExtract(string $unit, $date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('EXTRACT', [$unit . ' FROM ' . $date]);
+        return (new static('EXTRACT'))
+            ->setHeadText($unit . ' FROM')
+            ->appendParameter($date, $quoteType);
     }
 
     // FROM_DAYS(N)
@@ -247,15 +271,17 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      *
      * @param $unixTimestamp
      * @param string|null $format
+     * @param string $quoteType
      * @return static
      */
-    public static function makeFromUnixTime($unixTimestamp, $format = null)
+    public static function makeFromUnixTime($unixTimestamp, $format = null, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        $p = [$unixTimestamp];
+        $x = new static('FROM_UNIXTIME');
+        $x->appendParameter($unixTimestamp, $quoteType);
         if ($format !== null) {
-            $p[] = $format;
+            $x->appendParameter($format, ArkPDO::QUOTE_TYPE_VALUE);
         }
-        return new static('FROM_UNIXTIME', $p);
+        return $x;
     }
 
     // GET_FORMAT({DATE|TIME|DATETIME}, {'EUR'|'USA'|'JIS'|'ISO'|'INTERNAL'})
@@ -266,11 +292,12 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * However, the range of TIME values actually is much larger, so HOUR can return values greater than 23.
      *
      * @param $time
+     * @param string $quoteType
      * @return static
      */
-    public static function makeHour($time)
+    public static function makeHour($time, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('HOUR', [$time]);
+        return (new static('HOUR'))->appendParameter($time, $quoteType);
     }
 
     // LAST_DAY(date)
@@ -283,26 +310,28 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * Returns the microseconds from the time or datetime expression expr as a number in the range from 0 to 999999.
      *
      * @param $expr
+     * @param string $quoteType
      * @return static
      */
-    public static function makeMicroSecond($expr)
+    public static function makeMicroSecond($expr, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('MICROSECOND', [$expr]);
+        return (new static('MICROSECOND'))->appendParameter($expr, $quoteType);
     }
 
     /**
      * Returns the minute for time, in the range 0 to 59.
      * @param $time
+     * @param string $quoteType
      * @return static
      */
-    public static function makeMinute($time)
+    public static function makeMinute($time, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('MINUTE', [$time]);
+        return (new static('MINUTE'))->appendParameter($time, $quoteType);
     }
 
-    public static function makeMonth($date)
+    public static function makeMonth($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('MONTH', [$date]);
+        return (new static('MONTH'))->appendParameter($date, $quoteType);
     }
 
     // MONTHNAME(date)
@@ -320,38 +349,42 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      */
     public static function makeNow($fsp = null)
     {
-        $p = [];
+        $x = new static('NOW');
         if ($fsp !== null) {
-            $p[] = $fsp;
+            $x->appendParameter(intval($fsp));
         }
-        return new static('NOW', $p);
+        return $x;
     }
 
     // PERIOD_ADD(P,N)
     // PERIOD_DIFF(P1,P2)
     // QUARTER(date)
 
-    public static function makeQuarter($date)
+    public static function makeQuarter($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('QUARTER', [$date]);
+        return (new static('QUARTER'))->appendParameter($date, $quoteType);
     }
 
-    public static function makeSecond($time)
+    public static function makeSecond($time, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('SECOND', [$time]);
+        return (new static('SECOND'))->appendParameter($time, $quoteType);
     }
 
     // SEC_TO_TIME(seconds)
     // STR_TO_DATE(str,format)
 
-    public static function makeSubDate($expr, $days)
+    public static function makeSubDate($expr, $days, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('SUBDATE', [$expr, $days]);
+        return (new static('SUBDATE'))
+            ->appendParameter($expr, $quoteType)
+            ->appendParameter($days);
     }
 
-    public static function makeSubTime($expr1, $expr2)
+    public static function makeSubTime($expr1, $expr2, $quoteType1 = ArkPDO::QUOTE_TYPE_RAW, $quoteType2 = ArkPDO::QUOTE_TYPE_VALUE)
     {
-        return new static('SUBTIME', [$expr1, $expr2]);
+        return (new static('SUBTIME'))
+            ->appendParameter($expr1, $quoteType1)
+            ->appendParameter($expr2, $quoteType2);
     }
 
     /**
@@ -373,16 +406,16 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      */
     public static function makeSysDate($fsp = null)
     {
-        $p = [];
+        $x = new static('SYSDATE');
         if ($fsp !== null) {
-            $p[] = $fsp;
+            $x->appendParameter(intval($fsp));
         }
-        return new static('SYSDATE', $p);
+        return $x;
     }
 
-    public static function makeTime($expr)
+    public static function makeTime($expr, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('TIME', [$expr]);
+        return (new static('TIME'))->appendParameter($expr, $quoteType);
     }
 
     // TIMEDIFF(expr1,expr2)
@@ -403,13 +436,14 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string|null $expr2
      * @return static
      */
-    public static function makeTimestamp($expr1, $expr2 = null)
+    public static function makeTimestamp($expr1, $expr2 = null, $quoteType1 = ArkPDO::QUOTE_TYPE_RAW, $quoteType2 = ArkPDO::QUOTE_TYPE_RAW)
     {
-        $p = [$expr1];
+        $x = new static('TIMESTAMP');
+        $x->appendParameter($expr1, $quoteType1);
         if ($expr2 !== null) {
-            $p[] = $expr2;
+            $x->appendParameter($expr2, $quoteType2);
         }
-        return new static('TIMESTAMP', $p);
+        return $x;
     }
 
     // TIMESTAMPADD(unit,interval,datetime_expr)
@@ -451,13 +485,13 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string|null $date
      * @return static
      */
-    public static function makeUnixTimestamp($date = null)
+    public static function makeUnixTimestamp($date = null, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        $p = [];
+        $x = new static('UNIX_TIMESTAMP');
         if ($date !== null) {
-            $p[] = $date;
+            $x->appendParameter($date, $quoteType);
         }
-        return new static('UNIX_TIMESTAMP', $p);
+        return $x;
     }
 
     // UTC_DATE, UTC_DATE()
@@ -469,11 +503,12 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * Returns the weekday index for date (0 = Monday, 1 = Tuesday, … 6 = Sunday).
      *
      * @param $date
+     * @param string $quoteType
      * @return static
      */
-    public static function makeWeekday($date)
+    public static function makeWeekday($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('WEEKDAY', [$date]);
+        return (new static('WEEKDAY'))->appendParameter($date, $quoteType);
     }
 
     /**
@@ -481,22 +516,24 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * WEEKOFYEAR() is a compatibility function that is equivalent to WEEK(date,3).
      *
      * @param $date
+     * @param string $quoteType
      * @return static
      */
-    public static function makeWeekOfYear($date)
+    public static function makeWeekOfYear($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('WEEKOFYEAR', [$date]);
+        return (new static('WEEKOFYEAR'))->appendParameter($date, $quoteType);
     }
 
     /**
      * Returns the year for date, in the range 1000 to 9999, or 0 for the “zero” date.
      *
      * @param $date
+     * @param string $quoteType
      * @return static
      */
-    public static function makeYear($date)
+    public static function makeYear($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new static('YEAR', [$date]);
+        return (new static('YEAR'))->appendParameter($date, $quoteType);
     }
 
     // YEARWEEK(date), YEARWEEK(date,mode)

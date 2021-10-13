@@ -619,4 +619,60 @@ class ArkPDO
 
         return $inp;
     }
+
+    const QUOTE_TYPE_RAW = 'RAW';
+    const QUOTE_TYPE_FIELD = 'FIELD';
+    const QUOTE_TYPE_VALUE = 'VALUE';
+    const QUOTE_TYPE_INT = 'INT';
+    const QUOTE_TYPE_FLOAT = 'FLOAT';
+    const QUOTE_TYPE_STRING = 'STRING';
+
+    const CONST_TRUE = "TRUE";
+    const CONST_FALSE = "FALSE";
+    const CONST_NULL = "NULL";
+
+    /**
+     * @param scalar $x
+     * @param string $quoteType
+     * @return string
+     * @since 2.1.x
+     */
+    public static function quoteScalar($x, $quoteType): string
+    {
+        if ($quoteType === self::QUOTE_TYPE_RAW) {
+            // $x must be a variable that could be transformed into string
+            return $x;
+        }
+        if ($quoteType === self::QUOTE_TYPE_FIELD) {
+            // $x must be a string
+            return '`' . $x . '`';
+        }
+        if ($quoteType === self::QUOTE_TYPE_VALUE) {
+            if ($x === null) {
+                return self::CONST_NULL;
+            }
+            if ($x === false) {
+                return self::CONST_FALSE;
+            }
+            if ($x === true) {
+                return self::CONST_TRUE;
+            }
+            if (is_int($x)) {
+                $quoteType = self::QUOTE_TYPE_INT;
+            } elseif (is_float($x)) {
+                $quoteType = self::QUOTE_TYPE_FLOAT;
+            } else {
+                $quoteType = self::QUOTE_TYPE_STRING;
+            }
+        }
+        switch ($quoteType) {
+            case self::QUOTE_TYPE_INT:
+                return '' . intval($x);
+            case self::QUOTE_TYPE_FLOAT:
+                return '' . floatval($x);
+            case self::QUOTE_TYPE_STRING:
+            default:
+                return self::dryQuote($x);
+        }
+    }
 }

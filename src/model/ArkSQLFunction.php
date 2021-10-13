@@ -3,6 +3,8 @@
 
 namespace sinri\ark\database\model;
 
+use sinri\ark\database\pdo\ArkPDO;
+
 /**
  * Class ArkSQLFunction
  * @package sinri\ark\database\model
@@ -15,6 +17,14 @@ class ArkSQLFunction
      */
     protected $functionName;
     /**
+     * @var string
+     */
+    protected $headText = '';
+    /**
+     * @var string
+     */
+    protected $tailText = '';
+    /**
      * @var scalar[]
      */
     protected $functionParameterArray;
@@ -22,12 +32,48 @@ class ArkSQLFunction
     /**
      * ArkSQLFunction constructor.
      * @param string $functionName
-     * @param array $functionParameterArray
+     * @param array $functionParameterArray Each item are raw
      */
     public function __construct(string $functionName, array $functionParameterArray = [])
     {
         $this->functionName = $functionName;
         $this->functionParameterArray = $functionParameterArray;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHeadText(): string
+    {
+        return $this->headText;
+    }
+
+    /**
+     * @param string $headText
+     * @return ArkSQLFunction
+     */
+    public function setHeadText(string $headText): ArkSQLFunction
+    {
+        $this->headText = $headText;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTailText(): string
+    {
+        return $this->tailText;
+    }
+
+    /**
+     * @param string $tailText
+     * @return ArkSQLFunction
+     */
+    public function setTailText(string $tailText): ArkSQLFunction
+    {
+        $this->tailText = $tailText;
+        return $this;
     }
 
     /**
@@ -51,9 +97,9 @@ class ArkSQLFunction
      * @param scalar $x
      * @return $this
      */
-    public function appendParameter($x)
+    public function appendParameter($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        $this->functionParameterArray[] = $x;
+        $this->functionParameterArray[] = ArkPDO::quoteScalar($x, $quoteType);
         return $this;
     }
 
@@ -67,18 +113,24 @@ class ArkSQLFunction
 
     /**
      * @return string
-     */
-    public function makeFunctionSQL(): string
-    {
-        return $this->functionName . "(" . implode(" , ", $this->functionParameterArray) . ")";
-    }
-
-    /**
-     * @return string
      * @since 2.0.25
      */
     public function __toString()
     {
         return $this->makeFunctionSQL();
+    }
+
+    /**
+     * @return string
+     */
+    public function makeFunctionSQL(): string
+    {
+        return $this->functionName . "("
+            . (empty($this->headText) ? '' : ' ')
+            . $this->headText
+            . implode(" , ", $this->functionParameterArray)
+            . (empty($this->tailText) ? '' : ' ')
+            . $this->tailText
+            . ")";
     }
 }

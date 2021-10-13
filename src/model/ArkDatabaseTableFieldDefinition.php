@@ -20,6 +20,7 @@ class ArkDatabaseTableFieldDefinition
     protected $type;
     protected $typeCategory;
     protected $nullable;
+    protected $comment;
 
     protected function __construct()
     {
@@ -34,6 +35,7 @@ class ArkDatabaseTableFieldDefinition
         $field = new ArkDatabaseTableFieldDefinition();
         $field->name = ArkHelper::readTarget($row, 'Field');
         $field->nullable = ArkHelper::readTarget($row, 'Null', 'NO') === 'YES';
+        $field->comment = ArkHelper::readTarget($row, 'Comment', '');
 
         $field->type = ArkHelper::readTarget($row, 'Type', '');
         if (preg_match('/^[A-Za-z0-9]+/', $field->type, $matches)) {
@@ -55,16 +57,14 @@ class ArkDatabaseTableFieldDefinition
             case 'mediumint':
             case 'int':
             case 'integer':
-                return "integer";
             case 'bigint'://for bigint it sometimes sucks for PHP when number too large
-                return "integer";
+                return "int";
             case 'SERIAL'://SERIAL is an alias for BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE.
                 return "string";
             case 'decimal':
             case 'dec':
             case 'double':
-            case 'real':
-                return 'double';
+            case 'real':// double in PHP is as float
             case 'float':
                 return 'float';
             case 'bool':
@@ -138,6 +138,11 @@ class ArkDatabaseTableFieldDefinition
         $this->nullable = $nullable;
     }
 
+    public function getComment()
+    {
+        return $this->comment;
+    }
+
     /**
      * @param ArkPDO $db
      * @param string $tableExpression
@@ -148,7 +153,8 @@ class ArkDatabaseTableFieldDefinition
     public static function loadTableDesc(ArkPDO $db, string $tableExpression): array
     {
         $fieldDefinition = [];
-        $field_list = $db->getAll("desc " . $tableExpression);
+//        $field_list = $db->getAll("desc " . $tableExpression);
+        $field_list = $db->getAll("show full columns in " . $tableExpression);
         if (empty($field_list)) {
             throw new LookUpTargetException("Seems no such table " . $tableExpression);
         }
@@ -167,10 +173,20 @@ class ArkDatabaseTableFieldDefinition
      */
     public static function devShowFieldsForPHPDoc(ArkDatabaseTableCoreModel $model)
     {
-        echo "THIS IS A HELPER FOR DEV." . PHP_EOL;
+        echo "THIS IS A HELPER FOR DEVELOPER TO GENERATE PHPDOC OF ArkDatabaseQueryResultRow." . PHP_EOL;
+        echo "/**" . PHP_EOL;
+//        echo " * DB: ".$model->db()->getPdoConfig()->title . PHP_EOL;
+        echo " * TABLE: " . $model->getTableExpressForSQL() . PHP_EOL;
         $fieldDefinition = self::loadTableDesc($model->db(), $model->getTableExpressForSQL());
         foreach ($fieldDefinition as $definition) {
-            echo " * @property " . $definition->getTypeCategory() . ' ' . $definition->getName() . PHP_EOL;
+            echo " * @property-read "
+                . $definition->getTypeCategory()
+                . ($definition->nullable ? '|null' : '')
+                . ' ' . $definition->getName()
+                . ' [' . $definition->type . ']'
+                . ' ' . $definition->getComment()
+                . PHP_EOL;
         }
+        echo " */" . PHP_EOL;
     }
 }
