@@ -27,7 +27,7 @@ $config = new ArkPDOConfig();
 //    ->setCharset(\sinri\ark\database\ArkPDOConfig::CHARSET_UTF8)
 //    ->setEngine(\sinri\ark\database\ArkPDOConfig::ENGINE_MYSQL);
 
-require __DIR__ . '/config.php';
+require __DIR__ . '/config-MySQL-8.0.php';
 
 $logger = new ArkLogger();
 
@@ -72,7 +72,7 @@ try {
     // update
     $result = $model->updateRows(
         [
-            ArkSQLCondition::makeGreaterThan('score', 3),
+            ArkSQLCondition::for('score')->greaterThan(3),
         ],
         [
             'score' => 5
@@ -81,7 +81,7 @@ try {
     $logger->smartLogLite($result->getStatus() === ArkDatabaseQueryResult::STATUS_EXECUTED, 'UPDATE ONE RAW', ['afx' => $result->getAffectedRowsCount()]);
 
     // delete
-    $result = $model->deleteRows([ArkSQLCondition::makeEqual('score', 1)]);
+    $result = $model->deleteRows([ArkSQLCondition::for('score')->equal(1)]);
     $logger->smartLogLite($result->getStatus() === ArkDatabaseQueryResult::STATUS_EXECUTED, 'DELETE ONE RAW', ['afx' => $result->getAffectedRowsCount()]);
 
 

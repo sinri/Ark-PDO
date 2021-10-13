@@ -241,9 +241,13 @@ class ArkDatabaseSelectTableQuery
     {
         foreach ($simpleConditions as $fieldName => $value) {
             if (is_array($value)) {
-                $this->addCondition(ArkSQLCondition::makeInArray($fieldName, $value));
+                $this->addCondition(
+                    ArkSQLCondition::for($fieldName)->in($value)
+                );
             } else {
-                $this->addCondition(ArkSQLCondition::makeEqual($fieldName, $value));
+                $this->addCondition(
+                    ArkSQLCondition::for($fieldName)->equal($value)
+                );
             }
         }
         return $this;

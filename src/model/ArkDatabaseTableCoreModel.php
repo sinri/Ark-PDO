@@ -132,11 +132,11 @@ abstract class ArkDatabaseTableCoreModel
         $conditions = [];
         foreach ($simpleConditions as $fieldName => $value) {
             if (is_array($value)) {
-                $conditions[] = ArkSQLCondition::makeInArray($fieldName, $value);
+                $conditions[] = ArkSQLCondition::for($fieldName)->in($value);
             } elseif ($value === null) {
-                $conditions[] = ArkSQLCondition::makeIsNull($fieldName);
+                $conditions[] = ArkSQLCondition::for($fieldName)->isNull();
             } else {
-                $conditions[] = ArkSQLCondition::makeEqual($fieldName, $value);
+                $conditions[] = ArkSQLCondition::for($fieldName)->equal($value);
             }
         }
         return $this->updateRows($conditions, $modification);
@@ -184,11 +184,11 @@ abstract class ArkDatabaseTableCoreModel
         $conditions = [];
         foreach ($simpleConditions as $fieldName => $value) {
             if (is_array($value)) {
-                $conditions[] = ArkSQLCondition::makeInArray($fieldName, $value);
+                $conditions[] = ArkSQLCondition::for($fieldName)->in($value);
             } elseif ($value === null) {
-                $conditions[] = ArkSQLCondition::makeIsNull($fieldName);
+                $conditions[] = ArkSQLCondition::for($fieldName)->isNull();
             } else {
-                $conditions[] = ArkSQLCondition::makeEqual($fieldName, $value);
+                $conditions[] = ArkSQLCondition::for($fieldName)->equal($value);
             }
         }
         return $this->deleteRows($conditions);

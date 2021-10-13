@@ -35,7 +35,7 @@ try {
     $table_x2 = new ArkDatabaseDynamicTableModel($db, 'x2');
 
     $result = $table_x2->insert_into_select(
-        $table_x1->selectInTable()->addCondition(ArkSQLCondition::makeEqual('x_id', 1))
+        $table_x1->selectInTable()->addCondition(ArkSQLCondition::for('x_id')->equal(1))
     );
     $logger->notice(
         'x1 --[x_id=1]-> x2',
@@ -48,7 +48,7 @@ try {
     );
 
     $result = $table_x2->replace_into_select(
-        $table_x1->selectInTable()->addCondition(ArkSQLCondition::makeEqual('x_id', 1))
+        $table_x1->selectInTable()->addCondition(ArkSQLCondition::for('x_id')->equal(1))
     );
     $logger->notice(
         'x1 ==[x_id=1]=> x2',

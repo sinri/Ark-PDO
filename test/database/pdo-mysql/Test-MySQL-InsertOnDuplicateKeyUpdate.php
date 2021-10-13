@@ -33,7 +33,9 @@ $db->connect();
 $table = new ArkDatabaseDynamicTableModel($db, 'd');
 
 $before = $table->selectInTable()
-    ->addCondition(ArkSQLCondition::makeLessThan('id', 10))
+    ->addCondition(
+        ArkSQLCondition::for('id')->lessThan(10)
+    )
     ->queryForRows()
     ->getRawMatrix();
 echo 'before: ' . json_encode($before) . PHP_EOL;
@@ -55,7 +57,7 @@ echo 'LID: ' . $result->getLastInsertedID() . PHP_EOL;
 
 
 $after = $table->selectInTable()
-    ->addCondition(ArkSQLCondition::makeLessThan('id', 10))
+    ->addCondition(ArkSQLCondition::for('id')->lessThan(10))
     ->queryForRows()
     ->getRawMatrix();
 echo 'after: ' . json_encode($after) . PHP_EOL;
