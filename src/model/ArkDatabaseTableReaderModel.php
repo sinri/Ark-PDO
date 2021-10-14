@@ -26,13 +26,24 @@ abstract class ArkDatabaseTableReaderModel
 
     /**
      * @return string
-     * @since 1.6.2
+     * @since 1.6.2 Old name: getTableExpressForSQL
+     * @since 2.1.x use current method name
      */
-    public function getTableExpressForSQL(): string
+    public function getTableExpression(): string
     {
         $e = ($this->mappingSchemeName() === '' ? "" : '`' . $this->mappingSchemeName() . "`.");
         $e .= "`" . $this->mappingTableName() . "`";
         return $e;
+    }
+
+    /**
+     * @param string $fieldName
+     * @return string
+     * @since 2.1.x
+     */
+    public function getFieldExpression(string $fieldName): string
+    {
+        return $this->getTableExpression() . '.`' . $fieldName . '`';
     }
 
     /**

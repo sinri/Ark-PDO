@@ -7,7 +7,6 @@ namespace sinri\ark\database\model\query;
 use sinri\ark\database\exception\ArkPDOQueryResultEmptySituation;
 use sinri\ark\database\exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\exception\ArkPDOStatementException;
-use sinri\ark\database\model\ArkDatabaseTableCoreModel;
 use sinri\ark\database\model\ArkDatabaseTableReaderModel;
 use sinri\ark\database\model\ArkSQLCondition;
 
@@ -19,9 +18,14 @@ use sinri\ark\database\model\ArkSQLCondition;
 class ArkDatabaseSelectTableQuery
 {
     /**
-     * @var ArkDatabaseTableCoreModel
+     * @var ArkDatabaseTableReaderModel
      */
     protected $model;
+    /**
+     * @var ArkDatabaseSelectJoinClause[]
+     */
+    protected $joinTables = [];
+
     /**
      * @var ArkDatabaseSelectFieldMeta[]
      */
@@ -53,20 +57,10 @@ class ArkDatabaseSelectTableQuery
      */
     protected $offset;
     /**
-     * @var string[]
-     * @since 2.0.7
+     * @var string
      */
-    protected $listOfUseIndexItems;
-    /**
-     * @var string[]
-     * @since 2.0.7
-     */
-    protected $listOfForceIndexItems;
-    /**
-     * @var string[]
-     * @since 2.0.7
-     */
-    protected $listOfIgnoreIndexItems;
+    protected $indexHint;
+
     /**
      * @var string Default as Empty when no locks required;
      * @since 2.0.23
@@ -75,6 +69,12 @@ class ArkDatabaseSelectTableQuery
      * * LOCK IN SHARE MODE
      */
     protected $lockMode = '';
+
+    /**
+     * @var string UNION [ALL | DISTINCT]
+     * ONLY USED FOR ArkDatabaseSelectUnionQuery
+     */
+    public $unionType = '';
 
     public function __construct(ArkDatabaseTableReaderModel $model)
     {
@@ -284,31 +284,82 @@ class ArkDatabaseSelectTableQuery
         return $this;
     }
 
-    /**
-     * @param string $indexKey
-     * @since 2.0.7
-     */
-    public function useIndex(string $indexKey)
+    public function setIndexHint(string $indexHint)
     {
-        $this->listOfUseIndexItems[] = $indexKey;
+        $this->indexHint = $indexHint;
+        return $this;
     }
 
-    /**
-     * @param string $indexKey
-     * @since 2.0.7
-     */
-    public function forceIndex(string $indexKey)
-    {
-        $this->listOfForceIndexItems[] = $indexKey;
-    }
+//    /**
+//     * @param string $indexKey
+//     * @since 2.0.7
+//     */
+//    public function useIndex(string $indexKey)
+//    {
+//        $this->listOfUseIndexItems[] = $indexKey;
+//    }
+//
+//    /**
+//     * @param string $indexKey
+//     * @since 2.0.7
+//     */
+//    public function forceIndex(string $indexKey)
+//    {
+//        $this->listOfForceIndexItems[] = $indexKey;
+//    }
+//
+//    /**
+//     * @param string $indexKey
+//     * @since 2.0.7
+//     */
+//    public function ignoreIndex(string $indexKey)
+//    {
+//        $this->listOfIgnoreIndexItems[] = $indexKey;
+//    }
 
     /**
-     * @param string $indexKey
-     * @since 2.0.7
+     * @see https://dev.mysql.com/doc/refman/8.0/en/join.html
+     *
+     * @param string $type
+     * @param ArkDatabaseTableReaderModel $model
+     * @param ArkSQLCondition[] $onConditions
+     * @param string $indexHint concatenated index hint pieces:
+     *
+     * Index Hint Piece:
+     * - USE {INDEX|KEY} [FOR {JOIN|ORDER BY|GROUP BY}] ([index_list])
+     * - {IGNORE|FORCE} {INDEX|KEY} [FOR {JOIN|ORDER BY|GROUP BY}] (index_list)
+     *
+     * @return ArkDatabaseSelectTableQuery
      */
-    public function ignoreIndex(string $indexKey)
+    protected function addJoinClause(string $type, ArkDatabaseTableReaderModel $model, array $onConditions, string $indexHint = '')
     {
-        $this->listOfIgnoreIndexItems[] = $indexKey;
+        $this->joinTables[] = new ArkDatabaseSelectJoinClause(
+            $type,// LEFT JOIN, etc.
+            $model->getTableExpression(),
+            $onConditions,
+            $indexHint
+        );
+        return $this;
+    }
+
+    public function innerJoin(ArkDatabaseTableReaderModel $model, array $onConditions, string $indexHint = '')
+    {
+        return $this->addJoinClause(ArkDatabaseSelectJoinClause::INNER_JOIN, $model, $onConditions, $indexHint);
+    }
+
+    public function leftJoin(ArkDatabaseTableReaderModel $model, array $onConditions, string $indexHint = '')
+    {
+        return $this->addJoinClause(ArkDatabaseSelectJoinClause::LEFT_JOIN, $model, $onConditions, $indexHint);
+    }
+
+    public function rightJoin(ArkDatabaseTableReaderModel $model, array $onConditions, string $indexHint = '')
+    {
+        return $this->addJoinClause(ArkDatabaseSelectJoinClause::RIGHT_JOIN, $model, $onConditions, $indexHint);
+    }
+
+    public function straightJoin(ArkDatabaseTableReaderModel $model, array $onConditions, string $indexHint = '')
+    {
+        return $this->addJoinClause(ArkDatabaseSelectJoinClause::STRAIGHT_JOIN, $model, $onConditions, $indexHint);
     }
 
     /**
@@ -355,22 +406,26 @@ class ArkDatabaseSelectTableQuery
      */
     public function generateSQL(): string
     {
-        $table = $this->model->getTableExpressForSQL();
+        $tables = $this->model->getTableExpression();
+        foreach ($this->joinTables as $joinTable) {
+            $tables .= ' ' . $joinTable;
+        }
+
         $fields = ArkDatabaseSelectFieldMeta::generateFieldSQLComponent($this->selectFields);
         $condition_sql = ArkSQLCondition::generateConditionSQLComponent($this->conditions);
 
-        $indexSql = "";
-        if (!empty($this->listOfUseIndexItems)) {
-            $indexSql .= " USE INDEX (" . implode(',', $this->listOfUseIndexItems) . ") ";
-        }
-        if (!empty($this->listOfForceIndexItems)) {
-            $indexSql .= " FORCE INDEX (" . implode(',', $this->listOfForceIndexItems) . ") ";
-        }
-        if (!empty($this->listOfIgnoreIndexItems)) {
-            $indexSql .= " IGNORE INDEX (" . implode(',', $this->listOfIgnoreIndexItems) . ") ";
-        }
+//        $indexSql = "";
+//        if (!empty($this->listOfUseIndexItems)) {
+//            $indexSql .= " USE INDEX (" . implode(',', $this->listOfUseIndexItems) . ") ";
+//        }
+//        if (!empty($this->listOfForceIndexItems)) {
+//            $indexSql .= " FORCE INDEX (" . implode(',', $this->listOfForceIndexItems) . ") ";
+//        }
+//        if (!empty($this->listOfIgnoreIndexItems)) {
+//            $indexSql .= " IGNORE INDEX (" . implode(',', $this->listOfIgnoreIndexItems) . ") ";
+//        }
 
-        $sql = "SELECT {$fields} FROM {$table} " . $indexSql . " WHERE {$condition_sql} ";
+        $sql = "SELECT $fields FROM $tables {$this->indexHint} WHERE $condition_sql ";
 
         if (!empty($this->groupByFields)) {
             $sql .= "group by " . implode(",", $this->groupByFields) . " ";

@@ -176,8 +176,8 @@ class ArkDatabaseTableFieldDefinition
         echo "THIS IS A HELPER FOR DEVELOPER TO GENERATE PHPDOC OF ArkDatabaseQueryResultRow." . PHP_EOL;
         echo "/**" . PHP_EOL;
 //        echo " * DB: ".$model->db()->getPdoConfig()->title . PHP_EOL;
-        echo " * TABLE: " . $model->getTableExpressForSQL() . PHP_EOL;
-        $fieldDefinition = self::loadTableDesc($model->db(), $model->getTableExpressForSQL());
+        echo " * TABLE: " . $model->getTableExpression() . PHP_EOL;
+        $fieldDefinition = self::loadTableDesc($model->db(), $model->getTableExpression());
         foreach ($fieldDefinition as $definition) {
             echo " * @property-read "
                 . $definition->getTypeCategory()

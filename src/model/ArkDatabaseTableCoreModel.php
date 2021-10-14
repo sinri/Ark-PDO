@@ -51,7 +51,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
         try {
             $condition_sql = ArkSQLCondition::generateConditionSQLComponent($conditions);
             $data_sql = $this->buildRowValuesForUpdate($modification);
-            $table = $this->getTableExpressForSQL();
+            $table = $this->getTableExpression();
             $sql = "UPDATE {$table} SET {$data_sql} WHERE {$condition_sql}";
             $result->setSql($sql);
             $afx = $this->db()->exec($sql);
@@ -104,7 +104,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
         $result = new ArkDatabaseQueryResult();
         try {
             $condition_sql = ArkSQLCondition::generateConditionSQLComponent($conditions);
-            $table = $this->getTableExpressForSQL();
+            $table = $this->getTableExpression();
             $sql = "DELETE FROM {$table} WHERE {$condition_sql}";
             $afx = $this->db()->exec($sql);
             if ($afx === false) {
@@ -175,7 +175,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
      */
     protected function writeInto(array $data, $pk = null, bool $shouldReplace = false): ArkDatabaseQueryResult
     {
-        $table = $this->getTableExpressForSQL();
+        $table = $this->getTableExpression();
         $values = $this->buildRowValuesForWrite($data, $fields);
         $result = new ArkDatabaseQueryResult();
 
@@ -266,7 +266,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
             }
             $fields = implode(",", $fields);
             $values = implode(",", $values);
-            $table = $this->getTableExpressForSQL();
+            $table = $this->getTableExpression();
             $sql = ($shouldReplace ? 'REPLACE' : 'INSERT') . " INTO {$table} ({$fields}) VALUES {$values}";
             $result->setSql($sql);
 
@@ -329,7 +329,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
     {
         $result = new ArkDatabaseQueryResult();
         try {
-            $sql = $method . ' INTO ' . $this->getTableExpressForSQL() . ' ';
+            $sql = $method . ' INTO ' . $this->getTableExpression() . ' ';
             if (count($fields) > 0) {
                 $sql .= 'VALUES (' . implode(',', $fields) . ') ';
             }
@@ -391,7 +391,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
             }
             $fields = implode(",", $fields);
             $values = implode(",", $values);
-            $table = $this->getTableExpressForSQL();
+            $table = $this->getTableExpression();
             $sql = "INSERT INTO {$table} ({$fields}) VALUES {$values} ON DUPLICATE KEY UPDATE ";
 
             $duplicateModificationPairs = [];
