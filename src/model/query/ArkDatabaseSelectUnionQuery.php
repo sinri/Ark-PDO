@@ -1,12 +1,18 @@
 <?php
 
 namespace sinri\ark\database\model\query;
+
+use sinri\ark\database\model\ArkDatabaseSQLReaderTrait;
+use sinri\ark\database\pdo\ArkPDO;
+
 /**
  * @see https://dev.mysql.com/doc/refman/8.0/en/union.html
  * @since 2.1.x
  */
 class ArkDatabaseSelectUnionQuery
 {
+    use ArkDatabaseSQLReaderTrait;
+
     /**
      * @var ArkDatabaseSelectTableQuery[]
      */
@@ -60,4 +66,8 @@ class ArkDatabaseSelectUnionQuery
     }
 
 
+    public function getTargetPDO(): ArkPDO
+    {
+        return $this->selections[0]->getTargetPDO();
+    }
 }

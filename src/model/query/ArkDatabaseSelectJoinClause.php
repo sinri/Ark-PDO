@@ -2,10 +2,13 @@
 
 namespace sinri\ark\database\model\query;
 
+use sinri\ark\database\model\ArkDatabaseSQLBuilderTrait;
 use sinri\ark\database\model\ArkSQLCondition;
 
 class ArkDatabaseSelectJoinClause
 {
+    use ArkDatabaseSQLBuilderTrait;
+
     const INNER_JOIN = 'INNER JOIN';
     const LEFT_JOIN = 'LEFT JOIN';
     const RIGHT_JOIN = 'RIGHT JOIN';
@@ -42,12 +45,7 @@ class ArkDatabaseSelectJoinClause
         return $this;
     }
 
-    public function __toString()
-    {
-        return $this->toJoinSQLClause();
-    }
-
-    public function toJoinSQLClause(): string
+    public function generateSQL(): string
     {
         $anotherTable = $this->joinType . ' ' . $this->tableExpression;
         if (!empty($this->onConditions)) {

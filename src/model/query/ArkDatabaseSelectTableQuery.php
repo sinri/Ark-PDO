@@ -6,9 +6,10 @@ namespace sinri\ark\database\model\query;
 
 use sinri\ark\database\exception\ArkPDOQueryResultEmptySituation;
 use sinri\ark\database\exception\ArkPDOSQLBuilderError;
-use sinri\ark\database\exception\ArkPDOStatementException;
+use sinri\ark\database\model\ArkDatabaseSQLReaderTrait;
 use sinri\ark\database\model\ArkDatabaseTableReaderModel;
 use sinri\ark\database\model\ArkSQLCondition;
+use sinri\ark\database\pdo\ArkPDO;
 
 /**
  * Class ArkDatabaseSelectTableQuery
@@ -17,6 +18,8 @@ use sinri\ark\database\model\ArkSQLCondition;
  */
 class ArkDatabaseSelectTableQuery
 {
+    use ArkDatabaseSQLReaderTrait;
+
     /**
      * @var ArkDatabaseTableReaderModel
      */
@@ -363,44 +366,6 @@ class ArkDatabaseSelectTableQuery
     }
 
     /**
-     * @param string $resultRowCustomizedClass // I wonder if it is useful.
-     * @return ArkDatabaseQueryResult
-     */
-    public function queryForRows($resultRowCustomizedClass = ArkDatabaseQueryResultRow::class): ArkDatabaseQueryResult
-    {
-        $result = new ArkDatabaseQueryResult();
-        try {
-            $sql = $this->generateSQL();
-            $result->setSql($sql);
-
-            // old implementation
-            $all = $this->model->db()->getAll($sql);
-            if (is_array($all)) {
-                foreach ($all as $row) {
-                    $result->addResultRow(new $resultRowCustomizedClass($row));
-                }
-            }
-
-            // new implementation with raw PDO
-//            $rows=$this->model->db()->getAllAsClassInstanceArray($sql,$resultRowCustomizedClass);
-//            $result->addResultRows($rows);
-
-            $result->setStatus(ArkDatabaseQueryResult::STATUS_QUERIED);
-        } catch (ArkPDOStatementException $e) {
-            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
-            $result->setError(
-                'ArkPDOStatementException: ' . $e->getMessage() . ';'
-                . ' SQL: ' . $e->getSql()
-                . ' PDO Last Error: ' . $this->model->db()->getPDOErrorDescription()
-            );
-        } catch (ArkPDOSQLBuilderError $e) {
-            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
-            $result->setError('ArkPDOSQLBuilderError: ' . $e->getMessage() . ' SQL: ' . $e->getWrongSQLPiece());
-        }
-        return $result;
-    }
-
-    /**
      * @return string
      * @throws ArkPDOSQLBuilderError
      */
@@ -452,37 +417,75 @@ class ArkDatabaseSelectTableQuery
         return $sql;
     }
 
-    /**
-     * @return ArkDatabaseQueryResult
-     */
-    public function queryForStream(): ArkDatabaseQueryResult
-    {
-        $result = new ArkDatabaseQueryResult();
-        try {
-            $sql = $this->generateSQL();
-            $result->setSql($sql);
-
-            $statement = $this->model->db()->getPdo()->query($sql);
-            if ($statement === false) {
-                throw new ArkPDOStatementException($sql);
-            }
-
-            $result->setResultRowStream($statement);
-            $result->setStatus(ArkDatabaseQueryResult::STATUS_STREAMING);
-
-        } catch (ArkPDOSQLBuilderError $e) {
-            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
-            $result->setError('ArkPDOSQLBuilderError: ' . $e->getMessage() . ' SQL: ' . $e->getWrongSQLPiece());
-        } catch (ArkPDOStatementException $e) {
-            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
-            $result->setError(
-                'ArkPDOStatementException: ' . $e->getMessage() . ';'
-                . ' SQL: ' . $e->getSql()
-                . ' PDO Last Error: ' . $this->model->db()->getPDOErrorDescription()
-            );
-        }
-        return $result;
-    }
+//    /**
+//     * @param string $resultRowCustomizedClass // I wonder if it is useful.
+//     * @return ArkDatabaseQueryResult
+//     */
+//    public function queryForRows($resultRowCustomizedClass = ArkDatabaseQueryResultRow::class): ArkDatabaseQueryResult
+//    {
+//        $result = new ArkDatabaseQueryResult();
+//        try {
+//            $sql = $this->generateSQL();
+//            $result->setSql($sql);
+//
+//            // old implementation
+//            $all = $this->model->db()->getAll($sql);
+//            if (is_array($all)) {
+//                foreach ($all as $row) {
+//                    $result->addResultRow(new $resultRowCustomizedClass($row));
+//                }
+//            }
+//
+//            // new implementation with raw PDO
+////            $rows=$this->model->db()->getAllAsClassInstanceArray($sql,$resultRowCustomizedClass);
+////            $result->addResultRows($rows);
+//
+//            $result->setStatus(ArkDatabaseQueryResult::STATUS_QUERIED);
+//        } catch (ArkPDOStatementException $e) {
+//            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
+//            $result->setError(
+//                'ArkPDOStatementException: ' . $e->getMessage() . ';'
+//                . ' SQL: ' . $e->getSql()
+//                . ' PDO Last Error: ' . $this->model->db()->getPDOErrorDescription()
+//            );
+//        } catch (ArkPDOSQLBuilderError $e) {
+//            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
+//            $result->setError('ArkPDOSQLBuilderError: ' . $e->getMessage() . ' SQL: ' . $e->getWrongSQLPiece());
+//        }
+//        return $result;
+//    }
+//
+//    /**
+//     * @return ArkDatabaseQueryResult
+//     */
+//    public function queryForStream(): ArkDatabaseQueryResult
+//    {
+//        $result = new ArkDatabaseQueryResult();
+//        try {
+//            $sql = $this->generateSQL();
+//            $result->setSql($sql);
+//
+//            $statement = $this->model->db()->getPdo()->query($sql);
+//            if ($statement === false) {
+//                throw new ArkPDOStatementException($sql);
+//            }
+//
+//            $result->setResultRowStream($statement);
+//            $result->setStatus(ArkDatabaseQueryResult::STATUS_STREAMING);
+//
+//        } catch (ArkPDOSQLBuilderError $e) {
+//            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
+//            $result->setError('ArkPDOSQLBuilderError: ' . $e->getMessage() . ' SQL: ' . $e->getWrongSQLPiece());
+//        } catch (ArkPDOStatementException $e) {
+//            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
+//            $result->setError(
+//                'ArkPDOStatementException: ' . $e->getMessage() . ';'
+//                . ' SQL: ' . $e->getSql()
+//                . ' PDO Last Error: ' . $this->model->db()->getPDOErrorDescription()
+//            );
+//        }
+//        return $result;
+//    }
 
     /**
      * @param int $page
@@ -512,5 +515,10 @@ class ArkDatabaseSelectTableQuery
             }
         }
         return $matrix;
+    }
+
+    public function getTargetPDO(): ArkPDO
+    {
+        return $this->model->db();
     }
 }
