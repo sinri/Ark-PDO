@@ -23,6 +23,10 @@ class ArkDatabaseSelectJoinClause
      */
     protected $tableExpression;
     /**
+     * @var string
+     */
+    protected $alias;
+    /**
      * @var ArkSQLCondition[]
      */
     protected $onConditions;
@@ -31,10 +35,18 @@ class ArkDatabaseSelectJoinClause
      */
     protected $indexHint;
 
-    public function __construct($joinType, $tableExpression, $onConditions = [], $indexHint = '')
+    /**
+     * @param $joinType
+     * @param string|ArkDatabaseSQLBuilderTrait $tableExpression
+     * @param array $onConditions
+     * @param string $alias
+     * @param string $indexHint
+     */
+    public function __construct($joinType, $tableExpression, $onConditions = [], $alias = '', $indexHint = '')
     {
         $this->joinType = $joinType;
         $this->tableExpression = $tableExpression;
+        $this->alias = $alias;
         $this->onConditions = $onConditions;
         $this->indexHint = $indexHint;
     }
@@ -47,7 +59,15 @@ class ArkDatabaseSelectJoinClause
 
     public function generateSQL(): string
     {
-        $anotherTable = $this->joinType . ' ' . $this->tableExpression;
+        $anotherTable = $this->joinType . ' ';
+        if (is_string($this->tableExpression)) {
+            $anotherTable .= $this->tableExpression;
+        } else {
+            $anotherTable .= '(' . $this->tableExpression . ')';
+        }
+        if ($this->alias) {
+            $anotherTable .= ' AS ' . $this->alias;
+        }
         if (!empty($this->onConditions)) {
             $anotherTable .= ' ON ';
             $anotherTable .= ArkSQLCondition::generateConditionSQLComponent($this->onConditions);

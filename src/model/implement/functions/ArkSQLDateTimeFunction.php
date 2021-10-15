@@ -11,6 +11,7 @@ use sinri\ark\database\pdo\ArkPDO;
  * Class ArkSQLDateTimeFunction
  * @package sinri\ark\database\model\implement
  * @since 2.0.24 Experimental
+ * @since 2.1 reconstructed
  */
 class ArkSQLDateTimeFunction extends ArkSQLFunction
 {

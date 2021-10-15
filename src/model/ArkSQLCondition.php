@@ -6,7 +6,7 @@ use sinri\ark\database\exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\pdo\ArkPDO;
 
 /**
- * Greatly Upgraded since 2.1.x
+ * @since 2.1 reconstructed
  */
 class ArkSQLCondition
 {

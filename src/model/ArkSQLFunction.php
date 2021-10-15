@@ -9,6 +9,7 @@ use sinri\ark\database\pdo\ArkPDO;
  * Class ArkSQLFunction
  * @package sinri\ark\database\model
  * @since 2.0.24 Experimental
+ * @since 2.1 reconstructed
  */
 class ArkSQLFunction
 {
@@ -32,12 +33,11 @@ class ArkSQLFunction
     /**
      * ArkSQLFunction constructor.
      * @param string $functionName
-     * @param array $functionParameterArray Each item are raw
      */
-    public function __construct(string $functionName, array $functionParameterArray = [])
+    public function __construct(string $functionName)
     {
         $this->functionName = $functionName;
-        $this->functionParameterArray = $functionParameterArray;
+        $this->functionParameterArray = [];
     }
 
     /**
@@ -79,9 +79,9 @@ class ArkSQLFunction
     /**
      * @return $this
      */
-    public function resetParameterArray()
+    public function resetParameterArray($functionParameterArray = [])
     {
-        $this->functionParameterArray = [];
+        $this->functionParameterArray = $functionParameterArray;
         return $this;
     }
 

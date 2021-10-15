@@ -635,7 +635,7 @@ class ArkPDO
      * @param scalar $x
      * @param string $quoteType
      * @return string
-     * @since 2.1.x
+     * @since 2.1 reconstructed
      */
     public static function quoteScalar($x, $quoteType): string
     {

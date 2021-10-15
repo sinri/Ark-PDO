@@ -12,6 +12,7 @@ use sinri\ark\database\pdo\ArkPDO;
  * Class ArkSQLStringFunction
  * @package sinri\ark\database\model\implement
  * @since 2.0.24 Experimental
+ * @since 2.1 reconstructed
  */
 class ArkSQLStringFunction extends ArkSQLFunction
 {
@@ -123,7 +124,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
         if (count($parts) == 0) {
             throw new ArkPDOSQLBuilderError('CONCAT NEED ONE OR MORE ARGUMENTS');
         }
-        $x = (new static('CONCAT', $parts));
+        $x = (new static('CONCAT'));
         foreach ($parts as $part) {
             $x->appendParameter($part, $quoteType);
         }
@@ -222,13 +223,15 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $substr
      * @param $str
      * @param int|null $pos
-     * @param string $quoteType
+     * @param string $quoteTypeForNeedle
+     * @param string $quoteTypeForHaystack
      * @return static
      */
-    public static function makeLocate($substr, $str, $pos = null, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeLocate($substr, $str, $pos = null, $quoteTypeForNeedle = ArkPDO::QUOTE_TYPE_VALUE, $quoteTypeForHaystack = ArkPDO::QUOTE_TYPE_RAW)
     {
         $x = new static('LOCATE');
-        $x->appendParameter($substr, $quoteType);
+        $x->appendParameter($substr, $quoteTypeForNeedle);
+        $x->appendParameter($str, $quoteTypeForHaystack);
         if ($pos !== null) {
             $x->appendParameter($pos);
         }

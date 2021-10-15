@@ -7,6 +7,7 @@ use sinri\ark\database\pdo\ArkPDO;
 
 /**
  * If expr1 is not NULL, IFNULL() returns expr1; otherwise it returns expr2.
+ * @since 2.1 reconstructed
  */
 class ArkSQLIfNullFunction extends ArkSQLFunction
 {

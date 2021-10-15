@@ -11,6 +11,7 @@ use sinri\ark\database\pdo\ArkPDO;
  * Class ArkSQLMathematicalFunction
  * @package sinri\ark\database\model\implement
  * @since 2.0.24 Experimental
+ * @since 2.1 reconstructed
  */
 class ArkSQLMathematicalFunction extends ArkSQLFunction
 {
@@ -143,12 +144,12 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      */
     public static function makeRound($x, $d = null, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        $x = new static('ROUND');
-        $x->appendParameter($x, $quoteType);
+        $func = new static('ROUND');
+        $func->appendParameter($x, $quoteType);
         if ($d !== null) {
-            $x->appendParameter($d);
+            $func->appendParameter($d);
         }
-        return $x;
+        return $func;
     }
 
     /**

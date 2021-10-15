@@ -8,6 +8,9 @@ use sinri\ark\database\model\query\ArkDatabaseSelectFieldMeta;
 use sinri\ark\database\model\query\ArkDatabaseSelectTableQuery;
 use sinri\ark\database\pdo\ArkPDO;
 
+/**
+ * @since 2.1 reconstructed
+ */
 abstract class ArkDatabaseTableReaderModel
 {
     /**

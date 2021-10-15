@@ -10,6 +10,8 @@ use sinri\ark\database\pdo\ArkPDO;
  * This is the same as CASE WHEN expr1 = expr2 THEN NULL ELSE expr1 END.
  *
  * Note: MySQL evaluates expr1 twice if the arguments are not equal.
+ *
+ * @since 2.1 reconstructed
  */
 class ArkSQLNullIfFunction extends ArkSQLFunction
 {

@@ -6,6 +6,7 @@ namespace sinri\ark\database\model\query;
 
 use sinri\ark\database\exception\ArkPDOQueryResultEmptySituation;
 use sinri\ark\database\exception\ArkPDOSQLBuilderError;
+use sinri\ark\database\model\ArkDatabaseSQLBuilderTrait;
 use sinri\ark\database\model\ArkDatabaseSQLReaderTrait;
 use sinri\ark\database\model\ArkDatabaseTableReaderModel;
 use sinri\ark\database\model\ArkSQLCondition;
@@ -324,8 +325,9 @@ class ArkDatabaseSelectTableQuery
      * @see https://dev.mysql.com/doc/refman/8.0/en/join.html
      *
      * @param string $type
-     * @param ArkDatabaseTableReaderModel $model
+     * @param string|ArkDatabaseTableReaderModel|ArkDatabaseSQLBuilderTrait $joinObject
      * @param ArkSQLCondition[] $onConditions
+     * @param string $alias
      * @param string $indexHint concatenated index hint pieces:
      *
      * Index Hint Piece:
@@ -334,36 +336,90 @@ class ArkDatabaseSelectTableQuery
      *
      * @return ArkDatabaseSelectTableQuery
      */
-    protected function addJoinClause(string $type, ArkDatabaseTableReaderModel $model, array $onConditions, string $indexHint = '')
+    protected function addJoinClause(string $type, $joinObject, array $onConditions, string $alias = '', string $indexHint = '')
     {
+        $tableExpression = $joinObject;
+        if (is_a($joinObject, ArkDatabaseTableReaderModel::class)) {
+            $tableExpression = $joinObject->getTableExpression();
+        }
         $this->joinTables[] = new ArkDatabaseSelectJoinClause(
             $type,// LEFT JOIN, etc.
-            $model->getTableExpression(),
+            $tableExpression,
             $onConditions,
+            $alias,
             $indexHint
         );
         return $this;
     }
 
-    public function innerJoin(ArkDatabaseTableReaderModel $model, array $onConditions, string $indexHint = '')
+    public function innerJoinAnotherTable(ArkDatabaseTableReaderModel $model, array $onConditions, string $alias = '', string $indexHint = '')
     {
-        return $this->addJoinClause(ArkDatabaseSelectJoinClause::INNER_JOIN, $model, $onConditions, $indexHint);
+        return $this->addJoinClause(ArkDatabaseSelectJoinClause::INNER_JOIN, $model, $onConditions, $alias, $indexHint);
     }
 
-    public function leftJoin(ArkDatabaseTableReaderModel $model, array $onConditions, string $indexHint = '')
+    public function leftJoinAnotherTable(ArkDatabaseTableReaderModel $model, array $onConditions, string $alias = '', string $indexHint = '')
     {
-        return $this->addJoinClause(ArkDatabaseSelectJoinClause::LEFT_JOIN, $model, $onConditions, $indexHint);
+        return $this->addJoinClause(ArkDatabaseSelectJoinClause::LEFT_JOIN, $model, $onConditions, $alias, $indexHint);
     }
 
-    public function rightJoin(ArkDatabaseTableReaderModel $model, array $onConditions, string $indexHint = '')
+    public function rightJoinAnotherTable(ArkDatabaseTableReaderModel $model, array $onConditions, string $alias = '', string $indexHint = '')
     {
-        return $this->addJoinClause(ArkDatabaseSelectJoinClause::RIGHT_JOIN, $model, $onConditions, $indexHint);
+        return $this->addJoinClause(ArkDatabaseSelectJoinClause::RIGHT_JOIN, $model, $onConditions, $alias, $indexHint);
     }
 
-    public function straightJoin(ArkDatabaseTableReaderModel $model, array $onConditions, string $indexHint = '')
+    public function straightJoinAnotherTable(ArkDatabaseTableReaderModel $model, array $onConditions, string $alias = '', string $indexHint = '')
     {
-        return $this->addJoinClause(ArkDatabaseSelectJoinClause::STRAIGHT_JOIN, $model, $onConditions, $indexHint);
+        return $this->addJoinClause(ArkDatabaseSelectJoinClause::STRAIGHT_JOIN, $model, $onConditions, $alias, $indexHint);
     }
+
+    /**
+     * @param ArkDatabaseSQLBuilderTrait $builder
+     * @param string $alias
+     * @param ArkSQLCondition[] $onConditions
+     * @param string $indexHint
+     * @return $this
+     */
+    public function innerJoinQueryBlock($builder, string $alias, array $onConditions, string $indexHint = '')
+    {
+        return $this->addJoinClause(ArkDatabaseSelectJoinClause::INNER_JOIN, $builder, $onConditions, $alias, $indexHint);
+    }
+
+    /**
+     * @param ArkDatabaseSQLBuilderTrait $builder
+     * @param string $alias
+     * @param ArkSQLCondition[] $onConditions
+     * @param string $indexHint
+     * @return $this
+     */
+    public function leftJoinQueryBlock($builder, string $alias, array $onConditions, string $indexHint = '')
+    {
+        return $this->addJoinClause(ArkDatabaseSelectJoinClause::LEFT_JOIN, $builder, $onConditions, $alias, $indexHint);
+    }
+
+    /**
+     * @param ArkDatabaseSQLBuilderTrait $builder
+     * @param string $alias
+     * @param ArkSQLCondition[] $onConditions
+     * @param string $indexHint
+     * @return $this
+     */
+    public function rightJoinQueryBlock($builder, string $alias, array $onConditions, string $indexHint = '')
+    {
+        return $this->addJoinClause(ArkDatabaseSelectJoinClause::RIGHT_JOIN, $builder, $onConditions, $alias, $indexHint);
+    }
+
+    /**
+     * @param ArkDatabaseSQLBuilderTrait $builder
+     * @param string $alias
+     * @param ArkSQLCondition[] $onConditions
+     * @param string $indexHint
+     * @return $this
+     */
+    public function straightJoinQueryBlock($builder, string $alias, array $onConditions, string $indexHint = '')
+    {
+        return $this->addJoinClause(ArkDatabaseSelectJoinClause::STRAIGHT_JOIN, $builder, $onConditions, $alias, $indexHint);
+    }
+
 
     /**
      * @return string

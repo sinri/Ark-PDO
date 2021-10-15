@@ -23,7 +23,7 @@ $tableD = new ArkDatabaseDynamicTableModel($db, 'd', 'sinri');
 $selection = (new ArkDatabaseSelectTableQuery($tableC));
 $selection->addSelectFieldByDetail($tableC->getFieldExpression('id'), 'ID');
 $selection->addSelectFieldByDetail($tableD->getFieldExpression('score'), 'SCORE');
-$selection->leftJoin(
+$selection->leftJoinAnotherTable(
     $tableD,
     [
         ArkSQLCondition::for($tableC->getFieldExpression('id'))
@@ -46,3 +46,28 @@ $unionSelection = new ArkDatabaseSelectUnionQuery($selection);
 $unionSelection->union($selection2);
 $unionSelection->setSortExpression('score desc');
 echo $unionSelection->generateSQL() . PHP_EOL;
+
+$selection3 = new ArkDatabaseSelectTableQuery($tableC);
+$selection3->addSelectFieldByDetail($tableC->getFieldExpression('id'), 'ID');
+$selection3->addSelectFieldByDetail($tableD->getFieldExpression('score'), 'SCORE');
+$selection3->rightJoinAnotherTable(
+    $tableD,
+    [
+        ArkSQLCondition::for($tableC->getFieldExpression('id'))
+            ->equal($tableD->getFieldExpression('id'), ArkPDO::QUOTE_TYPE_RAW),
+    ]
+);
+$selection3->addCondition(
+    ArkSQLCondition::for($tableD->getFieldExpression('value'))
+        ->havePrefix('A')
+);
+$selection3->setSortExpression('SCORE desc, ' . $tableC->getFieldExpression('name'));
+
+$selection3->innerJoinQueryBlock(
+    $unionSelection,
+    't',
+    [
+        ArkSQLCondition::for('t.ID')->equal($tableC->getFieldExpression('id'))
+    ]
+);
+echo $selection3->generateSQL() . PHP_EOL;

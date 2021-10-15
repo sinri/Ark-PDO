@@ -1,20 +1,20 @@
 {
-    "_readme": [
-        "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
-        "This file is @generated automatically"
-    ],
-    "content-hash": "6d1f8b42a514d12a5d53e8e8808021f3",
-    "packages": [
-        {
-            "name": "psr/log",
-            "version": "1.1.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-fig/log.git",
-                "reference": "d49695b909c3b7628b6289db5479a1c204601f11"
-            },
-            "dist": {
+  "_readme": [
+    "This file locks the dependencies of your project to a known state",
+    "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+    "This file is @generated automatically"
+  ],
+  "content-hash": "f15aa71c373cc4de6abb231ada5686ed",
+  "packages": [
+    {
+      "name": "psr/log",
+      "version": "1.1.4",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/php-fig/log.git",
+        "reference": "d49695b909c3b7628b6289db5479a1c204601f11"
+      },
+      "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/php-fig/log/zipball/d49695b909c3b7628b6289db5479a1c204601f11",
                 "reference": "d49695b909c3b7628b6289db5479a1c204601f11",
@@ -62,26 +62,26 @@
             },
             "time": "2021-05-03T11:20:27+00:00"
         },
-        {
-            "name": "sinri/ark-core",
-            "version": "2.7.12",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sinri/Ark-Core.git",
-                "reference": "87bea4d2572a05b0b5bf120227116df56a63d26d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sinri/Ark-Core/zipball/87bea4d2572a05b0b5bf120227116df56a63d26d",
-                "reference": "87bea4d2572a05b0b5bf120227116df56a63d26d",
-                "shasum": "",
-                "mirrors": [
-                    {
-                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
-                        "preferred": true
-                    }
-                ]
-            },
+    {
+      "name": "sinri/ark-core",
+      "version": "2.7.21",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/sinri/Ark-Core.git",
+        "reference": "5e4628bc9a53827f31b020520d3bd02dd415c219"
+      },
+      "dist": {
+        "type": "zip",
+        "url": "https://api.github.com/repos/sinri/Ark-Core/zipball/5e4628bc9a53827f31b020520d3bd02dd415c219",
+        "reference": "5e4628bc9a53827f31b020520d3bd02dd415c219",
+        "shasum": "",
+        "mirrors": [
+          {
+            "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+            "preferred": true
+          }
+        ]
+      },
             "require": {
                 "ext-json": "*",
                 "psr/log": "~1.0"
@@ -108,9 +108,9 @@
             "description": "The core components of Ark 2",
             "support": {
                 "issues": "https://github.com/sinri/Ark-Core/issues",
-                "source": "https://github.com/sinri/Ark-Core/tree/2.7.12"
+              "source": "https://github.com/sinri/Ark-Core/tree/2.7.21"
             },
-            "time": "2021-04-11T05:36:41+00:00"
+      "time": "2021-10-15T03:42:09+00:00"
         }
     ],
     "packages-dev": [],

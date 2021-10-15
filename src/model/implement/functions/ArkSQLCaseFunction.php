@@ -6,6 +6,9 @@ use sinri\ark\database\exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\model\ArkSQLFunction;
 use sinri\ark\database\pdo\ArkPDO;
 
+/**
+ * @since 2.1 reconstructed
+ */
 class ArkSQLCaseFunction extends ArkSQLFunction
 {
     /**
@@ -17,35 +20,36 @@ class ArkSQLCaseFunction extends ArkSQLFunction
      */
     protected $tempWhen;
 
-    public function __construct(string $functionName, array $functionParameterArray = [], $asStatement = false)
+    public function __construct(string $functionName, $asStatement = false)
     {
-        parent::__construct($functionName, $functionParameterArray);
+        parent::__construct($functionName);
         $this->asStatement = $asStatement;
     }
 
     public static function makeCaseFunction($target, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new self(
-            'CASE',
+        $func = new self('CASE');
+        $func->resetParameterArray(
             [
                 'target' => ArkPDO::quoteScalar($target, $quoteType),
                 'branches' => [],
                 'else' => null,
             ]
         );
+        return $func;
     }
 
     public static function makeCaseStatement($target, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
     {
-        return new self(
-            'CASE',
+        $func = new self('CASE', true);
+        $func->resetParameterArray(
             [
-                'target' => $target,
+                'target' => ArkPDO::quoteScalar($target, $quoteType),
                 'branches' => [],
                 'else' => null,
-            ],
-            true
+            ]
         );
+        return $func;
     }
 
     public function when($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)

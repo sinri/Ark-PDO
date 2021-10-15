@@ -8,6 +8,9 @@ use sinri\ark\database\model\query\ArkDatabaseQueryResult;
 use sinri\ark\database\model\query\ArkDatabaseQueryResultRow;
 use sinri\ark\database\pdo\ArkPDO;
 
+/**
+ * @since 2.1 reconstructed
+ */
 trait ArkDatabaseSQLReaderTrait
 {
     use ArkDatabaseSQLBuilderTrait;
