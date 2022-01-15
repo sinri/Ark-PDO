@@ -214,10 +214,10 @@ class ArkPDO
 
     /**
      * @param string $sql
-     * @return mixed|bool
+     * @return mixed
      * @throws ArkPDOStatementException
      */
-    public function getOne(string $sql): bool
+    public function getOne(string $sql)
     {
         $stmt = $this->buildPDOStatement($sql);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
