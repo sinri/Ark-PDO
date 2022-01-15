@@ -388,7 +388,7 @@ class ArkPDO
      * @return mixed
      * @throws ArkPDOStatementException
      */
-    public function safeQueryRow(string $sql, $values = array()): bool
+    public function safeQueryRow(string $sql, $values = array())
     {
         $sth = $this->buildPDOStatement($sql, true);
         if ($sth->execute($values)) {
