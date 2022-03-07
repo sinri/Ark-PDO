@@ -21,33 +21,7 @@ use sinri\ark\database\pdo\ArkPDO;
 abstract class ArkDatabaseTableCoreModel
 {
 
-    /**
-     * @return null|string
-     * @since 1.6.2
-     */
-    abstract public function mappingSchemeName();
-
-    /**
-     * @return string
-     * @since 1.6.2
-     */
-    abstract public function mappingTableName();
-
-    /**
-     * @return string
-     * @since 1.6.2
-     */
-    public function getTableExpressForSQL()
-    {
-        $e = ($this->mappingSchemeName() === null ? "" : '`' . $this->mappingSchemeName() . "`.");
-        $e .= "`" . $this->mappingTableName() . "`";
-        return $e;
-    }
-
-    /**
-     * @return ArkPDO
-     */
-    abstract public function db();
+    protected $fields;
 
     /**
      * @return false|string
@@ -55,83 +29,6 @@ abstract class ArkDatabaseTableCoreModel
     public static function now()
     {
         return date('Y-m-d H:i:s');
-    }
-
-    /**
-     * @param string|array|ArkSQLCondition[] $conditions It might be the condition sql (the string after WHERE), or the key-value array, with FIELD-VALUE or KEY-ArkSQLCondition format.
-     * @param string $glue
-     * @return string
-     * @throws ArkPDOSQLBuilderError
-     */
-    protected final function buildCondition($conditions, $glue = ' AND ')
-    {
-        $condition_sql = "";
-        if (is_string($conditions)) {
-            $condition_sql = $conditions;
-        } elseif (is_array($conditions)) {
-            $c = [];
-            foreach ($conditions as $key => $value) {
-                if (is_a($value, ArkSQLCondition::class)) {
-                    // since 1.7.9, mistakes here would be thrown
-                    $c[] = $value->makeConditionSQL();
-                } else {
-                    if (is_array($value)) {
-                        $x = [];
-                        foreach ($value as $value_piece) {
-                            $x[] = $this->db()->quote($value_piece);
-                        }
-                        $x = implode(",", $x);
-                        $c[] = " `{$key}` in (" . $x . ") ";
-                    } else {
-                        $c[] = " `{$key}`=" . $this->db()->quote($value) . " ";
-                    }
-                }
-            }
-            $condition_sql = implode($glue, $c);
-        }
-        return trim($condition_sql);
-    }
-
-    /**
-     * @param array $valuesForOneRow [field_name=>value], NULL for NULL.
-     * @return string
-     * @since 1.7.4
-     */
-    protected function buildRowValuesForUpdate($valuesForOneRow)
-    {
-        $sql = [];
-        foreach ($valuesForOneRow as $key => $value) {
-            if ($value === null) {
-                $part = "`{$key}`=NULL";
-            } else {
-                $part = "`{$key}`=" . $this->db()->quote($value);
-            }
-            $sql[] = $part;
-        }
-        return implode(",", $sql);
-    }
-
-    /**
-     * @param array $valuesForOneRow [field_name=>value], NULL for NULL.
-     * @param string $fields as output
-     * @return string
-     * @since 1.7.4
-     */
-    protected function buildRowValuesForWrite($valuesForOneRow, &$fields = null)
-    {
-        $sql = [];
-        $fields = [];
-        foreach ($valuesForOneRow as $key => $value) {
-            $fields[] = "`{$key}`";
-            if ($value === null) {
-                $part = "NULL";
-            } else {
-                $part = $this->db()->quote($value);
-            }
-            $sql[] = $part;
-        }
-        $fields = implode(",", $fields);
-        return implode(",", $sql);
     }
 
     /**
@@ -151,136 +48,6 @@ abstract class ArkDatabaseTableCoreModel
     {
         $sql = $this->makeSelectSQL($field, $conditions, $orderBy, $limit, $offset, $groupBy, $having);
         return $this->db()->getOne($sql);
-    }
-
-    /**
-     * @param array|string $conditions
-     * @param string|string[] $field Remove limitation of string for group by situation
-     * @param null|string $orderBy
-     * @param null|string[] $groupBy
-     * @param int $limit
-     * @param int $offset
-     * @param null|int|string $useAnotherKeyToFetch maybe you need field name, alias, index
-     * @param string|null $having since 1.8.4
-     * @return array
-     * @throws ArkPDOSQLBuilderError
-     * @throws ArkPDOStatementException
-     * @since 1.7.6
-     * @since 1.8.0 would throw exceptions on failure
-     * @since 1.8.2 fix the ambiguous point between $useAnotherKeyToFetch and $field
-     */
-    public function selectColumn($conditions, $field, $orderBy = null, $groupBy = null, $limit = 0, $offset = 0, $useAnotherKeyToFetch = null, $having = null)
-    {
-        $sql = $this->makeSelectSQL($field, $conditions, $orderBy, $limit, $offset, $groupBy, $having);
-        return $this->db()->getCol($sql, ($useAnotherKeyToFetch === null ? $field : $useAnotherKeyToFetch));
-    }
-
-    /**
-     * @param array|string $conditions
-     * @param string|string[] $fields "*","f1,f2" or ["f1","f2"] @since 1.2
-     * @param null|string[] $groupBy @since 1.5
-     * @param null|string $having @since 1.8.4
-     * @return array
-     * @throws ArkPDOExecutedWithEmptyResultSituation
-     * @since 1.8.0 would throw exceptions on failure
-     */
-    public function selectRow($conditions, $fields = "*", $groupBy = null, $having = null)
-    {
-        $sql = $this->makeSelectSQL($fields, $conditions, null, 1, 0, $groupBy, $having);
-        return $this->db()->getRow($sql);
-    }
-
-
-    /**
-     * @param array|string $conditions
-     * @param int $limit
-     * @param int $offset
-     * @param string|string[] $fields "*","f1,f2" or ["f1","f2"] @since 1.2
-     * @param null|string[] $groupBy @since 1.5
-     * @return array
-     * @throws ArkPDOSQLBuilderError
-     * @throws ArkPDOStatementException
-     * @deprecated @since 1.8.0 use selectRowsForFieldsWithSort instead
-     * @since 1.8.0 would throw exceptions on failure
-     */
-    public function selectRows($conditions, $limit = 0, $offset = 0, $fields = "*", $groupBy = null)
-    {
-        return $this->selectRowsForFieldsWithSort($fields, $conditions, null, $limit, $offset, null, $groupBy);
-    }
-
-    /**
-     * @param array|string $conditions
-     * @param string $countField @since 1.5.2
-     * @param bool $useDistinct @since 1.5.2
-     * @return int
-     * @since 1.8.0 would throw exceptions on failure
-     */
-    public function selectRowsForCount($conditions, $countField = '*', $useDistinct = false)
-    {
-        $condition_sql = $this->buildCondition($conditions);
-        if ($condition_sql === '') {
-            $condition_sql = "1";
-        }
-
-        if ($countField === '*') {
-            $countTarget = "*";
-        } else {
-            $countTarget = ($useDistinct ? "DISTINCT " : '') . $countField;
-        }
-
-        $table = $this->getTableExpressForSQL();
-        $sql = "SELECT count({$countTarget}) FROM {$table} WHERE {$condition_sql} ";
-
-        try {
-            $count = $this->db()->getOne($sql);
-            return intval($count);
-        } catch (ArkPDOExecutedWithEmptyResultSituation $e) {
-            // Note: the count sql should not unfetchable unless SQL error.
-            throw new ArkPDOStatementException($e->getRelatedSQL(), $e->getCode(), $e);
-        }
-    }
-
-    /**
-     * @param $conditions
-     * @param null|string $sort "field","field desc"," f1 asc, f2 desc"
-     * @param int $limit
-     * @param int $offset
-     * @param null|string $refKey normally PK or UK if you want to get map rather than list
-     * @param null|string[] $groupBy @since 1.5
-     * @return array
-     * @throws ArkPDOSQLBuilderError
-     * @throws ArkPDOStatementException
-     * @deprecated @since 1.7.3 Please use `selectRowsForFieldsWithSort` instead!
-     * @since 1.8.0 would throw exceptions on failure
-     */
-    public function selectRowsWithSort($conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null, $groupBy = null)
-    {
-        return $this->selectRowsForFieldsWithSort("*", $conditions, $sort, $limit, $offset, $refKey, $groupBy);
-    }
-
-    /**
-     * @param string|string[] $fields such as '*', 'field_1,field_2 as x,sum(field_3)' or ['field_1','field_2 as x','sum(field_3)']
-     * @param array|string $conditions
-     * @param null|string $sort "field","field desc"," f1 asc, f2 desc"
-     * @param int $limit
-     * @param int $offset
-     * @param null|string $refKey normally PK or UK if you want to get map rather than list
-     * @param null|string[] $groupBy @since 1.5
-     * @param null|string $having @since 1.8.4
-     * @return array
-     * @throws ArkPDOSQLBuilderError
-     * @throws ArkPDOStatementException
-     * @since 1.2
-     * @since 1.8.0 would throw exceptions on failure
-     */
-    public function selectRowsForFieldsWithSort($fields, $conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null, $groupBy = null, $having = null)
-    {
-        $sql = $this->makeSelectSQL($fields, $conditions, $sort, $limit, $offset, $groupBy, $having);
-        $all = $this->db()->getAll($sql);
-        if ($refKey) {
-            $all = ArkHelper::turnListToMapping($all, $refKey);
-        }
-        return $all;
     }
 
     /**
@@ -341,26 +108,196 @@ abstract class ArkDatabaseTableCoreModel
     }
 
     /**
-     * @param array $data
-     * @param string|null $pk
-     * @param bool $shouldReplace
-     * @return int
-     * @throws ArkPDOExecuteFailedError
-     * @throws ArkPDOExecuteNotAffectedError
+     * @param string|array|ArkSQLCondition[] $conditions It might be the condition sql (the string after WHERE), or the key-value array, with FIELD-VALUE or KEY-ArkSQLCondition format.
+     * @param string $glue
+     * @return string
+     * @throws ArkPDOSQLBuilderError
+     */
+    protected final function buildCondition($conditions, $glue = ' AND ')
+    {
+        $condition_sql = "";
+        if (is_string($conditions)) {
+            $condition_sql = $conditions;
+        } elseif (is_array($conditions)) {
+            $c = [];
+            foreach ($conditions as $key => $value) {
+                if (is_a($value, ArkSQLCondition::class)) {
+                    // since 1.7.9, mistakes here would be thrown
+                    $c[] = $value->makeConditionSQL();
+                } else {
+                    if (is_array($value)) {
+                        $x = [];
+                        foreach ($value as $value_piece) {
+                            $x[] = $this->db()->quote($value_piece);
+                        }
+                        $x = implode(",", $x);
+                        $c[] = " `{$key}` in (" . $x . ") ";
+                    } else {
+                        $c[] = " `{$key}`=" . $this->db()->quote($value) . " ";
+                    }
+                }
+            }
+            $condition_sql = implode($glue, $c);
+        }
+        return trim($condition_sql);
+    }
+
+    /**
+     * @return ArkPDO
+     */
+    abstract public function db();
+
+    /**
+     * @return string
+     * @since 1.6.2
+     */
+    public function getTableExpressForSQL()
+    {
+        $e = ($this->mappingSchemeName() === null ? "" : '`' . $this->mappingSchemeName() . "`.");
+        $e .= "`" . $this->mappingTableName() . "`";
+        return $e;
+    }
+
+    /**
+     * @return null|string
+     * @since 1.6.2
+     */
+    abstract public function mappingSchemeName();
+
+    /**
+     * @return string
+     * @since 1.6.2
+     */
+    abstract public function mappingTableName();
+
+    /**
+     * @param array|string $conditions
+     * @param string|string[] $field Remove limitation of string for group by situation
+     * @param null|string $orderBy
+     * @param null|string[] $groupBy
+     * @param int $limit
+     * @param int $offset
+     * @param null|int|string $useAnotherKeyToFetch maybe you need field name, alias, index
+     * @param string|null $having since 1.8.4
+     * @return array
+     * @throws ArkPDOSQLBuilderError
+     * @throws ArkPDOStatementException
+     * @since 1.7.6
+     * @since 1.8.0 would throw exceptions on failure
+     * @since 1.8.2 fix the ambiguous point between $useAnotherKeyToFetch and $field
+     */
+    public function selectColumn($conditions, $field, $orderBy = null, $groupBy = null, $limit = 0, $offset = 0, $useAnotherKeyToFetch = null, $having = null)
+    {
+        $sql = $this->makeSelectSQL($field, $conditions, $orderBy, $limit, $offset, $groupBy, $having);
+        return $this->db()->getCol($sql, ($useAnotherKeyToFetch === null ? $field : $useAnotherKeyToFetch));
+    }
+
+    /**
+     * @param array|string $conditions
+     * @param string|string[] $fields "*","f1,f2" or ["f1","f2"] @since 1.2
+     * @param null|string[] $groupBy @since 1.5
+     * @param null|string $having @since 1.8.4
+     * @return array
+     * @throws ArkPDOExecutedWithEmptyResultSituation
      * @since 1.8.0 would throw exceptions on failure
      */
-    protected function writeInto($data, $pk = null, $shouldReplace = false)
+    public function selectRow($conditions, $fields = "*", $groupBy = null, $having = null)
     {
-        $table = $this->getTableExpressForSQL();
-        $values = $this->buildRowValuesForWrite($data, $fields);
+        $sql = $this->makeSelectSQL($fields, $conditions, null, 1, 0, $groupBy, $having);
+        return $this->db()->getRow($sql);
+    }
 
-        if ($shouldReplace) {
-            $sql = "REPLACE INTO {$table} ({$fields}) VALUES ({$values})";
-            return $this->db()->insert($sql);
-        } else {
-            $sql = "INSERT INTO {$table} ({$fields}) VALUES ({$values})";
-            return $this->db()->insert($sql, $pk);
+
+    /**
+     * @param array|string $conditions
+     * @param int $limit
+     * @param int $offset
+     * @param string|string[] $fields "*","f1,f2" or ["f1","f2"] @since 1.2
+     * @param null|string[] $groupBy @since 1.5
+     * @return array
+     * @throws ArkPDOSQLBuilderError
+     * @throws ArkPDOStatementException
+     * @deprecated @since 1.8.0 use selectRowsForFieldsWithSort instead
+     * @since 1.8.0 would throw exceptions on failure
+     */
+    public function selectRows($conditions, $limit = 0, $offset = 0, $fields = "*", $groupBy = null)
+    {
+        return $this->selectRowsForFieldsWithSort($fields, $conditions, null, $limit, $offset, null, $groupBy);
+    }
+
+    /**
+     * @param string|string[] $fields such as '*', 'field_1,field_2 as x,sum(field_3)' or ['field_1','field_2 as x','sum(field_3)']
+     * @param array|string $conditions
+     * @param null|string $sort "field","field desc"," f1 asc, f2 desc"
+     * @param int $limit
+     * @param int $offset
+     * @param null|string $refKey normally PK or UK if you want to get map rather than list
+     * @param null|string[] $groupBy @since 1.5
+     * @param null|string $having @since 1.8.4
+     * @return array
+     * @throws ArkPDOSQLBuilderError
+     * @throws ArkPDOStatementException
+     * @since 1.2
+     * @since 1.8.0 would throw exceptions on failure
+     */
+    public function selectRowsForFieldsWithSort($fields, $conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null, $groupBy = null, $having = null)
+    {
+        $sql = $this->makeSelectSQL($fields, $conditions, $sort, $limit, $offset, $groupBy, $having);
+        $all = $this->db()->getAll($sql);
+        if ($refKey) {
+            $all = ArkHelper::turnListToMapping($all, $refKey);
         }
+        return $all;
+    }
+
+    /**
+     * @param array|string $conditions
+     * @param string $countField @since 1.5.2
+     * @param bool $useDistinct @since 1.5.2
+     * @return int
+     * @since 1.8.0 would throw exceptions on failure
+     */
+    public function selectRowsForCount($conditions, $countField = '*', $useDistinct = false)
+    {
+        $condition_sql = $this->buildCondition($conditions);
+        if ($condition_sql === '') {
+            $condition_sql = "1";
+        }
+
+        if ($countField === '*') {
+            $countTarget = "*";
+        } else {
+            $countTarget = ($useDistinct ? "DISTINCT " : '') . $countField;
+        }
+
+        $table = $this->getTableExpressForSQL();
+        $sql = "SELECT count({$countTarget}) FROM {$table} WHERE {$condition_sql} ";
+
+        try {
+            $count = $this->db()->getOne($sql);
+            return intval($count);
+        } catch (ArkPDOExecutedWithEmptyResultSituation $e) {
+            // Note: the count sql should not unfetchable unless SQL error.
+            throw new ArkPDOStatementException($e->getRelatedSQL(), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * @param $conditions
+     * @param null|string $sort "field","field desc"," f1 asc, f2 desc"
+     * @param int $limit
+     * @param int $offset
+     * @param null|string $refKey normally PK or UK if you want to get map rather than list
+     * @param null|string[] $groupBy @since 1.5
+     * @return array
+     * @throws ArkPDOSQLBuilderError
+     * @throws ArkPDOStatementException
+     * @deprecated @since 1.7.3 Please use `selectRowsForFieldsWithSort` instead!
+     * @since 1.8.0 would throw exceptions on failure
+     */
+    public function selectRowsWithSort($conditions, $sort = null, $limit = 0, $offset = 0, $refKey = null, $groupBy = null)
+    {
+        return $this->selectRowsForFieldsWithSort("*", $conditions, $sort, $limit, $offset, $refKey, $groupBy);
     }
 
     /**
@@ -406,6 +343,65 @@ abstract class ArkDatabaseTableCoreModel
 
     /**
      * @param array $data
+     * @param string|null $pk
+     * @param bool $shouldReplace
+     * @return int
+     * @throws ArkPDOExecuteFailedError
+     * @throws ArkPDOExecuteNotAffectedError
+     * @since 1.8.0 would throw exceptions on failure
+     */
+    protected function writeInto($data, $pk = null, $shouldReplace = false, $shouldIgnore = false)
+    {
+        $table = $this->getTableExpressForSQL();
+        $values = $this->buildRowValuesForWrite($data, $fields);
+
+        if ($shouldReplace) {
+            $sql = "REPLACE INTO {$table} ({$fields}) VALUES ({$values})";
+            return $this->db()->insert($sql);
+        } else {
+            $sql = "INSERT " . ($shouldIgnore ? "IGNORE" : "") . " INTO {$table} ({$fields}) VALUES ({$values})";
+            return $this->db()->insert($sql, $pk);
+        }
+    }
+
+    /**
+     * @param array $valuesForOneRow [field_name=>value], NULL for NULL.
+     * @param string $fields as output
+     * @return string
+     * @since 1.7.4
+     */
+    protected function buildRowValuesForWrite($valuesForOneRow, &$fields = null)
+    {
+        $sql = [];
+        $fields = [];
+        foreach ($valuesForOneRow as $key => $value) {
+            $fields[] = "`{$key}`";
+            if ($value === null) {
+                $part = "NULL";
+            } else {
+                $part = $this->db()->quote($value);
+            }
+            $sql[] = $part;
+        }
+        $fields = implode(",", $fields);
+        return implode(",", $sql);
+    }
+
+    /**
+     * @param array $data
+     * @param string|null $pk
+     * @return int
+     * @throws ArkPDOExecuteFailedError
+     * @throws ArkPDOExecuteNotAffectedError
+     * @since 1.8.15
+     */
+    public function insertIgnore($data, $pk = null)
+    {
+        return $this->writeInto($data, $pk, false, true);
+    }
+
+    /**
+     * @param array $data
      * @return int
      * @throws ArkPDOExecuteFailedError
      * @throws ArkPDOExecuteNotAffectedError
@@ -439,6 +435,25 @@ abstract class ArkDatabaseTableCoreModel
     }
 
     /**
+     * @param array $valuesForOneRow [field_name=>value], NULL for NULL.
+     * @return string
+     * @since 1.7.4
+     */
+    protected function buildRowValuesForUpdate($valuesForOneRow)
+    {
+        $sql = [];
+        foreach ($valuesForOneRow as $key => $value) {
+            if ($value === null) {
+                $part = "`{$key}`=NULL";
+            } else {
+                $part = "`{$key}`=" . $this->db()->quote($value);
+            }
+            $sql[] = $part;
+        }
+        return implode(",", $sql);
+    }
+
+    /**
      * @param $conditions
      * @return int
      * @throws ArkPDOExecuteFailedError
@@ -461,6 +476,33 @@ abstract class ArkDatabaseTableCoreModel
     /**
      * @param array[] $dataList
      * @param string|null $pk
+     * @return int
+     * @throws ArkPDOExecuteFailedError
+     * @throws ArkPDOExecuteNotAffectedError
+     * @throws ArkPDOSQLBuilderError
+     * @since 1.8.0 would throw exceptions on failure
+     */
+    public function batchInsert($dataList, $pk = null)
+    {
+        return $this->batchWriteInto($dataList, $pk);
+    }
+
+    /**
+     * @param array[] $dataList
+     * @param string|null $pk
+     * @return int
+     * @throws ArkPDOExecuteFailedError
+     * @throws ArkPDOExecuteNotAffectedError
+     * @since 1.8.15
+     */
+    public function batchInsertIgnore($dataList, $pk = null)
+    {
+        return $this->batchWriteInto($dataList, $pk, false, true);
+    }
+
+    /**
+     * @param array[] $dataList
+     * @param string|null $pk
      * @param bool $shouldReplace
      * @return int
      * @throws ArkPDOExecuteFailedError
@@ -468,7 +510,7 @@ abstract class ArkDatabaseTableCoreModel
      * @throws ArkPDOSQLBuilderError
      * @since 1.8.0 would throw exceptions on failure
      */
-    protected function batchWriteInto($dataList, $pk = null, $shouldReplace = false)
+    protected function batchWriteInto($dataList, $pk = null, $shouldReplace = false, $shouldIgnore = false)
     {
         $fields = [];
         $values = [];
@@ -489,24 +531,10 @@ abstract class ArkDatabaseTableCoreModel
             $sql = "REPLACE INTO {$table} ({$fields}) VALUES {$values}";
             return $this->db()->exec($sql);
         } else {
-            $sql = "INSERT INTO {$table} ({$fields}) VALUES {$values}";
+            $sql = "INSERT " . ($shouldIgnore ? "IGNORE" : "") . " INTO {$table} ({$fields}) VALUES {$values}";
             return $this->db()->insert($sql, $pk);
         }
 
-    }
-
-    /**
-     * @param array[] $dataList
-     * @param string|null $pk
-     * @return int
-     * @throws ArkPDOExecuteFailedError
-     * @throws ArkPDOExecuteNotAffectedError
-     * @throws ArkPDOSQLBuilderError
-     * @since 1.8.0 would throw exceptions on failure
-     */
-    public function batchInsert($dataList, $pk = null)
-    {
-        return $this->batchWriteInto($dataList, $pk);
     }
 
     /**
@@ -559,6 +587,21 @@ abstract class ArkDatabaseTableCoreModel
     }
 
     /**
+     * When you design a model for a certain table which is eventually designed,
+     * you might run this method to get `@property` lines for the model class PHPDoc.
+     * @throws ArkPDOStatementException
+     * @throws EnsureItemException
+     */
+    public function devShowFieldsForPHPDoc()
+    {
+        echo "THIS IS A HELPER FOR DEV." . PHP_EOL;
+        $fieldDefinition = $this->loadTableDesc();
+        foreach ($fieldDefinition as $definition) {
+            echo " * @property " . $definition->getTypeCategory() . ' ' . $definition->getName() . PHP_EOL;
+        }
+    }
+
+    /**
      * @return ArkDatabaseTableFieldDefinition[]
      * @throws EnsureItemException
      * @throws ArkPDOStatementException
@@ -575,23 +618,6 @@ abstract class ArkDatabaseTableCoreModel
         }
         return $fieldDefinition;
     }
-
-    /**
-     * When you design a model for a certain table which is eventually designed,
-     * you might run this method to get `@property` lines for the model class PHPDoc.
-     * @throws ArkPDOStatementException
-     * @throws EnsureItemException
-     */
-    public function devShowFieldsForPHPDoc()
-    {
-        echo "THIS IS A HELPER FOR DEV." . PHP_EOL;
-        $fieldDefinition = $this->loadTableDesc();
-        foreach ($fieldDefinition as $definition) {
-            echo " * @property " . $definition->getTypeCategory() . ' ' . $definition->getName() . PHP_EOL;
-        }
-    }
-
-    protected $fields;
 
     /**
      * 如果model类里定义了字段名作为property，此方法可以加载一行的关联数组的数据以复写
