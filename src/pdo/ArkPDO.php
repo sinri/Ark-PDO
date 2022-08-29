@@ -18,6 +18,9 @@ use sinri\ark\database\exception\ArkPDORollbackSituation;
 use sinri\ark\database\exception\ArkPDOSQLBuilderError;
 use sinri\ark\database\exception\ArkPDOStatementException;
 
+/**
+ * @since 2.2 support Sqlite3
+ */
 class ArkPDO
 {
     /**
@@ -69,56 +72,7 @@ class ArkPDO
             throw new ArkPDOConfigError();
         }
 
-        $engine = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_ENGINE, ArkPDOConfig::ENGINE_MYSQL);
-        $host = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_HOST);
-        $port = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_PORT);
-        $username = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_USERNAME);
-        $password = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_PASSWORD);
-        $database = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_DATABASE);
-        $charset = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_CHARSET, ArkPDOConfig::CHARSET_UTF8);
-        $options = $this->pdoConfig->getConfigField(ArkPDOConfig::CONFIG_OPTIONS);
-
-        $pairs = [
-            ArkPDOConfig::CONFIG_HOST => $host,
-            ArkPDOConfig::CONFIG_PORT => $port,
-            ArkPDOConfig::CONFIG_USERNAME => $username,
-            ArkPDOConfig::CONFIG_PASSWORD => $password,
-            ArkPDOConfig::CONFIG_CHARSET => $charset,
-        ];
-        foreach ($pairs as $fieldName => $fieldValue) {
-            if (empty($fieldValue)) {
-                throw new ArkPDOConfigError($fieldName, $fieldValue);
-            }
-        }
-
-        $engine = strtolower($engine);
-        switch ($engine) {
-            case ArkPDOConfig::ENGINE_MYSQL:
-                if ($options === null) {
-                    $options = [
-                        PDO::ATTR_EMULATE_PREPARES => false
-                    ];
-                }
-                $dsn = "mysql:host={$host};port={$port};charset={$charset}";
-                if (!empty($database)) {
-                    $dsn .= ";dbname={$database}";
-                }
-                $this->pdo = new PDO(
-                    $dsn,
-                    $username,
-                    $password,
-                    $options
-                );
-                if (!empty($database)) {
-                    $this->pdo->exec("use `{$database}`;");
-                }
-                if (!empty($charset)) {
-                    $this->pdo->query("set names " . $charset);
-                }
-                break;
-            default:
-                throw new ArkPDOConfigError(ArkPDOConfig::CONFIG_ENGINE, $engine);
-        }
+        $this->pdo = $this->pdoConfig->initializePDO();
     }
 
     /**

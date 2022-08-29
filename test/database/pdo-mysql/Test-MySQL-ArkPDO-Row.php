@@ -7,17 +7,17 @@ use sinri\ark\database\exception\ArkPDOQueryResultIsNotQueriedError;
 use sinri\ark\database\exception\ArkPDOQueryResultIsNotStreamingError;
 use sinri\ark\database\model\ArkDatabaseDynamicTableModel;
 use sinri\ark\database\pdo\ArkPDO;
-use sinri\ark\database\pdo\ArkPDOConfig;
+use sinri\ark\database\pdo\engine\ArkPDOConfigForMySQL;
 use sinri\ark\database\test\database\entity\ArkTestTableRow;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 $logger = new ArkLogger(__DIR__ . '/../../log', 'pdo-mysql-row');
 
-$config = new ArkPDOConfig();
+$config = new ArkPDOConfigForMySQL();
 
 
-require __DIR__ . '/config.php';
+require __DIR__ . '/../../../config/config-MySQL-8.0.php';
 
 $db = new ArkPDO();
 try {

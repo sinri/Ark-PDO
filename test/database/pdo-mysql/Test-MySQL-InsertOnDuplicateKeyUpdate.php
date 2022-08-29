@@ -5,14 +5,14 @@ use sinri\ark\core\ArkLogger;
 use sinri\ark\database\model\ArkDatabaseDynamicTableModel;
 use sinri\ark\database\model\ArkSQLCondition;
 use sinri\ark\database\pdo\ArkPDO;
-use sinri\ark\database\pdo\ArkPDOConfig;
+use sinri\ark\database\pdo\engine\ArkPDOConfigForMySQL;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 $logger = new ArkLogger(__DIR__ . '/../../log', 'pdo-mysql-wis');
 //$logger->setIgnoreLevel(\Psr\Log\LogLevel::INFO);
 
-$config = new ArkPDOConfig();
+$config = new ArkPDOConfigForMySQL();
 
 // REQUIRE config.php (you might generate one besides) to do the commented job
 //$config->setHost('db.com')
@@ -23,7 +23,7 @@ $config = new ArkPDOConfig();
 //    ->setCharset(\sinri\ark\database\ArkPDOConfig::CHARSET_UTF8)
 //    ->setEngine(\sinri\ark\database\ArkPDOConfig::ENGINE_MYSQL);
 
-require __DIR__ . '/config.php';
+require __DIR__ . '/../../../config/config-MySQL-8.0.php';
 
 $db = new ArkPDO();
 $db->setPdoConfig($config);

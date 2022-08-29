@@ -6,12 +6,12 @@ use sinri\ark\database\model\query\ArkDatabaseSelectJoinedTablesQuery;
 use sinri\ark\database\model\query\ArkDatabaseSelectTableQuery;
 use sinri\ark\database\model\query\ArkDatabaseSelectUnionQuery;
 use sinri\ark\database\pdo\ArkPDO;
-use sinri\ark\database\pdo\ArkPDOConfig;
+use sinri\ark\database\pdo\engine\ArkPDOConfigForMySQL;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-$config = new ArkPDOConfig();
-require __DIR__ . '/config-MySQL-8.0.php';
+$config = new ArkPDOConfigForMySQL();
+require __DIR__ . '/../../../config/config-MySQL-8.0.php';
 
 $db = new ArkPDO();
 $db->setPdoConfig($config);

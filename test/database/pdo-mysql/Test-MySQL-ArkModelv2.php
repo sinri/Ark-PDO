@@ -7,7 +7,7 @@ use sinri\ark\database\model\ArkSQLCondition;
 use sinri\ark\database\model\query\ArkDatabaseQueryResult;
 use sinri\ark\database\model\query\ArkDatabaseSelectFieldMeta;
 use sinri\ark\database\pdo\ArkPDO;
-use sinri\ark\database\pdo\ArkPDOConfig;
+use sinri\ark\database\pdo\engine\ArkPDOConfigForMySQL;
 use sinri\ark\database\test\database\entity\ArkTestTableRow;
 
 require_once __DIR__ . '/../../../vendor/autoload.php';
@@ -16,7 +16,7 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 $logger = new ArkLogger(__DIR__ . '/../../log', 'pdo-mysql');
 //$logger->setIgnoreLevel(\Psr\Log\LogLevel::INFO);
 
-$config = new ArkPDOConfig();
+$config = new ArkPDOConfigForMySQL();
 
 // REQUIRE config.php (you might generate one besides) to do the commented job
 //$config->setHost('db.com')
@@ -27,7 +27,7 @@ $config = new ArkPDOConfig();
 //    ->setCharset(\sinri\ark\database\ArkPDOConfig::CHARSET_UTF8)
 //    ->setEngine(\sinri\ark\database\ArkPDOConfig::ENGINE_MYSQL);
 
-require __DIR__ . '/config-MySQL-8.0.php';
+require __DIR__ . '/../../../config/config-MySQL-8.0.php';
 
 $logger = new ArkLogger();
 

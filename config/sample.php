@@ -3,7 +3,7 @@
 //require_once __DIR__ . '/../../../autoload.php';
 
 
-use sinri\ark\database\pdo\ArkPDOConfig;
+use sinri\ark\database\pdo\engine\ArkPDOConfigForMySQL;
 
 $pdoInfo = [
     "host" => "",
@@ -11,11 +11,11 @@ $pdoInfo = [
     "username" => "",
     "password" => "",
     "database" => "",
-    "charset" => ArkPDOConfig::CHARSET_UTF8,
-    "engine" => ArkPDOConfig::ENGINE_MYSQL,
+    "charset" => ArkPDOConfigForMySQL::CHARSET_UTF8,
+    "engine" => ArkPDOConfigForMySQL::ENGINE,
 ];
 
-$config = new ArkPDOConfig();
+$config = new ArkPDOConfigForMySQL();
 
 $config->setHost($pdoInfo['host'])
     ->setPort($pdoInfo['port'])
