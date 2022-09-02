@@ -11,7 +11,8 @@ use Throwable;
  * Class QueryResultIsNotQueriedError
  * @package sinri\ark\database\Exception
  * @since 2.0.13
- * @since 2.0.26 Changed to extends RuntimeException
+ * @since 2.0.26 Changed to extend RuntimeException
+ * @todo think: is it correct to be RuntimeException? for example, insert a duplicated row.
  *
  * When ArkDatabaseQueryResult hold non-QUERIED status after querying.
  */

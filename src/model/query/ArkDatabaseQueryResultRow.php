@@ -24,7 +24,7 @@ class ArkDatabaseQueryResultRow
     /**
      * ArkDatabaseQueryResultRow constructor.
      * @param array $row
-     * @since 2.0.22 row could be empty so it could be omitted now.
+     * @since 2.0.22 row could be empty, so it could be omitted now.
      */
     public function __construct(array $row = [])
     {
