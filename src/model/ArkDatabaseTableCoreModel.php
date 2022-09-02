@@ -33,7 +33,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
      * @param array $data
      * @param null|string $pk
      * @return ArkDatabaseQueryResult
-     * @since 2.1.1
+     * @since 2.1.2
      */
     public function insertIgnoreOneRow(array $data, $pk = null): ArkDatabaseQueryResult
     {
