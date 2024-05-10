@@ -16,10 +16,10 @@ use sinri\ark\database\pdo\ArkPDO;
 
 class ArkDatabaseTableFieldDefinition
 {
-    protected $name;
-    protected $type;
-    protected $typeCategory;
-    protected $nullable;
+    protected string $name;
+    protected string $type;
+    protected string $typeCategory;
+    protected bool $nullable;
 
     protected function __construct()
     {
@@ -48,92 +48,53 @@ class ArkDatabaseTableFieldDefinition
     protected static function determineTypeCategory($type): string
     {
         $type = strtolower($type);
-        switch ($type) {
-            case 'bit':
-            case 'tinyint':
-            case 'smallint':
-            case 'mediumint':
-            case 'int':
-            case 'integer':
-                return "integer";
-            case 'bigint'://for bigint it sometimes sucks for PHP when number too large
-                return "integer";
-            case 'SERIAL'://SERIAL is an alias for BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE.
-                return "string";
-            case 'decimal':
-            case 'dec':
-            case 'double':
-            case 'real':
-                return 'double';
-            case 'float':
-                return 'float';
-            case 'bool':
-            case 'boolean':
-                // actually tinyint(1)
-                return "int";
-            case 'data':
-            case 'datetime':
-            case 'timestamp':
-            case 'time':
-            case 'year':
-                // maybe timestamp or time need integer?
-                return 'string';
-            case 'char':
-            case 'varchar':
-            case 'binary':
-            case 'varbinary':
-            case 'tinyblob':
-            case 'tinytext':
-            case 'blob':
-            case 'text':
-            case 'mediumblob':
-            case 'mediumtext':
-            case 'longblob':
-            case 'longtext':
-            case 'enum':
-            case 'set':
-                return 'string';
-            default:
-                return "string";
-        }
+        //for bigint it sometimes sucks for PHP when number too large
+        //SERIAL is an alias for BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE.
+        //boolean: actually tinyint(1)
+        //year: maybe timestamp or time need integer?
+        return match ($type) {
+            'bit', 'tinyint', 'smallint', 'mediumint', 'int', 'integer', 'bigint' => "integer",
+            'decimal', 'dec', 'double', 'real' => 'double',
+            'float' => 'float',
+            'bool', 'boolean' => "int",
+            'data', 'datetime', 'timestamp', 'time', 'year', 'char', 'varchar', 'binary', 'varbinary', 'tinyblob', 'tinytext', 'blob', 'text', 'mediumblob', 'mediumtext', 'longblob', 'longtext', 'enum', 'set' => 'string',
+            default => "string",
+        };
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getTypeCategory()
+    public function getTypeCategory(): string
     {
         return $this->typeCategory;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
-    public function getNullable()
+    public function getNullable(): bool
     {
         return $this->nullable;
     }
 
     /**
-     * @param mixed $nullable
+     * @param bool $nullable
      */
-    public function setNullable($nullable)
+    public function setNullable(bool $nullable): void
     {
         $this->nullable = $nullable;
     }
@@ -165,7 +126,7 @@ class ArkDatabaseTableFieldDefinition
      * @throws ArkPDOStatementException
      * @throws LookUpTargetException
      */
-    public static function devShowFieldsForPHPDoc(ArkDatabaseTableCoreModel $model)
+    public static function devShowFieldsForPHPDoc(ArkDatabaseTableCoreModel $model): void
     {
         echo "THIS IS A HELPER FOR DEV." . PHP_EOL;
         $fieldDefinition = self::loadTableDesc($model->db(), $model->getTableExpressForSQL());

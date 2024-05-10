@@ -13,11 +13,11 @@ class ArkSQLFunction
     /**
      * @var string
      */
-    protected $functionName;
+    protected string $functionName;
     /**
      * @var scalar[]
      */
-    protected $functionParameterArray;
+    protected array $functionParameterArray;
 
     /**
      * ArkSQLFunction constructor.
@@ -33,7 +33,7 @@ class ArkSQLFunction
     /**
      * @return $this
      */
-    public function resetParameterArray()
+    public function resetParameterArray(): static
     {
         $this->functionParameterArray = [];
         return $this;
@@ -42,7 +42,7 @@ class ArkSQLFunction
     /**
      * @return array
      */
-    public function getParameterArray()
+    public function getParameterArray(): array
     {
         return $this->functionParameterArray;
     }
@@ -51,7 +51,7 @@ class ArkSQLFunction
      * @param scalar $x
      * @return $this
      */
-    public function appendParameter($x)
+    public function appendParameter($x): static
     {
         $this->functionParameterArray[] = $x;
         return $this;
@@ -60,7 +60,7 @@ class ArkSQLFunction
     /**
      * @return string
      */
-    public function getFunctionName()
+    public function getFunctionName(): string
     {
         return $this->functionName;
     }

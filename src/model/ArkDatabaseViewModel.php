@@ -14,7 +14,7 @@ use sinri\ark\database\model\query\ArkDatabaseQueryResult;
 abstract class ArkDatabaseViewModel extends ArkDatabaseTableModel
 {
 
-    final public function insertOneRow(array $data, $pk = null): ArkDatabaseQueryResult
+    final public function insertOneRow(array $data, string $pk = null): ArkDatabaseQueryResult
     {
         return ArkDatabaseQueryResult::makeErrorResult("The VIEW is not modifiable.");
     }

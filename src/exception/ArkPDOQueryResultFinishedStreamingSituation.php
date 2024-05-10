@@ -11,7 +11,7 @@ use Exception;
  * @package sinri\ark\database\exception
  * @since 2.0.23
  *
- * When streaming result, find there hed been no more rows
+ * When streaming result, find there had been no more rows
  */
 class ArkPDOQueryResultFinishedStreamingSituation extends Exception
 {

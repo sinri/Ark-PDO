@@ -4,6 +4,6 @@
 [![GitHub release](https://img.shields.io/github/release/sinri/Ark-PDO.svg)](https://github.com/sinri/Ark-PDO/releases)
 [![Packagist](https://img.shields.io/packagist/v/sinri/ark-pdo.svg)](https://packagist.org/packages/sinri/ark-pdo) 
 
-The PDO Component for Ark 2
+The PDO Component for Ark 3
 
-Version 2.x In Here Now !
+Version 3.x In Here Now For PHP 8.

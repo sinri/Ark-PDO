@@ -25,7 +25,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $str
      * @return static
      */
-    public static function makeAscii($str)
+    public static function makeAscii($str): static
     {
         return new static('ASCII', [$str]);
     }
@@ -38,7 +38,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $n
      * @return static
      */
-    public static function makeBin($n)
+    public static function makeBin($n): static
     {
         return new static('BIN', [$n]);
     }
@@ -49,7 +49,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $str
      * @return static
      */
-    public static function makeBitLength($str)
+    public static function makeBitLength($str): static
     {
         return new static('BIT_LENGTH', [$str]);
     }
@@ -62,10 +62,10 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * CHAR() arguments larger than 255 are converted into multiple result bytes.
      *
      * @param $chars
-     * @param false $usingCharsetName
+     * @param string|null $usingCharsetName
      * @return static
      */
-    public static function makeChar($chars, $usingCharsetName = false)
+    public static function makeChar($chars, ?string $usingCharsetName = null): static
     {
         $p = [];
         if (is_array($chars)) {
@@ -92,7 +92,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $str
      * @return static
      */
-    public static function makeCharLength($str)
+    public static function makeCharLength($str): static
     {
         return new static('CHAR_LENGTH', [$str]);
     }
@@ -111,7 +111,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string[] $parts
      * @return static
      */
-    public static function makeConcat(array $parts)
+    public static function makeConcat(array $parts): static
     {
         if (count($parts) == 0) {
             throw new ArkPDOSQLBuilderError('CONCAT NEED ONE OR MORE ARGUMENTS');
@@ -132,7 +132,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param array $parts
      * @return static
      */
-    public static function makeConcatWithSeparator(string $separator, array $parts)
+    public static function makeConcatWithSeparator(string $separator, array $parts): static
     {
         if (count($parts) == 0) {
             throw new ArkPDOSQLBuilderError('CONCAT NEED ONE OR MORE ARGUMENTS');
@@ -147,12 +147,12 @@ class ArkSQLStringFunction extends ArkSQLFunction
     // FIND_IN_SET(str,strlist)
     // FORMAT(X,D[,locale])
 
-    public static function makeFromBase64($str)
+    public static function makeFromBase64($str): static
     {
         return new static('FROM_BASE64', [$str]);
     }
 
-    public static function makeHex($x)
+    public static function makeHex($x): static
     {
         return new static('HEX', [$x]);
     }
@@ -169,7 +169,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $len
      * @return static
      */
-    public static function makeLeft($str, $len)
+    public static function makeLeft($str, $len): static
     {
         return new static('LEFT', [$str, $len]);
     }
@@ -183,7 +183,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $str
      * @return static
      */
-    public static function makeLength($str)
+    public static function makeLength($str): static
     {
         return new static('LENGTH', [$str]);
     }
@@ -203,7 +203,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param int|null $pos
      * @return static
      */
-    public static function makeLocate($substr, $str, $pos = null)
+    public static function makeLocate($substr, $str, $pos = null): static
     {
         $p = [$substr, $str];
         if ($pos !== null) {
@@ -219,7 +219,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $str
      * @return static
      */
-    public static function makeLower($str)
+    public static function makeLower($str): static
     {
         return new static('LOWER', [$str]);
     }
@@ -232,7 +232,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $str
      * @return static
      */
-    public static function makeLeftTrim($str)
+    public static function makeLeftTrim($str): static
     {
         return new static('LTRIM', [$str]);
     }
@@ -249,7 +249,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $x
      * @return static
      */
-    public static function makeOct($x)
+    public static function makeOct($x): static
     {
         return new static('OCT', [$x]);
     }
@@ -269,7 +269,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $x
      * @return static
      */
-    public static function makeOrd($x)
+    public static function makeOrd($x): static
     {
         return new static('ORD', [$x]);
     }
@@ -285,7 +285,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $str
      * @return static
      */
-    public static function makeQuote($str)
+    public static function makeQuote($str): static
     {
         return new static('QUOTE', [$str]);
     }
@@ -299,7 +299,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $count
      * @return static
      */
-    public static function makeRepeat($str, $count)
+    public static function makeRepeat($str, $count): static
     {
         return new static('REPEAT', [$str, $count]);
     }
@@ -313,7 +313,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $to_str
      * @return static
      */
-    public static function makeReplace($str, $from_str, $to_str)
+    public static function makeReplace($str, $from_str, $to_str): static
     {
         return new static('REPLACE', [$str, $from_str, $to_str]);
     }
@@ -324,7 +324,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $str
      * @return static
      */
-    public static function makeReverse($str)
+    public static function makeReverse($str): static
     {
         return new static('REVERSE', [$str]);
     }
@@ -336,7 +336,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $len
      * @return static
      */
-    public static function makeRight($str, $len)
+    public static function makeRight($str, $len): static
     {
         return new static('RIGHT', [$str, $len]);
     }
@@ -349,7 +349,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $str
      * @return static
      */
-    public static function makeRightTrim($str)
+    public static function makeRightTrim($str): static
     {
         return new static('RTRIM', [$str]);
     }
@@ -376,7 +376,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param int|null $len
      * @return static
      */
-    public static function makeSubString($str, $pos, $len = null)
+    public static function makeSubString($str, $pos, ?int $len = null): static
     {
         $p = [$str, $pos];
         if ($len !== null) {
@@ -393,7 +393,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $str
      * @return static
      */
-    public static function makeToBase64($str)
+    public static function makeToBase64($str): static
     {
         return new static('TO_BASE64', [$str]);
     }
@@ -406,7 +406,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $type BOTH | LEADING | TRAILING
      * @return static
      */
-    public static function makeTrim($originalStr, $removeStr = null, $type = 'BOTH')
+    public static function makeTrim(string $originalStr, ?string $removeStr = null, string $type = 'BOTH'): static
     {
         if ($removeStr === null) {
             return new static('TRIM', [$originalStr]);
@@ -426,7 +426,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $x
      * @return static
      */
-    public static function makeUnHex($x)
+    public static function makeUnHex($x): static
     {
         return new static('UNHEX', [$x]);
     }
@@ -438,7 +438,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param $str
      * @return static
      */
-    public static function makeUpper($str)
+    public static function makeUpper($str): static
     {
         return new static('UPPER', [$str]);
     }

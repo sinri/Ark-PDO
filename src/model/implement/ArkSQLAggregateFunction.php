@@ -15,7 +15,7 @@ class ArkSQLAggregateFunction extends ArkSQLFunction
 {
     // https://dev.mysql.com/doc/refman/8.0/en/aggregate-functions.html
 
-    public static function makeAvg($expr, $withDistinct = false)
+    public static function makeAvg($expr, $withDistinct = false): static
     {
         // AVG([DISTINCT] expr) [over_clause]
         return new static('AVG', [($withDistinct ? 'DISTINCT ' : '') . $expr]);
@@ -25,13 +25,13 @@ class ArkSQLAggregateFunction extends ArkSQLFunction
     // BIT_OR(expr) [over_clause]
     // BIT_XOR(expr) [over_clause]
 
-    public static function makeCount($expr, $withDistinct = false)
+    public static function makeCount($expr, $withDistinct = false): static
     {
         // COUNT(expr) [over_clause]
         return new static('COUNT', [($withDistinct ? 'DISTINCT ' : '') . $expr]);
     }
 
-    public static function makeGroupConcat($expr, $withDistinct = false, $orderByExpression = '', $separator = ',')
+    public static function makeGroupConcat($expr, $withDistinct = false, $orderByExpression = '', $separator = ','): static
     {
         // GROUP_CONCAT([DISTINCT] expr [,expr ...]
         //             [ORDER BY {unsigned_integer | col_name | expr}
@@ -50,13 +50,13 @@ class ArkSQLAggregateFunction extends ArkSQLFunction
     // JSON_ARRAYAGG(col_or_expr) [over_clause]
     // JSON_OBJECTAGG(key, value) [over_clause]
 
-    public static function makeMax($expr, $withDistinct = false)
+    public static function makeMax($expr, $withDistinct = false): static
     {
         // MAX([DISTINCT] expr) [over_clause]
         return new static('MAX', [($withDistinct ? 'DISTINCT ' : '') . $expr]);
     }
 
-    public static function makeMin($expr, $withDistinct = false)
+    public static function makeMin($expr, $withDistinct = false): static
     {
         // MIN([DISTINCT] expr) [over_clause]
         return new static('MIN', [($withDistinct ? 'DISTINCT ' : '') . $expr]);
@@ -67,7 +67,7 @@ class ArkSQLAggregateFunction extends ArkSQLFunction
     // STDDEV_POP(expr) [over_clause]
     // STDDEV_SAMP(expr) [over_clause]
 
-    public static function makeSum($expr, $withDistinct = false)
+    public static function makeSum($expr, $withDistinct = false): static
     {
         // SUM([DISTINCT] expr) [over_clause]
         return new static('SUM', [($withDistinct ? 'DISTINCT ' : '') . $expr]);

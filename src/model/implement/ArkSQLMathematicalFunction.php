@@ -20,7 +20,7 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string|numeric $x Field name or number
      * @return static
      */
-    public static function makeAbs($x)
+    public static function makeAbs($x): static
     {
         return new static('ABS', [$x]);
     }
@@ -35,7 +35,7 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string|numeric $x
      * @return static
      */
-    public static function makeCeil($x)
+    public static function makeCeil($x): static
     {
         return self::makeCeiling($x);
     }
@@ -45,7 +45,7 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string|numeric $x
      * @return static
      */
-    public static function makeCeiling($x)
+    public static function makeCeiling($x): static
     {
         return new static('CEILING', [$x]);
     }
@@ -65,7 +65,7 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param int $toBase
      * @return static
      */
-    public static function makeConv($n, int $fromBase, int $toBase)
+    public static function makeConv($n, int $fromBase, int $toBase): static
     {
         return new static('CONV', [$n, $fromBase, $toBase]);
     }
@@ -81,7 +81,7 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string|numeric $x
      * @return static
      */
-    public static function makeFloor($x)
+    public static function makeFloor($x): static
     {
         return new static('FLOOR', [$x]);
     }
@@ -114,7 +114,7 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string|numeric|null $seed
      * @return static
      */
-    public static function makeRand($seed = null)
+    public static function makeRand($seed = null): static
     {
         $p = [];
         if ($seed !== null) {
@@ -136,7 +136,7 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param int|null $d
      * @return static
      */
-    public static function makeRound($x, $d = null)
+    public static function makeRound($x, $d = null): static
     {
         $p = [$x];
         if ($d !== null) {
@@ -152,7 +152,7 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string|numeric $x
      * @return static
      */
-    public static function makeSign($x)
+    public static function makeSign($x): static
     {
         return new static('SIGN', [$x]);
     }
@@ -172,7 +172,7 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param int $d
      * @return static
      */
-    public static function makeTruncate($x, $d)
+    public static function makeTruncate($x, $d): static
     {
         return new static('TRUNCATE', [$x, $d]);
     }

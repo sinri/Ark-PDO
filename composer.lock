@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6d1f8b42a514d12a5d53e8e8808021f3",
+    "content-hash": "721e0fe96ddac1632a9d71c99b0852db",
     "packages": [
         {
             "name": "psr/log",
-            "version": "1.1.4",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "d49695b909c3b7628b6289db5479a1c204601f11"
+                "reference": "fe5ea303b0887d5caefd3d431c3e61ad47037001"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/d49695b909c3b7628b6289db5479a1c204601f11",
-                "reference": "d49695b909c3b7628b6289db5479a1c204601f11",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/fe5ea303b0887d5caefd3d431c3e61ad47037001",
+                "reference": "fe5ea303b0887d5caefd3d431c3e61ad47037001",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -27,17 +27,17 @@
                 ]
             },
             "require": {
-                "php": ">=5.3.0"
+                "php": ">=8.0.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.1.x-dev"
+                    "dev-master": "3.x-dev"
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "Psr\\Log\\": "Psr/Log/"
+                    "Psr\\Log\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -58,22 +58,22 @@
                 "psr-3"
             ],
             "support": {
-                "source": "https://github.com/php-fig/log/tree/1.1.4"
+                "source": "https://github.com/php-fig/log/tree/3.0.0"
             },
-            "time": "2021-05-03T11:20:27+00:00"
+            "time": "2021-07-14T16:46:02+00:00"
         },
         {
             "name": "sinri/ark-core",
-            "version": "2.7.12",
+            "version": "3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sinri/Ark-Core.git",
-                "reference": "87bea4d2572a05b0b5bf120227116df56a63d26d"
+                "reference": "941661e08510deea685ad9acec2554755b965ff7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sinri/Ark-Core/zipball/87bea4d2572a05b0b5bf120227116df56a63d26d",
-                "reference": "87bea4d2572a05b0b5bf120227116df56a63d26d",
+                "url": "https://api.github.com/repos/sinri/Ark-Core/zipball/941661e08510deea685ad9acec2554755b965ff7",
+                "reference": "941661e08510deea685ad9acec2554755b965ff7",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -84,10 +84,10 @@
             },
             "require": {
                 "ext-json": "*",
-                "psr/log": "~1.0"
+                "psr/log": "~3.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^9"
+                "phpunit/phpunit": "^11"
             },
             "type": "library",
             "autoload": {
@@ -108,9 +108,9 @@
             "description": "The core components of Ark 2",
             "support": {
                 "issues": "https://github.com/sinri/Ark-Core/issues",
-                "source": "https://github.com/sinri/Ark-Core/tree/2.7.12"
+                "source": "https://github.com/sinri/Ark-Core/tree/3.0.1"
             },
-            "time": "2021-04-11T05:36:41+00:00"
+            "time": "2024-05-09T06:09:21+00:00"
         }
     ],
     "packages-dev": [],
@@ -120,10 +120,10 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "~7.0",
+        "php": "~8.0",
         "ext-json": "*",
         "ext-pdo": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.6.0"
 }

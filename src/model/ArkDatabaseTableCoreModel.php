@@ -50,9 +50,9 @@ abstract class ArkDatabaseTableCoreModel
     abstract public function mappingTableName(): string;
 
     /**
-     * @return false|string
+     * @return string
      */
-    public static function now()
+    public static function now(): string
     {
         return date('Y-m-d H:i:s');
     }
@@ -68,11 +68,11 @@ abstract class ArkDatabaseTableCoreModel
 
     /**
      * @param array $data
-     * @param null|string $pk
+     * @param string|null $pk
      * @return ArkDatabaseQueryResult
      * @since 2.0
      */
-    public function insertOneRow(array $data, $pk = null): ArkDatabaseQueryResult
+    public function insertOneRow(array $data, ?string $pk = null): ArkDatabaseQueryResult
     {
         return $this->writeInto($data, $pk);
     }
@@ -348,7 +348,7 @@ abstract class ArkDatabaseTableCoreModel
      *
      * @since 2.0.20
      */
-    public function insert_into_select(ArkDatabaseSelectTableQuery $selection, array $fields = [])
+    public function insert_into_select(ArkDatabaseSelectTableQuery $selection, array $fields = []): ArkDatabaseQueryResult
     {
         return $this->write_into_select('INSERT', $selection, $fields);
     }
@@ -360,7 +360,7 @@ abstract class ArkDatabaseTableCoreModel
      *
      * @since 2.0.20
      */
-    public function replace_into_select(ArkDatabaseSelectTableQuery $selection, array $fields = [])
+    public function replace_into_select(ArkDatabaseSelectTableQuery $selection, array $fields = []): ArkDatabaseQueryResult
     {
         return $this->write_into_select('REPLACE', $selection, $fields);
     }
@@ -373,7 +373,7 @@ abstract class ArkDatabaseTableCoreModel
      *
      * @since 2.0.20
      */
-    protected function write_into_select($method, ArkDatabaseSelectTableQuery $selection, array $fields = [])
+    protected function write_into_select($method, ArkDatabaseSelectTableQuery $selection, array $fields = []): ArkDatabaseQueryResult
     {
         $result = new ArkDatabaseQueryResult();
         try {
@@ -419,7 +419,7 @@ abstract class ArkDatabaseTableCoreModel
      * @since 2.0.30
      * @see https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html
      */
-    public function insertOnDuplicateKeyUpdate($dataList, $duplicateModification)
+    public function insertOnDuplicateKeyUpdate(array $dataList, array $duplicateModification): ArkDatabaseQueryResult
     {
         $result = new ArkDatabaseQueryResult();
         try {
@@ -480,7 +480,7 @@ abstract class ArkDatabaseTableCoreModel
      * @param ArkDatabaseSelectFieldMeta[] $fieldMataList
      * @param ArkSQLCondition[] $conditions
      * @param string $sortExpression
-     * @param int|null $totalRows
+     * @param int $totalRows
      * @return array[]
      * @since 2.0.10
      * @since 2.0.11 loose $totalRows type check, allow unassigned variable to be there

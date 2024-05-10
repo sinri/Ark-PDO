@@ -25,7 +25,7 @@ class ArkSQLFlowControlFunction extends ArkSQLFunction
      * @param scalar $expressionForFalse expr3
      * @return static
      */
-    public static function makeIf($boolConditionExpression, $expressionForTrue, $expressionForFalse)
+    public static function makeIf($boolConditionExpression, $expressionForTrue, $expressionForFalse): static
     {
         return new static('IF', [$boolConditionExpression, $expressionForTrue, $expressionForFalse]);
     }
@@ -37,7 +37,7 @@ class ArkSQLFlowControlFunction extends ArkSQLFunction
      * @param scalar $expressionForNull expr2
      * @return static
      */
-    public static function makeIfNull($originalExpression, $expressionForNull)
+    public static function makeIfNull($originalExpression, $expressionForNull): static
     {
         return new static('IFNULL', [$originalExpression, $expressionForNull]);
     }
@@ -50,7 +50,7 @@ class ArkSQLFlowControlFunction extends ArkSQLFunction
      * @param scalar $b expr2
      * @return static
      */
-    public static function makeNullIf($a, $b)
+    public static function makeNullIf($a, $b): static
     {
         return new static('NULLIF', [$a, $b]);
     }

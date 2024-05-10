@@ -19,12 +19,12 @@ class ArkDatabaseQueryResultRow
     /**
      * @var array Key-Value Pair
      */
-    protected $row;
+    protected array $row;
 
     /**
      * ArkDatabaseQueryResultRow constructor.
      * @param array $row
-     * @since 2.0.22 row could be empty so it could be omitted now.
+     * @since 2.0.22 row could be empty, so it could be omitted now.
      */
     public function __construct(array $row = [])
     {
@@ -51,10 +51,10 @@ class ArkDatabaseQueryResultRow
 
     /**
      * @param string $fieldName
-     * @param mixed $default
+     * @param mixed|null $default
      * @return mixed
      */
-    public function getField(string $fieldName, $default = null)
+    public function getField(string $fieldName, mixed $default = null): mixed
     {
         return ArkHelper::readTarget($this->row, [$fieldName], $default);
     }
@@ -67,7 +67,7 @@ class ArkDatabaseQueryResultRow
      * @throws ArkPDOQueryResultEmptySituation
      * @since 2.0.32
      */
-    public static function fetchOneRowWithSelection(ArkDatabaseSelectTableQuery $selection, int $rowIndex = 0, &$result = null)
+    public static function fetchOneRowWithSelection(ArkDatabaseSelectTableQuery $selection, int $rowIndex = 0, ?ArkDatabaseQueryResult &$result = null): static
     {
         $result = $selection->queryForRows(static::class);
         return $result->getResultRowByIndex($rowIndex);
@@ -81,7 +81,7 @@ class ArkDatabaseQueryResultRow
      * @since 2.0.21
      * @since 2.0.32 result became optional
      */
-    public static function fetchRowsWithSelection(ArkDatabaseSelectTableQuery $selection, &$result = null)
+    public static function fetchRowsWithSelection(ArkDatabaseSelectTableQuery $selection, ?ArkDatabaseQueryResult &$result = null): array
     {
         $result = $selection->queryForRows(static::class);
         return $result->getResultRows();
@@ -94,7 +94,7 @@ class ArkDatabaseQueryResultRow
      * @throws ArkPDOQueryResultIsNotStreamingError
      * @since 2.0.21
      */
-    public static function fetchRowFromStream(ArkDatabaseQueryResult $result)
+    public static function fetchRowFromStream(ArkDatabaseQueryResult $result): static
     {
         return $result->readNextRow(static::class);
     }
@@ -106,7 +106,7 @@ class ArkDatabaseQueryResultRow
      * @throws ArkPDOQueryResultIsNotStreamingError
      * @since 2.0.25
      */
-    public function fetchRowFromStreamAndReloadThis(ArkDatabaseQueryResult $result)
+    public function fetchRowFromStreamAndReloadThis(ArkDatabaseQueryResult $result): static
     {
         return $result->readNextRowAndReloadRowClassInstance($this);
     }

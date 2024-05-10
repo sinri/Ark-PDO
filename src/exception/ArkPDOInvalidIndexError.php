@@ -19,7 +19,7 @@ class ArkPDOInvalidIndexError extends RangeException
     /**
      * @var int
      */
-    protected $givenIndex;
+    protected int $givenIndex;
 
     /**
      * ArkPDOInvalidIndexError constructor.
@@ -37,7 +37,7 @@ class ArkPDOInvalidIndexError extends RangeException
     /**
      * @return int
      */
-    public function getGivenIndex()
+    public function getGivenIndex(): int
     {
         return $this->givenIndex;
     }
@@ -46,7 +46,7 @@ class ArkPDOInvalidIndexError extends RangeException
      * @param int $givenIndex
      * @return ArkPDOInvalidIndexError
      */
-    public function setGivenIndex($givenIndex): ArkPDOInvalidIndexError
+    public function setGivenIndex(int $givenIndex): ArkPDOInvalidIndexError
     {
         $this->givenIndex = $givenIndex;
         return $this;

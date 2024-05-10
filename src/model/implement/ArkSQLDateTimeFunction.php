@@ -47,7 +47,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param $days
      * @return static
      */
-    public static function makeAddDate($expr, $days)
+    public static function makeAddDate($expr, $days): static
     {
         return new static('ADDDATE', [$expr, $days]);
     }
@@ -64,7 +64,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param $expr2
      * @return static
      */
-    public static function makeAddTime($expr1, $expr2)
+    public static function makeAddTime($expr1, $expr2): static
     {
         return new static('ADDTIME', [$expr1, $expr2]);
     }
@@ -80,7 +80,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      *
      * @return static
      */
-    public static function makeCurDate()
+    public static function makeCurDate(): static
     {
         return new static('CURDATE', []);
     }
@@ -103,7 +103,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param int|null $fsp
      * @return static
      */
-    public static function makeCurTime($fsp = null)
+    public static function makeCurTime(?int $fsp = null): static
     {
         $p = [];
         if ($fsp !== null) {
@@ -118,7 +118,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $expr
      * @return static
      */
-    public static function makeDate($expr)
+    public static function makeDate(string $expr): static
     {
         return new static('DATE', [$expr]);
     }
@@ -135,7 +135,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param $expr2
      * @return static
      */
-    public static function makeDateDiff($expr1, $expr2)
+    public static function makeDateDiff($expr1, $expr2): static
     {
         return new static('DATEDIFF', [$expr1, $expr2]);
     }
@@ -150,7 +150,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param $unit
      * @return static
      */
-    public static function makeDateAdd($date, $expr, $unit)
+    public static function makeDateAdd($date, $expr, $unit): static
     {
         return new static('DATE_ADD', [$date, 'INTERVAL ' . $expr . ' ' . $unit]);
     }
@@ -163,7 +163,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param $unit
      * @return static
      */
-    public static function makeDateSub($date, $expr, $unit)
+    public static function makeDateSub($date, $expr, $unit): static
     {
         return new static('DATE_SUB', [$date, 'INTERVAL ' . $expr . ' ' . $unit]);
     }
@@ -175,7 +175,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $format
      * @return static
      */
-    public static function makeDateFormat(string $date, string $format)
+    public static function makeDateFormat(string $date, string $format): static
     {
         return new static('DATE_FORMAT', [$date, $format]);
     }
@@ -187,7 +187,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $date
      * @return static
      */
-    public static function makeDayOfMonth($date)
+    public static function makeDayOfMonth($date): static
     {
         return new static('DAYOFMONTH', [$date]);
     }
@@ -202,7 +202,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param $date
      * @return static
      */
-    public static function makeDayOfWeek($date)
+    public static function makeDayOfWeek($date): static
     {
         return new static('DAYOFWEEK', [$date]);
     }
@@ -213,7 +213,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param $date
      * @return static
      */
-    public static function makeDayOfYear($date)
+    public static function makeDayOfYear($date): static
     {
         return new static('DAYOFYEAR', [$date]);
     }
@@ -227,7 +227,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param $date
      * @return static
      */
-    public static function makeExtract($unit, $date)
+    public static function makeExtract($unit, $date): static
     {
         return new static('EXTRACT', [$unit . ' FROM ' . $date]);
     }
@@ -249,7 +249,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string|null $format
      * @return static
      */
-    public static function makeFromUnixTime($unixTimestamp, $format = null)
+    public static function makeFromUnixTime($unixTimestamp, ?string $format = null): static
     {
         $p = [$unixTimestamp];
         if ($format !== null) {
@@ -268,7 +268,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param $time
      * @return static
      */
-    public static function makeHour($time)
+    public static function makeHour($time): static
     {
         return new static('HOUR', [$time]);
     }
@@ -285,7 +285,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param $expr
      * @return static
      */
-    public static function makeMicroSecond($expr)
+    public static function makeMicroSecond($expr): static
     {
         return new static('MICROSECOND', [$expr]);
     }
@@ -295,12 +295,12 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param $time
      * @return static
      */
-    public static function makeMinute($time)
+    public static function makeMinute($time): static
     {
         return new static('MINUTE', [$time]);
     }
 
-    public static function makeMonth($date)
+    public static function makeMonth($date): static
     {
         return new static('MONTH', [$date]);
     }
@@ -318,7 +318,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param int|null $fsp 0-6
      * @return static
      */
-    public static function makeNow($fsp = null)
+    public static function makeNow(?int $fsp = null): static
     {
         $p = [];
         if ($fsp !== null) {
@@ -331,12 +331,12 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
     // PERIOD_DIFF(P1,P2)
     // QUARTER(date)
 
-    public static function makeQuarter($date)
+    public static function makeQuarter($date): static
     {
         return new static('QUARTER', [$date]);
     }
 
-    public static function makeSecond($time)
+    public static function makeSecond($time): static
     {
         return new static('SECOND', [$time]);
     }
@@ -344,12 +344,12 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
     // SEC_TO_TIME(seconds)
     // STR_TO_DATE(str,format)
 
-    public static function makeSubDate($expr, $days)
+    public static function makeSubDate($expr, $days): static
     {
         return new static('SUBDATE', [$expr, $days]);
     }
 
-    public static function makeSubTime($expr1, $expr2)
+    public static function makeSubTime($expr1, $expr2): static
     {
         return new static('SUBTIME', [$expr1, $expr2]);
     }
@@ -371,7 +371,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param int|null $fsp 0-6
      * @return static
      */
-    public static function makeSysDate($fsp = null)
+    public static function makeSysDate(?int $fsp = null): static
     {
         $p = [];
         if ($fsp !== null) {
@@ -380,7 +380,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
         return new static('SYSDATE', $p);
     }
 
-    public static function makeTime($expr)
+    public static function makeTime($expr): static
     {
         return new static('TIME', [$expr]);
     }
@@ -403,7 +403,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string|null $expr2
      * @return static
      */
-    public static function makeTimestamp($expr1, $expr2 = null)
+    public static function makeTimestamp(string $expr1, ?string $expr2 = null): static
     {
         $p = [$expr1];
         if ($expr2 !== null) {
@@ -451,7 +451,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string|null $date
      * @return static
      */
-    public static function makeUnixTimestamp($date = null)
+    public static function makeUnixTimestamp(string $date = null): static
     {
         $p = [];
         if ($date !== null) {
@@ -471,7 +471,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param $date
      * @return static
      */
-    public static function makeWeekday($date)
+    public static function makeWeekday($date): static
     {
         return new static('WEEKDAY', [$date]);
     }
@@ -483,7 +483,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param $date
      * @return static
      */
-    public static function makeWeekOfYear($date)
+    public static function makeWeekOfYear($date): static
     {
         return new static('WEEKOFYEAR', [$date]);
     }
@@ -494,7 +494,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param $date
      * @return static
      */
-    public static function makeYear($date)
+    public static function makeYear($date): static
     {
         return new static('YEAR', [$date]);
     }

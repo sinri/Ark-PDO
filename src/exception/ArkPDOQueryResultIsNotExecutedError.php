@@ -18,20 +18,20 @@ class ArkPDOQueryResultIsNotExecutedError extends RuntimeException
     /**
      * @var string
      */
-    protected $action;
+    protected string $action;
     /**
      * @var string
      */
-    protected $status;
+    protected string $status;
     /**
      * @var string
      */
-    protected $databaseError;
+    protected string $databaseError;
     /**
      * @var string
      * @since 2.0.18
      */
-    protected $sql;
+    protected string $sql;
 
     /**
      * ArkPDOQueryResultIsNotExecutedError constructor.
@@ -42,7 +42,7 @@ class ArkPDOQueryResultIsNotExecutedError extends RuntimeException
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct(string $action, string $status, string $databaseError, string $sql = '', $code = 0, Throwable $previous = null)
+    public function __construct(string $action, string $status, string $databaseError, string $sql = '', int $code = 0, Throwable $previous = null)
     {
         parent::__construct(
             "Action Failed: " . $action . " | "
@@ -61,7 +61,7 @@ class ArkPDOQueryResultIsNotExecutedError extends RuntimeException
     /**
      * @return string
      */
-    public function getSql()
+    public function getSql(): string
     {
         return $this->sql;
     }
@@ -70,7 +70,7 @@ class ArkPDOQueryResultIsNotExecutedError extends RuntimeException
      * @param string $sql
      * @return ArkPDOQueryResultIsNotExecutedError
      */
-    public function setSql($sql)
+    public function setSql(string $sql): static
     {
         $this->sql = $sql;
         return $this;
@@ -79,7 +79,7 @@ class ArkPDOQueryResultIsNotExecutedError extends RuntimeException
     /**
      * @return string
      */
-    public function getAction()
+    public function getAction(): string
     {
         return $this->action;
     }
@@ -88,7 +88,7 @@ class ArkPDOQueryResultIsNotExecutedError extends RuntimeException
      * @param string $action
      * @return ArkPDOQueryResultIsNotExecutedError
      */
-    public function setAction($action): ArkPDOQueryResultIsNotExecutedError
+    public function setAction(string $action): ArkPDOQueryResultIsNotExecutedError
     {
         $this->action = $action;
         return $this;
@@ -97,7 +97,7 @@ class ArkPDOQueryResultIsNotExecutedError extends RuntimeException
     /**
      * @return string
      */
-    public function getStatus()
+    public function getStatus(): string
     {
         return $this->status;
     }
@@ -106,7 +106,7 @@ class ArkPDOQueryResultIsNotExecutedError extends RuntimeException
      * @param string $status
      * @return ArkPDOQueryResultIsNotExecutedError
      */
-    public function setStatus($status): ArkPDOQueryResultIsNotExecutedError
+    public function setStatus(string $status): ArkPDOQueryResultIsNotExecutedError
     {
         $this->status = $status;
         return $this;
@@ -115,7 +115,7 @@ class ArkPDOQueryResultIsNotExecutedError extends RuntimeException
     /**
      * @return string
      */
-    public function getDatabaseError()
+    public function getDatabaseError(): string
     {
         return $this->databaseError;
     }
@@ -124,7 +124,7 @@ class ArkPDOQueryResultIsNotExecutedError extends RuntimeException
      * @param string $databaseError
      * @return ArkPDOQueryResultIsNotExecutedError
      */
-    public function setDatabaseError($databaseError): ArkPDOQueryResultIsNotExecutedError
+    public function setDatabaseError(string $databaseError): ArkPDOQueryResultIsNotExecutedError
     {
         $this->databaseError = $databaseError;
         return $this;

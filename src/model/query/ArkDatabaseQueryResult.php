@@ -28,37 +28,37 @@ class ArkDatabaseQueryResult
     /**
      * @var string
      */
-    protected $sql;
+    protected string $sql;
     /**
      * @var string
      */
-    protected $status;
+    protected string $status;
     /**
      * @var string
      */
-    protected $error;
+    protected string $error;
     /**
      * @var int
      */
-    protected $lastInsertedID;
+    protected int $lastInsertedID;
     /**
      * @var int
      */
-    protected $affectedRowsCount;
+    protected int $affectedRowsCount;
     /**
      * @var ArkDatabaseQueryResultRow[]
      */
-    protected $resultRows;
+    protected array $resultRows;
     /**
      * @var PDOStatement|null
      */
-    protected $resultRowStream;
+    protected ?PDOStatement $resultRowStream;
     /**
      * @var ArkDatabaseQueryResultFieldMeta[]
      * @since 2.0.25
      * @experimental
      */
-    protected $resultRowStreamFieldMetaList;
+    protected array $resultRowStreamFieldMetaList;
 
     /**
      * @return ArkDatabaseQueryResultFieldMeta[]
@@ -240,7 +240,7 @@ class ArkDatabaseQueryResult
      * @since 2.0.12
      * @since 2.0.19 make it public
      */
-    public function assertStatusIsQueried(string $action)
+    public function assertStatusIsQueried(string $action): static
     {
         if ($this->status !== self::STATUS_QUERIED) {
             throw new ArkPDOQueryResultIsNotQueriedError($action, $this->status, $this->getError(), $this->sql);
@@ -254,7 +254,7 @@ class ArkDatabaseQueryResult
      * @since 2.0.18
      * @since 2.0.19 make it public
      */
-    public function assertStatusIsExecuted(string $action)
+    public function assertStatusIsExecuted(string $action): static
     {
         if ($this->status !== self::STATUS_EXECUTED) {
             throw new ArkPDOQueryResultIsNotExecutedError($action, $this->status, $this->getError(), $this->sql);
@@ -284,7 +284,7 @@ class ArkDatabaseQueryResult
     /**
      * @return PDOStatement|null
      */
-    public function getResultRowStream(): PDOStatement
+    public function getResultRowStream(): ?PDOStatement
     {
         return $this->resultRowStream;
     }
@@ -292,7 +292,7 @@ class ArkDatabaseQueryResult
     /**
      * @param PDOStatement|null $resultRowStream
      */
-    public function setResultRowStream(PDOStatement $resultRowStream)
+    public function setResultRowStream(?PDOStatement $resultRowStream): void
     {
         $this->resultRowStream = $resultRowStream;
         $this->loadStreamResultFieldsMeta();
@@ -303,7 +303,7 @@ class ArkDatabaseQueryResult
      * @since 2.0.25
      * @experimental
      */
-    protected function loadStreamResultFieldsMeta()
+    protected function loadStreamResultFieldsMeta(): static
     {
         $this->resultRowStreamFieldMetaList = [];
         for ($i = 0; $i < $this->resultRowStream->columnCount(); $i++) {
@@ -318,7 +318,7 @@ class ArkDatabaseQueryResult
      * @throws ArkPDOQueryResultFinishedStreamingSituation When all rows fetched
      * @throws ArkPDOQueryResultIsNotStreamingError When now is not streaming
      */
-    public function readNextRow($rowClass = ArkDatabaseQueryResultRow::class)
+    public function readNextRow(string $rowClass = ArkDatabaseQueryResultRow::class): ArkDatabaseQueryResultRow
     {
         if ($this->status !== self::STATUS_STREAMING) {
             throw new ArkPDOQueryResultIsNotStreamingError(__METHOD__, $this->getStatus(), $this->getError(), $this->getSql());
@@ -351,7 +351,7 @@ class ArkDatabaseQueryResult
      * @throws ArkPDOQueryResultIsNotStreamingError
      * @since 2.0.25
      */
-    public function readNextRowAndReloadRowClassInstance($rowClassInstance)
+    public function readNextRowAndReloadRowClassInstance(ArkDatabaseQueryResultRow $rowClassInstance): ArkDatabaseQueryResultRow
     {
         if ($this->status !== self::STATUS_STREAMING) {
             throw new ArkPDOQueryResultIsNotStreamingError(__METHOD__, $this->getStatus(), $this->getError(), $this->getSql());
@@ -375,7 +375,7 @@ class ArkDatabaseQueryResult
      * @throws ArkPDOQueryResultEmptySituation
      * @throws ArkPDOQueryResultIsNotQueriedError
      */
-    public function assertResultMatrixIsNotEmpty()
+    public function assertResultMatrixIsNotEmpty(): static
     {
         $this->assertStatusIsQueried(__METHOD__);
         if (empty($this->resultRows)) {
@@ -388,7 +388,7 @@ class ArkDatabaseQueryResult
      * @return array[]|false False for Error
      * @since 2.0.5
      */
-    public function tryGetRawRowsFromResultRowSet()
+    public function tryGetRawRowsFromResultRowSet(): array|bool
     {
         try {
             return $this->getRawMatrix();
@@ -415,7 +415,7 @@ class ArkDatabaseQueryResult
      * @return array|false|null False for Error, Null for Empty
      * @since 2.0.5
      */
-    public function tryGetFirstRawRowFromResultRowSet()
+    public function tryGetFirstRawRowFromResultRowSet(): bool|array|null
     {
         try {
             return $this->getResultRowByIndex(0)->getRawRow();
@@ -448,11 +448,11 @@ class ArkDatabaseQueryResult
 
     /**
      * @param string $fieldName
-     * @param mixed $default
+     * @param mixed|null $default
      * @return array|false False for Error
      * @since 2.0.5
      */
-    public function tryGetRawColumnsFromResultRowSet(string $fieldName, $default = null)
+    public function tryGetRawColumnsFromResultRowSet(string $fieldName, mixed $default = null): bool|array
     {
         try {
             return $this->getResultColumn($fieldName, $default);
@@ -463,14 +463,14 @@ class ArkDatabaseQueryResult
 
     /**
      * @param string $columnName
-     * @param null|mixed $default
+     * @param mixed|null $default
      * @return array
      * @throws ArkPDOQueryResultIsNotQueriedError
      * @since 2.0.1
      */
-    public function getResultColumn(string $columnName, $default = null): array
+    public function getResultColumn(string $columnName, mixed $default = null): array
     {
-        $this->assertStatusIsQueried(__METHOD__ . "({$columnName})");
+        $this->assertStatusIsQueried(__METHOD__ . "($columnName)");
         $column = [];
         foreach ($this->resultRows as $resultRow) {
             $column[] = $resultRow->getField($columnName, $default);
@@ -480,11 +480,11 @@ class ArkDatabaseQueryResult
 
     /**
      * @param string $fieldName
-     * @param mixed $default
+     * @param mixed|null $default
      * @return scalar|false|null False for Error, Null for Empty
      * @since 2.0.6
      */
-    public function tryGetRawCellFromResultRowSet(string $fieldName, $default = null)
+    public function tryGetRawCellFromResultRowSet(string $fieldName, mixed $default = null): float|bool|int|string|null
     {
         try {
             return $this->getResultRowByIndex(0)->getField($fieldName, $default);
@@ -504,7 +504,7 @@ class ArkDatabaseQueryResult
      */
     public function getResultKeyRowMap(string $fieldName): array
     {
-        $this->assertStatusIsQueried(__METHOD__ . "({$fieldName})");
+        $this->assertStatusIsQueried(__METHOD__ . "($fieldName)");
         $map = [];
         foreach ($this->resultRows as $resultRow) {
             $map[$resultRow->getField($fieldName, '')] = $resultRow;
@@ -519,7 +519,7 @@ class ArkDatabaseQueryResult
      */
     public function getResultKeyArrayRowMap(string $fieldName): array
     {
-        $this->assertStatusIsQueried(__METHOD__ . "({$fieldName})");
+        $this->assertStatusIsQueried(__METHOD__ . "($fieldName)");
         $map = [];
         foreach ($this->resultRows as $resultRow) {
             $map[$resultRow->getField($fieldName, '')] = $resultRow->getRawRow();
@@ -530,14 +530,14 @@ class ArkDatabaseQueryResult
     /**
      * @param string $keyFieldName
      * @param string $valueFieldName
-     * @param mixed $defaultValue
+     * @param mixed|null $defaultValue
      * @return array [key_filed_name=>value_field_value, ...]
      * @throws ArkPDOQueryResultIsNotQueriedError
      * @since 2.0.12
      */
-    public function getResultKeyValueMap(string $keyFieldName, string $valueFieldName, $defaultValue = null): array
+    public function getResultKeyValueMap(string $keyFieldName, string $valueFieldName, mixed $defaultValue = null): array
     {
-        $this->assertStatusIsQueried(__METHOD__ . "({$keyFieldName}=>{$valueFieldName})");
+        $this->assertStatusIsQueried(__METHOD__ . "($keyFieldName=>$valueFieldName)");
         $map = [];
         foreach ($this->resultRows as $resultRow) {
             $map[$resultRow->getField($keyFieldName, '')] = $resultRow->getField($valueFieldName, $defaultValue);

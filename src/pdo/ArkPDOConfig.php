@@ -41,7 +41,7 @@ class ArkPDOConfig
 
     const ENGINE_MYSQL = "mysql";
 
-    protected $dict;
+    protected array $dict;
 
     public function __construct($dict = null)
     {
@@ -69,7 +69,7 @@ class ArkPDOConfig
 
     public function __isset($name): bool
     {
-        return (isset($this->dict) && isset($this->dict[$name]));
+        return (isset($this->dict[$name]));
     }
 
     public function setHost($value): ArkPDOConfig

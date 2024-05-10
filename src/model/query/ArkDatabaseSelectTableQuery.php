@@ -20,52 +20,52 @@ class ArkDatabaseSelectTableQuery
     /**
      * @var ArkDatabaseTableCoreModel
      */
-    protected $model;
+    protected ArkDatabaseTableCoreModel $model;
     /**
      * @var ArkDatabaseSelectFieldMeta[]
      */
-    protected $selectFields;
+    protected array $selectFields;
 
     /**
      * @var ArkSQLCondition[]
      */
-    protected $conditions;
+    protected array $conditions;
     /**
      * @var string[]
      */
-    protected $groupByFields;
+    protected array $groupByFields;
     /**
      * @var ArkSQLCondition[]
      * @since 2.0.23
      */
-    protected $havingConditions;
+    protected array $havingConditions;
     /**
      * @var string
      */
-    protected $sortExpression;
+    protected string $sortExpression;
     /**
      * @var int
      */
-    protected $limit;
+    protected int $limit;
     /**
      * @var int
      */
-    protected $offset;
+    protected int $offset;
     /**
      * @var string[]
      * @since 2.0.7
      */
-    protected $listOfUseIndexItems;
+    protected array $listOfUseIndexItems;
     /**
      * @var string[]
      * @since 2.0.7
      */
-    protected $listOfForceIndexItems;
+    protected array $listOfForceIndexItems;
     /**
      * @var string[]
      * @since 2.0.7
      */
-    protected $listOfIgnoreIndexItems;
+    protected array $listOfIgnoreIndexItems;
     /**
      * @var string Default as Empty when no locks required;
      * @since 2.0.23
@@ -73,7 +73,7 @@ class ArkDatabaseSelectTableQuery
      * * [ For { Update | Share } [ Of TableName[, ...] ] [ NOWAIT | SKIP LOCKED ]
      * * LOCK IN SHARE MODE
      */
-    protected $lockMode = '';
+    protected string $lockMode = '';
 
     public function __construct(ArkDatabaseTableCoreModel $model)
     {
@@ -283,7 +283,7 @@ class ArkDatabaseSelectTableQuery
      * @param string $indexKey
      * @since 2.0.7
      */
-    public function useIndex(string $indexKey)
+    public function useIndex(string $indexKey): void
     {
         $this->listOfUseIndexItems[] = $indexKey;
     }
@@ -292,7 +292,7 @@ class ArkDatabaseSelectTableQuery
      * @param string $indexKey
      * @since 2.0.7
      */
-    public function forceIndex(string $indexKey)
+    public function forceIndex(string $indexKey): void
     {
         $this->listOfForceIndexItems[] = $indexKey;
     }
@@ -301,7 +301,7 @@ class ArkDatabaseSelectTableQuery
      * @param string $indexKey
      * @since 2.0.7
      */
-    public function ignoreIndex(string $indexKey)
+    public function ignoreIndex(string $indexKey): void
     {
         $this->listOfIgnoreIndexItems[] = $indexKey;
     }
@@ -310,7 +310,7 @@ class ArkDatabaseSelectTableQuery
      * @param string $resultRowCustomizedClass // I wonder if it is useful.
      * @return ArkDatabaseQueryResult
      */
-    public function queryForRows($resultRowCustomizedClass = ArkDatabaseQueryResultRow::class): ArkDatabaseQueryResult
+    public function queryForRows(string $resultRowCustomizedClass = ArkDatabaseQueryResultRow::class): ArkDatabaseQueryResult
     {
         $result = new ArkDatabaseQueryResult();
         try {
