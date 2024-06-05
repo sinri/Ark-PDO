@@ -20,13 +20,24 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
 {
     /**
      * @param array $data
+     * @param string|null $pk
+     * @return ArkDatabaseQueryResult
+     * @since 3.0.2
+     */
+    public function insertIgnoreOneRow(array $data, ?string $pk = null): ArkDatabaseQueryResult
+    {
+        return $this->writeInto("INSERT INTO", $data, $pk);
+    }
+
+    /**
+     * @param array $data
      * @param null|string $pk
      * @return ArkDatabaseQueryResult
      * @since 2.0
      */
     public function insertOneRow(array $data, ?string $pk = null): ArkDatabaseQueryResult
     {
-        return $this->writeInto($data, $pk);
+        return $this->writeInto("INSERT", $data, $pk);
     }
 
     /**
@@ -36,7 +47,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
      */
     public function replaceOneRow(array $data): ArkDatabaseQueryResult
     {
-        return $this->writeInto($data, null, true);
+        return $this->writeInto("REPLACE", $data, null, true);
     }
 
     /**
@@ -148,7 +159,18 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
      */
     public function batchInsertRows(array $dataList, $pk = null): ArkDatabaseQueryResult
     {
-        return $this->batchWriteInto($dataList, $pk);
+        return $this->batchWriteInto("INSERT", $dataList, $pk);
+    }
+
+    /**
+     * @param array $dataList
+     * @param $pk
+     * @return ArkDatabaseQueryResult
+     * @since 3.0.2
+     */
+    public function batchInsertIgnoreRows(array $dataList, $pk = null): ArkDatabaseQueryResult
+    {
+        return $this->batchWriteInto("INSERT IGNORE", $dataList, $pk);
     }
 
     /**
@@ -158,23 +180,24 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
      */
     public function batchReplaceRows(array $dataList): ArkDatabaseQueryResult
     {
-        return $this->batchWriteInto($dataList, null, true);
+        return $this->batchWriteInto("REPLACE", $dataList);
     }
 
     /**
+     * @param string $method
      * @param array $data
      * @param null|string $pk
-     * @param bool $shouldReplace
      * @return ArkDatabaseQueryResult
      */
-    protected function writeInto(array $data, ?string $pk = null, bool $shouldReplace = false): ArkDatabaseQueryResult
+    protected function writeInto(string $method, array $data, ?string $pk = null): ArkDatabaseQueryResult
     {
         $table = $this->getTableExpression();
         $values = $this->buildRowValuesForWrite($data, $fields);
         $result = new ArkDatabaseQueryResult();
 
         try {
-            $sql = ($shouldReplace ? 'REPLACE' : 'INSERT') . " INTO {$table} ({$fields}) VALUES ({$values})";
+            // ($shouldReplace ? 'REPLACE' : 'INSERT')
+            $sql = $method . " INTO {$table} ({$fields}) VALUES ({$values})";
             $result->setSql($sql);
             $afx = $this->db()->insert($sql, $pk);
             $result->setLastInsertedID($afx);
@@ -232,12 +255,12 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
     }
 
     /**
+     * @param string $method
      * @param array[] $dataList
-     * @param null|string $pk
-     * @param bool $shouldReplace
+     * @param null $pk
      * @return ArkDatabaseQueryResult
      */
-    protected function batchWriteInto(array $dataList, $pk = null, bool $shouldReplace = false): ArkDatabaseQueryResult
+    protected function batchWriteInto(string $method, array $dataList, $pk = null): ArkDatabaseQueryResult
     {
         $result = new ArkDatabaseQueryResult();
         try {
@@ -258,7 +281,8 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
             $fields = implode(",", $fields);
             $values = implode(",", $values);
             $table = $this->getTableExpression();
-            $sql = ($shouldReplace ? 'REPLACE' : 'INSERT') . " INTO {$table} ({$fields}) VALUES {$values}";
+            //($shouldReplace ? 'REPLACE' : 'INSERT')
+            $sql = $method . " INTO {$table} ({$fields}) VALUES {$values}";
             $result->setSql($sql);
 
             $afx = $this->db()->insert($sql, $pk);
@@ -287,9 +311,20 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
      *
      * @since 2.0.20
      */
-    public function insert_into_select(ArkDatabaseSelectTableQuery $selection, array $fields = []): ArkDatabaseQueryResult
+    public function insertIntoSelect(ArkDatabaseSelectTableQuery $selection, array $fields = []): ArkDatabaseQueryResult
     {
-        return $this->write_into_select('INSERT', $selection, $fields);
+        return $this->writeIntoSelect('INSERT', $selection, $fields);
+    }
+
+    /**
+     * @param ArkDatabaseSelectTableQuery $selection
+     * @param array $fields
+     * @return ArkDatabaseQueryResult
+     * @since 3.0.2
+     */
+    public function insertIgnoreIntoSelect(ArkDatabaseSelectTableQuery $selection, array $fields = []): ArkDatabaseQueryResult
+    {
+        return $this->writeIntoSelect('INSERT IGNORE', $selection, $fields);
     }
 
     /**
@@ -299,9 +334,9 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
      *
      * @since 2.0.20
      */
-    public function replace_into_select(ArkDatabaseSelectTableQuery $selection, array $fields = []): ArkDatabaseQueryResult
+    public function replaceIntoSelect(ArkDatabaseSelectTableQuery $selection, array $fields = []): ArkDatabaseQueryResult
     {
-        return $this->write_into_select('REPLACE', $selection, $fields);
+        return $this->writeIntoSelect('REPLACE', $selection, $fields);
     }
 
     /**
@@ -312,7 +347,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
      *
      * @since 2.0.20
      */
-    protected function write_into_select($method, ArkDatabaseSelectTableQuery $selection, array $fields = []): ArkDatabaseQueryResult
+    protected function writeIntoSelect(string $method, ArkDatabaseSelectTableQuery $selection, array $fields = []): ArkDatabaseQueryResult
     {
         $result = new ArkDatabaseQueryResult();
         try {
