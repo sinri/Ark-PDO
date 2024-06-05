@@ -18,7 +18,7 @@ use Throwable;
  */
 class ArkPDOStatementException extends RuntimeException
 {
-    protected $sql;
+    protected string $sql;
 
     public function __construct($sql = '', $code = 0, Throwable $previous = null)
     {
@@ -32,7 +32,7 @@ class ArkPDOStatementException extends RuntimeException
 
 
     /**
-     * @return mixed|string
+     * @return string
      */
     public function getSql(): string
     {

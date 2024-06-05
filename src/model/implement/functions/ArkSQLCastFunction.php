@@ -23,7 +23,7 @@ class ArkSQLCastFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeCast(string $expr, string $type, string $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeCast(string $expr, string $type, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         // CAST(expr AS type [ARRAY])
         return (new static('CAST'))
@@ -42,10 +42,11 @@ class ArkSQLCastFunction extends ArkSQLFunction
      *
      * @param string $timestamp_value field (in data time format) or date time string
      * @param string $timezone_specifier timezone_specifier: [INTERVAL] '+00:00' | 'UTC'
-     * @param int $precision
+     * @param int|string $precision
+     * @param string $timestamp_value_quote_type
      * @return static
      */
-    public static function makeCastTimeToDateTime($timestamp_value, $timezone_specifier, $precision = '', $timestamp_value_quote_type = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeCastTimeToDateTime(string $timestamp_value, string $timezone_specifier, int|string $precision = '', string $timestamp_value_quote_type = ArkPDO::QUOTE_TYPE_RAW): static
     {
         // CAST(timestamp_value AT TIME ZONE timezone_specifier AS DATETIME[(precision)])
         if (strlen(trim($precision)) > 0) {
@@ -60,14 +61,14 @@ class ArkSQLCastFunction extends ArkSQLFunction
 
     // CONVERT(expr USING transcoding_name), CONVERT(expr,type)
 
-    public static function makeConvertEncoding($expr, string $transcoding_name, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeConvertEncoding($expr, string $transcoding_name, $quoteType = ArkPDO::QUOTE_TYPE_RAW): ArkSQLCastFunction
     {
         return (new static('CONVERT'))
             ->appendParameter($expr, $quoteType)
             ->setTailText('USING ' . $transcoding_name);
     }
 
-    public static function makeConvertType($expr, $type, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeConvertType($expr, $type, $quoteType = ArkPDO::QUOTE_TYPE_RAW): ArkSQLCastFunction
     {
         return (new static('CONVERT'))
             ->appendParameter($expr, $quoteType)

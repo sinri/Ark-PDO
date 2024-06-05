@@ -15,17 +15,17 @@ use sinri\ark\database\pdo\ArkPDO;
  */
 class ArkSQLNullIfFunction extends ArkSQLFunction
 {
-    protected $target;
-    protected $standardForNull = ArkPDO::CONST_NULL;
+    protected string $target;
+    protected string $standardForNull = ArkPDO::CONST_NULL;
 
-    public static function check($target, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function check($target, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         $x = new static('NULLIF');
         $x->target = ArkPDO::quoteScalar($target, $quoteType);
         return $x;
     }
 
-    public function setStandardForNull($standard, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public function setStandardForNull($standard, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         $this->standardForNull = ArkPDO::quoteScalar($standard, $quoteType);
         return $this;

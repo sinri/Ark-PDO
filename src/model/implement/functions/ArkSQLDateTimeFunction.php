@@ -50,7 +50,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeAddDate($expr, int $days, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeAddDate($expr, int $days, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('ADDDATE'))->appendParameter($expr, $quoteType)->appendParameter($days);
     }
@@ -69,7 +69,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $quoteType2
      * @return static
      */
-    public static function makeAddTime($expr1, $expr2, $quoteType1 = ArkPDO::QUOTE_TYPE_RAW, $quoteType2 = ArkPDO::QUOTE_TYPE_VALUE)
+    public static function makeAddTime($expr1, $expr2, string $quoteType1 = ArkPDO::QUOTE_TYPE_RAW, string $quoteType2 = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         return (new static('ADDTIME'))
             ->appendParameter($expr1, $quoteType1)
@@ -87,7 +87,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      *
      * @return static
      */
-    public static function makeCurDate()
+    public static function makeCurDate(): static
     {
         return new static('CURDATE');
     }
@@ -110,7 +110,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param int|null $fsp
      * @return static
      */
-    public static function makeCurTime($fsp = null)
+    public static function makeCurTime(?int $fsp = null): static
     {
         $x = (new static('CURTIME'));
         if ($fsp !== null) {
@@ -123,9 +123,10 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * Extracts the date part of the date or datetime expression expr.
      *
      * @param string $expr
+     * @param string $quoteType
      * @return static
      */
-    public static function makeDate($expr, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeDate(string $expr, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('DATE'))->appendParameter($expr, $quoteType);
     }
@@ -144,7 +145,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $quoteType2
      * @return static
      */
-    public static function makeDateDiff($expr1, $expr2, $quoteType1 = ArkPDO::QUOTE_TYPE_RAW, $quoteType2 = ArkPDO::QUOTE_TYPE_VALUE)
+    public static function makeDateDiff($expr1, $expr2, string $quoteType1 = ArkPDO::QUOTE_TYPE_RAW, string $quoteType2 = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         return (new static('DATEDIFF'))
             ->appendParameter($expr1, $quoteType1)
@@ -157,12 +158,12 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @see https://dev.mysql.com/doc/refman/8.0/en/date-and-time-functions.html#function_date-add
      *
      * @param $date
-     * @param string|int $diff
+     * @param int|string $diff
      * @param string $unit
      * @param string $quoteType
      * @return static
      */
-    public static function makeDateAdd($date, $diff, string $unit, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeDateAdd($date, int|string $diff, string $unit, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('DATE_ADD'))
             ->appendParameter($date, $quoteType)
@@ -178,7 +179,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeDateSub($date, $diff, string $unit, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeDateSub($date, int|string $diff, string $unit, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('DATE_SUB'))
             ->appendParameter($date, $quoteType)
@@ -193,7 +194,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeDateFormat(string $date, string $format, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeDateFormat(string $date, string $format, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('DATE_FORMAT'))
             ->appendParameter($date, $quoteType)
@@ -207,7 +208,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $date
      * @return static
      */
-    public static function makeDayOfMonth($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeDayOfMonth(string $date, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('DAYOFMONTH'))->appendParameter($date, $quoteType);
     }
@@ -223,7 +224,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeDayOfWeek($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeDayOfWeek($date, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('DAYOFWEEK'))->appendParameter($date, $quoteType);
     }
@@ -235,7 +236,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeDayOfYear($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeDayOfYear($date, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('DAYOFYEAR'))->appendParameter($date, $quoteType);
     }
@@ -250,7 +251,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeExtract(string $unit, $date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeExtract(string $unit, $date, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('EXTRACT'))
             ->setHeadText($unit . ' FROM')
@@ -275,7 +276,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeFromUnixTime($unixTimestamp, $format = null, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeFromUnixTime($unixTimestamp, ?string $format = null, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         $x = new static('FROM_UNIXTIME');
         $x->appendParameter($unixTimestamp, $quoteType);
@@ -296,7 +297,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeHour($time, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeHour($time, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('HOUR'))->appendParameter($time, $quoteType);
     }
@@ -314,7 +315,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeMicroSecond($expr, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeMicroSecond($expr, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('MICROSECOND'))->appendParameter($expr, $quoteType);
     }
@@ -325,12 +326,12 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeMinute($time, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeMinute($time, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('MINUTE'))->appendParameter($time, $quoteType);
     }
 
-    public static function makeMonth($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeMonth($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW): ArkSQLDateTimeFunction
     {
         return (new static('MONTH'))->appendParameter($date, $quoteType);
     }
@@ -348,11 +349,11 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param int|null $fsp 0-6
      * @return static
      */
-    public static function makeNow($fsp = null)
+    public static function makeNow(?int $fsp = null): static
     {
         $x = new static('NOW');
         if ($fsp !== null) {
-            $x->appendParameter(intval($fsp));
+            $x->appendParameter($fsp);
         }
         return $x;
     }
@@ -361,12 +362,12 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
     // PERIOD_DIFF(P1,P2)
     // QUARTER(date)
 
-    public static function makeQuarter($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeQuarter($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW): ArkSQLDateTimeFunction
     {
         return (new static('QUARTER'))->appendParameter($date, $quoteType);
     }
 
-    public static function makeSecond($time, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeSecond($time, $quoteType = ArkPDO::QUOTE_TYPE_RAW): ArkSQLDateTimeFunction
     {
         return (new static('SECOND'))->appendParameter($time, $quoteType);
     }
@@ -374,14 +375,14 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
     // SEC_TO_TIME(seconds)
     // STR_TO_DATE(str,format)
 
-    public static function makeSubDate($expr, $days, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeSubDate($expr, $days, $quoteType = ArkPDO::QUOTE_TYPE_RAW): ArkSQLDateTimeFunction
     {
         return (new static('SUBDATE'))
             ->appendParameter($expr, $quoteType)
             ->appendParameter($days);
     }
 
-    public static function makeSubTime($expr1, $expr2, $quoteType1 = ArkPDO::QUOTE_TYPE_RAW, $quoteType2 = ArkPDO::QUOTE_TYPE_VALUE)
+    public static function makeSubTime($expr1, $expr2, $quoteType1 = ArkPDO::QUOTE_TYPE_RAW, $quoteType2 = ArkPDO::QUOTE_TYPE_VALUE): ArkSQLDateTimeFunction
     {
         return (new static('SUBTIME'))
             ->appendParameter($expr1, $quoteType1)
@@ -405,16 +406,16 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param int|null $fsp 0-6
      * @return static
      */
-    public static function makeSysDate($fsp = null)
+    public static function makeSysDate(?int $fsp = null): static
     {
         $x = new static('SYSDATE');
         if ($fsp !== null) {
-            $x->appendParameter(intval($fsp));
+            $x->appendParameter($fsp);
         }
         return $x;
     }
 
-    public static function makeTime($expr, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeTime($expr, $quoteType = ArkPDO::QUOTE_TYPE_RAW): ArkSQLDateTimeFunction
     {
         return (new static('TIME'))->appendParameter($expr, $quoteType);
     }
@@ -437,7 +438,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string|null $expr2
      * @return static
      */
-    public static function makeTimestamp($expr1, $expr2 = null, $quoteType1 = ArkPDO::QUOTE_TYPE_RAW, $quoteType2 = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeTimestamp(string $expr1, string $expr2 = null, $quoteType1 = ArkPDO::QUOTE_TYPE_RAW, $quoteType2 = ArkPDO::QUOTE_TYPE_RAW): static
     {
         $x = new static('TIMESTAMP');
         $x->appendParameter($expr1, $quoteType1);
@@ -486,7 +487,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string|null $date
      * @return static
      */
-    public static function makeUnixTimestamp($date = null, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeUnixTimestamp(string $date = null, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         $x = new static('UNIX_TIMESTAMP');
         if ($date !== null) {
@@ -507,7 +508,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeWeekday($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeWeekday($date, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('WEEKDAY'))->appendParameter($date, $quoteType);
     }
@@ -520,7 +521,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeWeekOfYear($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeWeekOfYear($date, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('WEEKOFYEAR'))->appendParameter($date, $quoteType);
     }
@@ -532,7 +533,7 @@ class ArkSQLDateTimeFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeYear($date, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeYear($date, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('YEAR'))->appendParameter($date, $quoteType);
     }

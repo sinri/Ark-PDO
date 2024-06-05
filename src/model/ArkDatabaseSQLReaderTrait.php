@@ -21,7 +21,7 @@ trait ArkDatabaseSQLReaderTrait
      * @param string $resultRowCustomizedClass // I wonder if it is useful.
      * @return ArkDatabaseQueryResult
      */
-    public function queryForRows($resultRowCustomizedClass = ArkDatabaseQueryResultRow::class): ArkDatabaseQueryResult
+    public function queryForRows(string $resultRowCustomizedClass = ArkDatabaseQueryResultRow::class): ArkDatabaseQueryResult
     {
         $result = new ArkDatabaseQueryResult();
         try {
@@ -30,10 +30,8 @@ trait ArkDatabaseSQLReaderTrait
 
             // old implementation
             $all = $this->getTargetPDO()->getAll($sql);
-            if (is_array($all)) {
-                foreach ($all as $row) {
-                    $result->addResultRow(new $resultRowCustomizedClass($row));
-                }
+            foreach ($all as $row) {
+                $result->addResultRow(new $resultRowCustomizedClass($row));
             }
 
             // new implementation with raw PDO

@@ -22,7 +22,7 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string|numeric $x Field name or number
      * @return static
      */
-    public static function makeAbs($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeAbs(float|int|string $x, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('ABS'))->appendParameter($x, $quoteType);
     }
@@ -34,10 +34,11 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
 
     /**
      * CEIL() is a synonym for CEILING().
-     * @param string|numeric $x
+     * @param float|int|string $x
+     * @param string $quoteType
      * @return static
      */
-    public static function makeCeil($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeCeil(float|int|string $x, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return self::makeCeiling($x, $quoteType);
     }
@@ -47,7 +48,7 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string|numeric $x
      * @return static
      */
-    public static function makeCeiling($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeCeiling(float|int|string $x, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('CEILING'))->appendParameter($x, $quoteType);
     }
@@ -68,7 +69,7 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeConv($n, int $fromBase, int $toBase, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeConv(float|int|string $n, int $fromBase, int $toBase, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('CONV'))
             ->appendParameter($n, $quoteType)
@@ -84,10 +85,11 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
 
     /**
      * Returns the largest integer value not greater than X.
-     * @param string|numeric $x
+     * @param float|int|string $x
+     * @param string $quoteType
      * @return static
      */
-    public static function makeFloor($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeFloor(float|int|string $x, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('FLOOR'))->appendParameter($x, $quoteType);
     }
@@ -120,7 +122,7 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param string|numeric|null $seed
      * @return static
      */
-    public static function makeRand($seed = null, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeRand(float|int|string|null $seed = null, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         $x = new static('RAND');
         if ($seed !== null) {
@@ -142,7 +144,7 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param int|null $d
      * @return static
      */
-    public static function makeRound($x, $d = null, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeRound(float|int|string $x, ?int $d = null, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         $func = new static('ROUND');
         $func->appendParameter($x, $quoteType);
@@ -156,10 +158,11 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * Returns the sign of the argument as -1, 0, or 1,
      * depending on whether X is negative, zero, or positive.
      *
-     * @param string|numeric $x
+     * @param float|int|string $x
+     * @param string $quoteType
      * @return static
      */
-    public static function makeSign($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeSign(float|int|string $x, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('SIGN'))->appendParameter($x, $quoteType);
     }
@@ -179,7 +182,7 @@ class ArkSQLMathematicalFunction extends ArkSQLFunction
      * @param int $d
      * @return static
      */
-    public static function makeTruncate($x, $d, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeTruncate(float|int|string $x, int $d, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('TRUNCATE'))->appendParameter($x, $quoteType)->appendParameter($d);
     }

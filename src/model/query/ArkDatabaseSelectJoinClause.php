@@ -17,23 +17,23 @@ class ArkDatabaseSelectJoinClause
     /**
      * @var string
      */
-    protected $joinType;
+    protected string $joinType;
     /**
-     * @var string
+     * @var string|ArkDatabaseSQLBuilderTrait
      */
     protected $tableExpression;
     /**
      * @var string
      */
-    protected $alias;
+    protected string $alias;
     /**
      * @var ArkSQLCondition[]
      */
-    protected $onConditions;
+    protected array $onConditions;
     /**
      * @var string
      */
-    protected $indexHint;
+    protected string $indexHint;
 
     /**
      * @param $joinType
@@ -42,7 +42,7 @@ class ArkDatabaseSelectJoinClause
      * @param string $alias
      * @param string $indexHint
      */
-    public function __construct($joinType, $tableExpression, $onConditions = [], $alias = '', $indexHint = '')
+    public function __construct($joinType, $tableExpression, array $onConditions = [], string $alias = '', string $indexHint = '')
     {
         $this->joinType = $joinType;
         $this->tableExpression = $tableExpression;
@@ -51,7 +51,7 @@ class ArkDatabaseSelectJoinClause
         $this->indexHint = $indexHint;
     }
 
-    public function addOnCondition(ArkSQLCondition $onCondition)
+    public function addOnCondition(ArkSQLCondition $onCondition): static
     {
         $this->onConditions[] = $onCondition;
         return $this;

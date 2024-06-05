@@ -73,14 +73,14 @@ class ArkSQLCondition
      * @param string $quoteType
      * @return ArkSQLCondition
      */
-    public static function for(string $leftSide, string $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function for(string $leftSide, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): ArkSQLCondition
     {
         $x = new self();
         $x->leftSide = ArkPDO::quoteScalar($leftSide, $quoteType);
         return $x;
     }
 
-    public static function raw(string $raw)
+    public static function raw(string $raw): ArkSQLCondition
     {
         $x = new self();
         $x->operator = self::MACRO_RAW_EXPRESSION;
@@ -89,7 +89,7 @@ class ArkSQLCondition
         return $x;
     }
 
-    public static function exists(string $subQuery)
+    public static function exists(string $subQuery): ArkSQLCondition
     {
         $x = new self();
         $x->operator = self::OP_EXISTS;
@@ -98,7 +98,7 @@ class ArkSQLCondition
         return $x;
     }
 
-    public static function notExists(string $subQuery)
+    public static function notExists(string $subQuery): ArkSQLCondition
     {
         $x = new self();
         $x->operator = self::OP_NOT_EXISTS;
@@ -111,7 +111,7 @@ class ArkSQLCondition
      * @param ArkSQLCondition[] $conditions
      * @return ArkSQLCondition
      */
-    public static function and(array $conditions)
+    public static function and(array $conditions): ArkSQLCondition
     {
         $x = new self();
         $x->operator = self::OP_PARENTHESES_AND;
@@ -127,7 +127,7 @@ class ArkSQLCondition
      * @param ArkSQLCondition[] $conditions
      * @return ArkSQLCondition
      */
-    public static function or(array $conditions)
+    public static function or(array $conditions): ArkSQLCondition
     {
         $x = new self();
         $x->operator = self::OP_PARENTHESES_OR;
@@ -212,14 +212,14 @@ class ArkSQLCondition
      * @param string $quoteType
      * @return $this
      */
-    public function notEqualNullSafe($rightSide, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
+    public function notEqualNullSafe($rightSide, string $quoteType = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         $this->operator = self::OP_NULL_SAFE_EQUAL;
         $this->rightSide = ArkPDO::quoteScalar($rightSide, $quoteType);
         return $this;
     }
 
-    public function equalOrIn($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
+    public function equalOrIn($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         if (is_array($x)) {
             return $this->in($x, $quoteType);
@@ -230,8 +230,9 @@ class ArkSQLCondition
     /**
      * @param scalar[] $array
      * @param string $quoteType
+     * @return ArkSQLCondition
      */
-    public function in(array $array, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
+    public function in(array $array, string $quoteType = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         $this->operator = self::OP_IN;
         $x = [];
@@ -250,14 +251,14 @@ class ArkSQLCondition
      * @param string $quoteType
      * @return $this
      */
-    public function equal($rightSide, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
+    public function equal($rightSide, string $quoteType = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         $this->operator = self::OP_EQ;
         $this->rightSide = ArkPDO::quoteScalar($rightSide, $quoteType);
         return $this;
     }
 
-    public function notEqualNorIn($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
+    public function notEqualNorIn($x, string $quoteType = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         if (is_array($x)) {
             return $this->notIn($x, $quoteType);
@@ -268,8 +269,9 @@ class ArkSQLCondition
     /**
      * @param scalar[] $array
      * @param string $quoteType
+     * @return ArkSQLCondition
      */
-    public function notIn(array $array, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
+    public function notIn(array $array, string $quoteType = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         $this->operator = self::OP_NOT_IN;
         $x = [];
@@ -288,56 +290,56 @@ class ArkSQLCondition
      * @param string $quoteType
      * @return $this
      */
-    public function notEqual($rightSide, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
+    public function notEqual($rightSide, string $quoteType = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         $this->operator = self::OP_NEQ;
         $this->rightSide = ArkPDO::quoteScalar($rightSide, $quoteType);
         return $this;
     }
 
-    public function greaterThan($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
+    public function greaterThan($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         $this->operator = self::OP_GT;
         $this->rightSide = ArkPDO::quoteScalar($x, $quoteType);
         return $this;
     }
 
-    public function greaterThanOrEqual($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
+    public function greaterThanOrEqual($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         $this->operator = self::OP_EGT;
         $this->rightSide = ArkPDO::quoteScalar($x, $quoteType);
         return $this;
     }
 
-    public function lessThan($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
+    public function lessThan($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         $this->operator = self::OP_LT;
         $this->rightSide = ArkPDO::quoteScalar($x, $quoteType);
         return $this;
     }
 
-    public function lessThanOrEqual($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
+    public function lessThanOrEqual($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         $this->operator = self::OP_ELT;
         $this->rightSide = ArkPDO::quoteScalar($x, $quoteType);
         return $this;
     }
 
-    public function isNull()
+    public function isNull(): static
     {
         $this->operator = self::OP_IS;
         $this->rightSide = ArkPDO::CONST_NULL;
         return $this;
     }
 
-    public function isNotNull()
+    public function isNotNull(): static
     {
         $this->operator = self::OP_IS_NOT;
         $this->rightSide = ArkPDO::CONST_NULL;
         return $this;
     }
 
-    public function havePrefix(string $prefix)
+    public function havePrefix(string $prefix): static
     {
         return $this->like($prefix . '%');
     }
@@ -345,14 +347,14 @@ class ArkSQLCondition
     /**
      * @param string $x such as `%A%B%` and the entire string would be quoted
      */
-    public function like(string $x)
+    public function like(string $x): static
     {
         $this->operator = self::OP_LIKE;
         $this->rightSide = ArkPDO::dryQuote($x);
         return $this;
     }
 
-    public function notHavePrefix(string $prefix)
+    public function notHavePrefix(string $prefix): static
     {
         return $this->notLike($prefix . '%');
     }
@@ -360,29 +362,29 @@ class ArkSQLCondition
     /**
      * @param string $x such as `%A%B%` and the entire string would be quoted
      */
-    public function notLike(string $x)
+    public function notLike(string $x): static
     {
         $this->operator = self::OP_NOT_LIKE;
         $this->rightSide = ArkPDO::dryQuote($x);
         return $this;
     }
 
-    public function haveSuffix(string $suffix)
+    public function haveSuffix(string $suffix): static
     {
         return $this->like('%' . $suffix);
     }
 
-    public function notHaveSuffix(string $suffix)
+    public function notHaveSuffix(string $suffix): static
     {
         return $this->notLike('%' . $suffix);
     }
 
-    public function contain(string $substring)
+    public function contain(string $substring): static
     {
         return $this->like('%' . $substring . '%');
     }
 
-    public function notContain(string $substring)
+    public function notContain(string $substring): static
     {
         return $this->notLike('%' . $substring . '%');
     }
@@ -393,7 +395,7 @@ class ArkSQLCondition
      * @param string $quoteType
      * @return $this
      */
-    public function between($a, $b, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
+    public function between($a, $b, string $quoteType = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         $this->operator = self::OP_BETWEEN;
         $this->rightSide = [
@@ -409,7 +411,7 @@ class ArkSQLCondition
      * @param string $quoteType
      * @return $this
      */
-    public function notBetween($a, $b, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
+    public function notBetween($a, $b, string $quoteType = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         $this->operator = self::OP_NOT_BETWEEN;
         $this->rightSide = [
@@ -419,14 +421,14 @@ class ArkSQLCondition
         return $this;
     }
 
-    public function isNullOrEmptyString()
+    public function isNullOrEmptyString(): static
     {
         $this->operator = self::MACRO_IS_NULL_OR_EMPTY_STRING;
         $this->rightSide = null;
         return $this;
     }
 
-    public function isNotNullNorEmptyString()
+    public function isNotNullNorEmptyString(): static
     {
         $this->operator = self::MACRO_IS_NOT_NULL_NOR_EMPTY_STRING;
         $this->rightSide = null;

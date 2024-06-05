@@ -20,20 +20,20 @@ class ArkPDOQueryResultIsNotStreamingError extends RuntimeException
     /**
      * @var string
      */
-    protected $action;
+    protected string $action;
     /**
      * @var string
      */
-    protected $status;
+    protected string $status;
     /**
      * @var string
      */
-    protected $databaseError;
+    protected string $databaseError;
     /**
      * @var string
      * @since 2.0.18
      */
-    protected $sql;
+    protected string $sql;
 
     /**
      * ArkPDOQueryResultIsNotStreamingError constructor.
@@ -44,7 +44,7 @@ class ArkPDOQueryResultIsNotStreamingError extends RuntimeException
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct(string $action, string $status, string $databaseError, string $sql = '', $code = 0, Throwable $previous = null)
+    public function __construct(string $action, string $status, string $databaseError, string $sql = '', int $code = 0, Throwable $previous = null)
     {
         parent::__construct(
             "Action Failed: " . $action . " | "
@@ -63,7 +63,7 @@ class ArkPDOQueryResultIsNotStreamingError extends RuntimeException
     /**
      * @return string
      */
-    public function getSql()
+    public function getSql(): string
     {
         return $this->sql;
     }
@@ -72,7 +72,7 @@ class ArkPDOQueryResultIsNotStreamingError extends RuntimeException
      * @param string $sql
      * @return ArkPDOQueryResultIsNotStreamingError
      */
-    public function setSql($sql)
+    public function setSql(string $sql): static
     {
         $this->sql = $sql;
         return $this;
@@ -81,7 +81,7 @@ class ArkPDOQueryResultIsNotStreamingError extends RuntimeException
     /**
      * @return string
      */
-    public function getAction()
+    public function getAction(): string
     {
         return $this->action;
     }
@@ -90,7 +90,7 @@ class ArkPDOQueryResultIsNotStreamingError extends RuntimeException
      * @param string $action
      * @return ArkPDOQueryResultIsNotStreamingError
      */
-    public function setAction($action): ArkPDOQueryResultIsNotStreamingError
+    public function setAction(string $action): ArkPDOQueryResultIsNotStreamingError
     {
         $this->action = $action;
         return $this;
@@ -99,7 +99,7 @@ class ArkPDOQueryResultIsNotStreamingError extends RuntimeException
     /**
      * @return string
      */
-    public function getStatus()
+    public function getStatus(): string
     {
         return $this->status;
     }
@@ -108,7 +108,7 @@ class ArkPDOQueryResultIsNotStreamingError extends RuntimeException
      * @param string $status
      * @return ArkPDOQueryResultIsNotStreamingError
      */
-    public function setStatus($status): ArkPDOQueryResultIsNotStreamingError
+    public function setStatus(string $status): ArkPDOQueryResultIsNotStreamingError
     {
         $this->status = $status;
         return $this;
@@ -117,7 +117,7 @@ class ArkPDOQueryResultIsNotStreamingError extends RuntimeException
     /**
      * @return string
      */
-    public function getDatabaseError()
+    public function getDatabaseError(): string
     {
         return $this->databaseError;
     }
@@ -126,7 +126,7 @@ class ArkPDOQueryResultIsNotStreamingError extends RuntimeException
      * @param string $databaseError
      * @return ArkPDOQueryResultIsNotStreamingError
      */
-    public function setDatabaseError($databaseError): ArkPDOQueryResultIsNotStreamingError
+    public function setDatabaseError(string $databaseError): ArkPDOQueryResultIsNotStreamingError
     {
         $this->databaseError = $databaseError;
         return $this;

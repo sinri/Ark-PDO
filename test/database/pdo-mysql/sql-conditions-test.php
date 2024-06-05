@@ -28,7 +28,7 @@ $x1 = ArkSQLCondition::and(
             ArkSQLCaseFunction::makeCaseFunction('x')
                 ->when('A')->then('B()', ArkPDO::QUOTE_TYPE_RAW)
                 ->when('C')->then('D')
-                ->else('0', ArkPDO::QUOTE_TYPE_VALUE)
+                ->else('0')
         )->equal('D'),
         ArkSQLCondition::for(
             ArkSQLIfFunction::check('P', ArkPDO::QUOTE_TYPE_FIELD)

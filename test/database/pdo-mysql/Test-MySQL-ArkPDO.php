@@ -7,8 +7,8 @@
  */
 
 use sinri\ark\core\ArkLogger;
+use sinri\ark\database\model\ArkDatabaseTableCoreModel;
 use sinri\ark\database\model\ArkDatabaseTableFieldDefinition;
-use sinri\ark\database\model\ArkDatabaseTableModel;
 use sinri\ark\database\pdo\ArkPDO;
 use sinri\ark\database\pdo\engine\ArkPDOConfigForMySQL;
 
@@ -70,7 +70,7 @@ try {
     $r = $db->getAll("desc ark_test_table");
     $logger->info("desc table", [$r]);
 
-    $model = new class($db) extends ArkDatabaseTableModel
+    $model = new class($db) extends ArkDatabaseTableCoreModel
     {
 
         protected $tmpDB;
@@ -94,6 +94,11 @@ try {
         public function db(): ArkPDO
         {
             return $this->tmpDB;
+        }
+
+        public function mappingSchemeName(): string
+        {
+            return '';
         }
     };
     ArkDatabaseTableFieldDefinition::devShowFieldsForPHPDoc($model);

@@ -17,7 +17,7 @@ class ArkSQLAggregateFunction extends ArkSQLFunction
 {
     // https://dev.mysql.com/doc/refman/8.0/en/aggregate-functions.html
 
-    public static function makeAvg(string $expr, bool $withDistinct = false, string $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeAvg(string $expr, bool $withDistinct = false, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): ArkSQLAggregateFunction
     {
         // AVG([DISTINCT] expr) [over_clause]
         return (new static('AVG'))
@@ -47,7 +47,7 @@ class ArkSQLAggregateFunction extends ArkSQLFunction
         }
     }
 
-    public static function makeGroupConcat($exprOrList, $withDistinct = false, $orderByExpression = '', $separator = ',', string $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeGroupConcat($exprOrList, $withDistinct = false, $orderByExpression = '', $separator = ',', string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         // GROUP_CONCAT([DISTINCT] expr [,expr ...]
         //             [ORDER BY {unsigned_integer | col_name | expr}
@@ -82,7 +82,7 @@ class ArkSQLAggregateFunction extends ArkSQLFunction
     // JSON_ARRAYAGG(col_or_expr) [over_clause]
     // JSON_OBJECTAGG(key, value) [over_clause]
 
-    public static function makeMax($expr, $withDistinct = false, string $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeMax($expr, $withDistinct = false, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): ArkSQLAggregateFunction
     {
         // MAX([DISTINCT] expr) [over_clause]
         return (new static('MAX'))
@@ -90,7 +90,7 @@ class ArkSQLAggregateFunction extends ArkSQLFunction
             ->appendParameter($expr, $quoteType);
     }
 
-    public static function makeMin($expr, $withDistinct = false, string $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeMin($expr, $withDistinct = false, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): ArkSQLAggregateFunction
     {
         // MIN([DISTINCT] expr) [over_clause]
         return (new static('MIN'))
@@ -103,7 +103,7 @@ class ArkSQLAggregateFunction extends ArkSQLFunction
     // STDDEV_POP(expr) [over_clause]
     // STDDEV_SAMP(expr) [over_clause]
 
-    public static function makeSum($expr, $withDistinct = false, string $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeSum($expr, $withDistinct = false, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): ArkSQLAggregateFunction
     {
         // SUM([DISTINCT] expr) [over_clause]
         return (new static('SUM'))

@@ -24,7 +24,7 @@ class ArkPDOConfigForSqlite extends ArkPDOConfig
         $this->setEngine(self::ENGINE);
     }
 
-    public function setAddress(string $address)
+    public function setAddress(string $address): static
     {
         $this->address = $address;
         return $this;

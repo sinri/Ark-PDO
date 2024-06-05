@@ -22,7 +22,7 @@ class ArkPDOSQLBuilderError extends RuntimeException
     /**
      * @var string
      */
-    protected $wrongSQLPiece;
+    protected mixed $wrongSQLPiece;
 
     public function __construct($message = "", $wrongSQLPiece = '', $code = 0, Throwable $previous = null)
     {

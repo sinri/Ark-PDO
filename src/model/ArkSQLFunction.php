@@ -16,19 +16,19 @@ class ArkSQLFunction
     /**
      * @var string
      */
-    protected $functionName;
+    protected string $functionName;
     /**
      * @var string
      */
-    protected $headText = '';
+    protected string $headText = '';
     /**
      * @var string
      */
-    protected $tailText = '';
+    protected string $tailText = '';
     /**
      * @var scalar[]
      */
-    protected $functionParameterArray;
+    protected array $functionParameterArray;
 
     /**
      * ArkSQLFunction constructor.
@@ -79,7 +79,7 @@ class ArkSQLFunction
     /**
      * @return $this
      */
-    public function resetParameterArray($functionParameterArray = [])
+    public function resetParameterArray($functionParameterArray = []): static
     {
         $this->functionParameterArray = $functionParameterArray;
         return $this;
@@ -88,7 +88,7 @@ class ArkSQLFunction
     /**
      * @return array
      */
-    public function getParameterArray()
+    public function getParameterArray(): array
     {
         return $this->functionParameterArray;
     }
@@ -97,7 +97,7 @@ class ArkSQLFunction
      * @param scalar $x
      * @return $this
      */
-    public function appendParameter($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public function appendParameter($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         $this->functionParameterArray[] = ArkPDO::quoteScalar($x, $quoteType);
         return $this;
@@ -106,7 +106,7 @@ class ArkSQLFunction
     /**
      * @return string
      */
-    public function getFunctionName()
+    public function getFunctionName(): string
     {
         return $this->functionName;
     }

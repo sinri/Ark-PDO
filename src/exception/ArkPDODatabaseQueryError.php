@@ -22,11 +22,11 @@ class ArkPDODatabaseQueryError extends RuntimeException
     /**
      * @var string
      */
-    protected $relatedSQL;
+    protected string $relatedSQL;
     /**
      * @var string
      */
-    protected $pdoError;
+    protected string $pdoError;
 
     /**
      * @return string

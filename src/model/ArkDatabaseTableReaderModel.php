@@ -14,10 +14,10 @@ use sinri\ark\database\pdo\ArkPDO;
 abstract class ArkDatabaseTableReaderModel
 {
     /**
-     * @return false|string
+     * @return string
      * Alternative: \sinri\ark\database\model\implement\functions\ArkSQLDateTimeFunction::makeNow
      */
-    public static function now()
+    public static function now(): string
     {
         return date('Y-m-d H:i:s');
     }
@@ -67,7 +67,7 @@ abstract class ArkDatabaseTableReaderModel
      * @param ArkDatabaseSelectFieldMeta[] $fieldMataList
      * @param ArkSQLCondition[] $conditions
      * @param string $sortExpression
-     * @param int|null $totalRows
+     * @param int $totalRows
      * @return array[]
      * @since 2.0.10
      * @since 2.0.11 loose $totalRows type check, allow unassigned variable to be there

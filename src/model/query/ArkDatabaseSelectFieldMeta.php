@@ -13,11 +13,11 @@ class ArkDatabaseSelectFieldMeta
     /**
      * @var string
      */
-    protected $fieldExpression;
+    protected string $fieldExpression;
     /**
      * @var string
      */
-    protected $alias;
+    protected string $alias;
 
     public function __construct(string $fieldExpression, string $alias = '')
     {

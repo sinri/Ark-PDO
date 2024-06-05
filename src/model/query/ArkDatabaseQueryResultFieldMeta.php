@@ -13,7 +13,7 @@ class ArkDatabaseQueryResultFieldMeta
     /**
      * @var array
      */
-    protected $meta;
+    protected array $meta;
 
     public function __construct(array $meta)
     {
@@ -43,7 +43,7 @@ class ArkDatabaseQueryResultFieldMeta
      * Any flags set for this column.
      * @return array
      */
-    public function getFlags()
+    public function getFlags(): array
     {
         return $this->meta['flags'];
     }

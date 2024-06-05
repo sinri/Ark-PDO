@@ -27,10 +27,11 @@ class SelectStatement implements SQLComponentInterface
      * [SQL_CACHE | SQL_NO_CACHE] [SQL_CALC_FOUND_ROWS]
      * @var string[]
      */
-    protected $prefixList = [];
+    protected array $prefixList = [];
 
     public function output(): string
     {
         // TODO: Implement output() method.
+        return '';
     }
 }

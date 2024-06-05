@@ -20,20 +20,20 @@ class ArkPDOQueryResultIsNotQueriedError extends RuntimeException
     /**
      * @var string
      */
-    protected $action;
+    protected string $action;
     /**
      * @var string
      */
-    protected $status;
+    protected string $status;
     /**
      * @var string
      */
-    protected $databaseError;
+    protected string $databaseError;
     /**
      * @var string
      * @since 2.0.18
      */
-    protected $sql;
+    protected string $sql;
 
     /**
      * ArkPDOQueryResultIsNotQueriedError constructor.
@@ -44,7 +44,7 @@ class ArkPDOQueryResultIsNotQueriedError extends RuntimeException
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct(string $action, string $status, string $databaseError, string $sql = '', $code = 0, Throwable $previous = null)
+    public function __construct(string $action, string $status, string $databaseError, string $sql = '', int $code = 0, Throwable $previous = null)
     {
         parent::__construct(
             "Action Failed: " . $action . " | "
@@ -63,7 +63,7 @@ class ArkPDOQueryResultIsNotQueriedError extends RuntimeException
     /**
      * @return string
      */
-    public function getSql()
+    public function getSql(): string
     {
         return $this->sql;
     }
@@ -72,7 +72,7 @@ class ArkPDOQueryResultIsNotQueriedError extends RuntimeException
      * @param string $sql
      * @return ArkPDOQueryResultIsNotQueriedError
      */
-    public function setSql($sql)
+    public function setSql(string $sql): static
     {
         $this->sql = $sql;
         return $this;
@@ -81,7 +81,7 @@ class ArkPDOQueryResultIsNotQueriedError extends RuntimeException
     /**
      * @return string
      */
-    public function getAction()
+    public function getAction(): string
     {
         return $this->action;
     }
@@ -90,7 +90,7 @@ class ArkPDOQueryResultIsNotQueriedError extends RuntimeException
      * @param string $action
      * @return ArkPDOQueryResultIsNotQueriedError
      */
-    public function setAction($action): ArkPDOQueryResultIsNotQueriedError
+    public function setAction(string $action): ArkPDOQueryResultIsNotQueriedError
     {
         $this->action = $action;
         return $this;
@@ -99,7 +99,7 @@ class ArkPDOQueryResultIsNotQueriedError extends RuntimeException
     /**
      * @return string
      */
-    public function getStatus()
+    public function getStatus(): string
     {
         return $this->status;
     }
@@ -108,7 +108,7 @@ class ArkPDOQueryResultIsNotQueriedError extends RuntimeException
      * @param string $status
      * @return ArkPDOQueryResultIsNotQueriedError
      */
-    public function setStatus($status): ArkPDOQueryResultIsNotQueriedError
+    public function setStatus(string $status): ArkPDOQueryResultIsNotQueriedError
     {
         $this->status = $status;
         return $this;
@@ -117,7 +117,7 @@ class ArkPDOQueryResultIsNotQueriedError extends RuntimeException
     /**
      * @return string
      */
-    public function getDatabaseError()
+    public function getDatabaseError(): string
     {
         return $this->databaseError;
     }
@@ -126,7 +126,7 @@ class ArkPDOQueryResultIsNotQueriedError extends RuntimeException
      * @param string $databaseError
      * @return ArkPDOQueryResultIsNotQueriedError
      */
-    public function setDatabaseError($databaseError): ArkPDOQueryResultIsNotQueriedError
+    public function setDatabaseError(string $databaseError): ArkPDOQueryResultIsNotQueriedError
     {
         $this->databaseError = $databaseError;
         return $this;

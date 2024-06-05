@@ -16,11 +16,11 @@ class ArkDatabaseSelectUnionQuery
     /**
      * @var ArkDatabaseSelectTableQuery[]
      */
-    protected $selections;
+    protected array $selections;
     /**
      * @var string
      */
-    protected $sortExpression;
+    protected string $sortExpression;
 
     public function __construct(ArkDatabaseSelectTableQuery $startSelection)
     {
@@ -28,26 +28,26 @@ class ArkDatabaseSelectUnionQuery
         $this->sortExpression = '';
     }
 
-    public function unionAll(ArkDatabaseSelectTableQuery $selection)
+    public function unionAll(ArkDatabaseSelectTableQuery $selection): static
     {
         $selection->unionType = 'UNION ALL'; //
         $this->selections[] = $selection;
         return $this;
     }
 
-    public function unionDistinct(ArkDatabaseSelectTableQuery $selection)
+    public function unionDistinct(ArkDatabaseSelectTableQuery $selection): static
     {
         return $this->union($selection);
     }
 
-    public function union(ArkDatabaseSelectTableQuery $selection)
+    public function union(ArkDatabaseSelectTableQuery $selection): static
     {
         $selection->unionType = 'UNION';// i.e. UNION DISTINCT
         $this->selections[] = $selection;
         return $this;
     }
 
-    public function setSortExpression(string $sortExpression)
+    public function setSortExpression(string $sortExpression): static
     {
         $this->sortExpression = trim($sortExpression);
         return $this;

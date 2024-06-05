@@ -532,10 +532,9 @@ class ArkDatabaseQueryResult
      * @param string $valueFieldName
      * @param mixed $defaultValue
      * @return array [key_filed_name=>value_field_value, ...]
-     * @throws ArkPDOQueryResultIsNotQueriedError
      * @since 2.0.12
      */
-    public function getResultKeyValueMap(string $keyFieldName, string $valueFieldName, $defaultValue = null): array
+    public function getResultKeyValueMap(string $keyFieldName, string $valueFieldName, mixed $defaultValue = null): array
     {
         $this->assertStatusIsQueried(__METHOD__ . "({$keyFieldName}=>{$valueFieldName})");
         $map = [];

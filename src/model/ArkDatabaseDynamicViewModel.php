@@ -9,9 +9,9 @@ use sinri\ark\database\pdo\ArkPDO;
  */
 class ArkDatabaseDynamicViewModel extends ArkDatabaseTableReaderModel
 {
-    protected $pdo;
-    protected $scheme;
-    protected $table;
+    protected ArkPDO $pdo;
+    protected string $scheme;
+    protected string $table;
 
     /**
      * ArkDatabaseDynamicTableModel constructor.

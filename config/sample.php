@@ -22,5 +22,4 @@ $config->setHost($pdoInfo['host'])
     ->setUsername($pdoInfo['username'])
     ->setPassword($pdoInfo['password'])
     ->setDatabase($pdoInfo['database'])
-    ->setCharset($pdoInfo['charset'])
-    ->setEngine($pdoInfo['engine']);
+    ->setCharset($pdoInfo['charset']);

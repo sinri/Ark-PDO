@@ -2,7 +2,6 @@
 
 use sinri\ark\database\model\ArkDatabaseDynamicTableModel;
 use sinri\ark\database\model\ArkSQLCondition;
-use sinri\ark\database\model\query\ArkDatabaseSelectJoinedTablesQuery;
 use sinri\ark\database\model\query\ArkDatabaseSelectTableQuery;
 use sinri\ark\database\model\query\ArkDatabaseSelectUnionQuery;
 use sinri\ark\database\pdo\ArkPDO;

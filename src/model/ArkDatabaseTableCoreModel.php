@@ -24,7 +24,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
      * @return ArkDatabaseQueryResult
      * @since 2.0
      */
-    public function insertOneRow(array $data, $pk = null): ArkDatabaseQueryResult
+    public function insertOneRow(array $data, ?string $pk = null): ArkDatabaseQueryResult
     {
         return $this->writeInto($data, $pk);
     }
@@ -55,9 +55,6 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
             $sql = "UPDATE {$table} SET {$data_sql} WHERE {$condition_sql}";
             $result->setSql($sql);
             $afx = $this->db()->exec($sql);
-            if ($afx === false) {
-                throw new ArkPDODatabaseQueryError($sql, $this->db()->getPDOErrorDescription());
-            }
             $result->setAffectedRowsCount($afx);
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
         } catch (ArkPDODatabaseQueryError $e) {
@@ -107,9 +104,6 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
             $table = $this->getTableExpression();
             $sql = "DELETE FROM {$table} WHERE {$condition_sql}";
             $afx = $this->db()->exec($sql);
-            if ($afx === false) {
-                throw new ArkPDODatabaseQueryError($sql, $this->db()->getPDOErrorDescription());
-            }
             $result->setAffectedRowsCount($afx);
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
         } catch (ArkPDODatabaseQueryError $e) {
@@ -173,7 +167,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
      * @param bool $shouldReplace
      * @return ArkDatabaseQueryResult
      */
-    protected function writeInto(array $data, $pk = null, bool $shouldReplace = false): ArkDatabaseQueryResult
+    protected function writeInto(array $data, ?string $pk = null, bool $shouldReplace = false): ArkDatabaseQueryResult
     {
         $table = $this->getTableExpression();
         $values = $this->buildRowValuesForWrite($data, $fields);
@@ -183,9 +177,6 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
             $sql = ($shouldReplace ? 'REPLACE' : 'INSERT') . " INTO {$table} ({$fields}) VALUES ({$values})";
             $result->setSql($sql);
             $afx = $this->db()->insert($sql, $pk);
-            if ($afx === false) {
-                throw new ArkPDODatabaseQueryError($sql, $this->db()->getPDOErrorDescription());
-            }
             $result->setLastInsertedID($afx);
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
         } catch (ArkPDODatabaseQueryError $e) {
@@ -271,10 +262,6 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
             $result->setSql($sql);
 
             $afx = $this->db()->insert($sql, $pk);
-            if ($afx === false) {
-                throw new ArkPDODatabaseQueryError($sql, $this->db()->getPDOErrorDescription());
-            }
-
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
             $result->setLastInsertedID($afx);
         } catch (ArkPDODatabaseQueryError $exception) {
@@ -300,7 +287,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
      *
      * @since 2.0.20
      */
-    public function insert_into_select(ArkDatabaseSelectTableQuery $selection, array $fields = [])
+    public function insert_into_select(ArkDatabaseSelectTableQuery $selection, array $fields = []): ArkDatabaseQueryResult
     {
         return $this->write_into_select('INSERT', $selection, $fields);
     }
@@ -312,7 +299,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
      *
      * @since 2.0.20
      */
-    public function replace_into_select(ArkDatabaseSelectTableQuery $selection, array $fields = [])
+    public function replace_into_select(ArkDatabaseSelectTableQuery $selection, array $fields = []): ArkDatabaseQueryResult
     {
         return $this->write_into_select('REPLACE', $selection, $fields);
     }
@@ -325,7 +312,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
      *
      * @since 2.0.20
      */
-    protected function write_into_select($method, ArkDatabaseSelectTableQuery $selection, array $fields = [])
+    protected function write_into_select($method, ArkDatabaseSelectTableQuery $selection, array $fields = []): ArkDatabaseQueryResult
     {
         $result = new ArkDatabaseQueryResult();
         try {
@@ -338,9 +325,6 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
             $result->setSql($sql);
 
             $afx = $this->db()->insert($sql);
-            if ($afx === false) {
-                throw new ArkPDODatabaseQueryError($sql, $this->db()->getPDOErrorDescription());
-            }
 
             $result->setStatus(ArkDatabaseQueryResult::STATUS_EXECUTED);
             $result->setLastInsertedID($afx);
@@ -354,10 +338,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
 //                $result->setError($this->db()->getPDOErrorDescription());
 //                $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
 //            }
-        } catch (ArkPDOSQLBuilderError $e) {
-            $result->setError($e->getMessage());
-            $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
-        } catch (ArkPDODatabaseQueryError $e) {
+        } catch (ArkPDOSQLBuilderError|ArkPDODatabaseQueryError $e) {
             $result->setError($e->getMessage());
             $result->setStatus(ArkDatabaseQueryResult::STATUS_ERROR);
         }
@@ -371,7 +352,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
      * @since 2.0.30
      * @see https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html
      */
-    public function insertOnDuplicateKeyUpdate($dataList, $duplicateModification)
+    public function insertOnDuplicateKeyUpdate(array $dataList, array $duplicateModification): ArkDatabaseQueryResult
     {
         $result = new ArkDatabaseQueryResult();
         try {

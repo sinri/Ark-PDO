@@ -24,46 +24,46 @@ class ArkDatabaseSelectTableQuery
     /**
      * @var ArkDatabaseTableReaderModel
      */
-    protected $model;
+    protected ArkDatabaseTableReaderModel $model;
     /**
      * @var ArkDatabaseSelectJoinClause[]
      */
-    protected $joinTables = [];
+    protected array $joinTables = [];
 
     /**
      * @var ArkDatabaseSelectFieldMeta[]
      */
-    protected $selectFields;
+    protected array $selectFields;
 
     /**
      * @var ArkSQLCondition[]
      */
-    protected $conditions;
+    protected array $conditions;
     /**
      * @var string[]
      */
-    protected $groupByFields;
+    protected array $groupByFields;
     /**
      * @var ArkSQLCondition[]
      * @since 2.0.23
      */
-    protected $havingConditions;
+    protected array $havingConditions;
     /**
      * @var string
      */
-    protected $sortExpression;
+    protected string $sortExpression;
     /**
      * @var int
      */
-    protected $limit;
+    protected int $limit;
     /**
      * @var int
      */
-    protected $offset;
+    protected int $offset;
     /**
      * @var string
      */
-    protected $indexHint;
+    protected string $indexHint;
 
     /**
      * @var string Default as Empty when no locks required;
@@ -72,13 +72,13 @@ class ArkDatabaseSelectTableQuery
      * * [ For { Update | Share } [ Of TableName[, ...] ] [ NOWAIT | SKIP LOCKED ]
      * * LOCK IN SHARE MODE
      */
-    protected $lockMode = '';
+    protected string $lockMode = '';
 
     /**
      * @var string UNION [ALL | DISTINCT]
      * ONLY USED FOR ArkDatabaseSelectUnionQuery
      */
-    public $unionType = '';
+    public string $unionType = '';
 
     public function __construct(ArkDatabaseTableReaderModel $model)
     {
@@ -288,7 +288,7 @@ class ArkDatabaseSelectTableQuery
         return $this;
     }
 
-    public function setIndexHint(string $indexHint)
+    public function setIndexHint(string $indexHint): static
     {
         $this->indexHint = $indexHint;
         return $this;
@@ -336,7 +336,7 @@ class ArkDatabaseSelectTableQuery
      *
      * @return ArkDatabaseSelectTableQuery
      */
-    protected function addJoinClause(string $type, $joinObject, array $onConditions, string $alias = '', string $indexHint = '')
+    protected function addJoinClause(string $type, $joinObject, array $onConditions, string $alias = '', string $indexHint = ''): static
     {
         $tableExpression = $joinObject;
         if (is_a($joinObject, ArkDatabaseTableReaderModel::class)) {
@@ -352,22 +352,22 @@ class ArkDatabaseSelectTableQuery
         return $this;
     }
 
-    public function innerJoinAnotherTable(ArkDatabaseTableReaderModel $model, array $onConditions, string $alias = '', string $indexHint = '')
+    public function innerJoinAnotherTable(ArkDatabaseTableReaderModel $model, array $onConditions, string $alias = '', string $indexHint = ''): static
     {
         return $this->addJoinClause(ArkDatabaseSelectJoinClause::INNER_JOIN, $model, $onConditions, $alias, $indexHint);
     }
 
-    public function leftJoinAnotherTable(ArkDatabaseTableReaderModel $model, array $onConditions, string $alias = '', string $indexHint = '')
+    public function leftJoinAnotherTable(ArkDatabaseTableReaderModel $model, array $onConditions, string $alias = '', string $indexHint = ''): static
     {
         return $this->addJoinClause(ArkDatabaseSelectJoinClause::LEFT_JOIN, $model, $onConditions, $alias, $indexHint);
     }
 
-    public function rightJoinAnotherTable(ArkDatabaseTableReaderModel $model, array $onConditions, string $alias = '', string $indexHint = '')
+    public function rightJoinAnotherTable(ArkDatabaseTableReaderModel $model, array $onConditions, string $alias = '', string $indexHint = ''): static
     {
         return $this->addJoinClause(ArkDatabaseSelectJoinClause::RIGHT_JOIN, $model, $onConditions, $alias, $indexHint);
     }
 
-    public function straightJoinAnotherTable(ArkDatabaseTableReaderModel $model, array $onConditions, string $alias = '', string $indexHint = '')
+    public function straightJoinAnotherTable(ArkDatabaseTableReaderModel $model, array $onConditions, string $alias = '', string $indexHint = ''): static
     {
         return $this->addJoinClause(ArkDatabaseSelectJoinClause::STRAIGHT_JOIN, $model, $onConditions, $alias, $indexHint);
     }
@@ -379,7 +379,7 @@ class ArkDatabaseSelectTableQuery
      * @param string $indexHint
      * @return $this
      */
-    public function innerJoinQueryBlock($builder, string $alias, array $onConditions, string $indexHint = '')
+    public function innerJoinQueryBlock($builder, string $alias, array $onConditions, string $indexHint = ''): static
     {
         return $this->addJoinClause(ArkDatabaseSelectJoinClause::INNER_JOIN, $builder, $onConditions, $alias, $indexHint);
     }
@@ -391,7 +391,7 @@ class ArkDatabaseSelectTableQuery
      * @param string $indexHint
      * @return $this
      */
-    public function leftJoinQueryBlock($builder, string $alias, array $onConditions, string $indexHint = '')
+    public function leftJoinQueryBlock($builder, string $alias, array $onConditions, string $indexHint = ''): static
     {
         return $this->addJoinClause(ArkDatabaseSelectJoinClause::LEFT_JOIN, $builder, $onConditions, $alias, $indexHint);
     }
@@ -403,7 +403,7 @@ class ArkDatabaseSelectTableQuery
      * @param string $indexHint
      * @return $this
      */
-    public function rightJoinQueryBlock($builder, string $alias, array $onConditions, string $indexHint = '')
+    public function rightJoinQueryBlock($builder, string $alias, array $onConditions, string $indexHint = ''): static
     {
         return $this->addJoinClause(ArkDatabaseSelectJoinClause::RIGHT_JOIN, $builder, $onConditions, $alias, $indexHint);
     }
@@ -415,7 +415,7 @@ class ArkDatabaseSelectTableQuery
      * @param string $indexHint
      * @return $this
      */
-    public function straightJoinQueryBlock($builder, string $alias, array $onConditions, string $indexHint = '')
+    public function straightJoinQueryBlock($builder, string $alias, array $onConditions, string $indexHint = ''): static
     {
         return $this->addJoinClause(ArkDatabaseSelectJoinClause::STRAIGHT_JOIN, $builder, $onConditions, $alias, $indexHint);
     }
@@ -550,7 +550,7 @@ class ArkDatabaseSelectTableQuery
      * @return array[]
      * @since 2.0.33
      */
-    public function queryForMatrixWithPaging(int $page, int $pageSize, int &$total = null)
+    public function queryForMatrixWithPaging(int $page, int $pageSize, int &$total = null): array
     {
         $matrix = $this->setLimit($pageSize)
             ->setOffset($pageSize * ($page - 1))

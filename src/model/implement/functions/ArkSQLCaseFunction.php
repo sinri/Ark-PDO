@@ -14,11 +14,11 @@ class ArkSQLCaseFunction extends ArkSQLFunction
     /**
      * @var bool
      */
-    protected $asStatement;
+    protected bool $asStatement;
     /**
-     * @var string
+     * @var string|null
      */
-    protected $tempWhen;
+    protected ?string $tempWhen;
 
     public function __construct(string $functionName, $asStatement = false)
     {
@@ -26,7 +26,7 @@ class ArkSQLCaseFunction extends ArkSQLFunction
         $this->asStatement = $asStatement;
     }
 
-    public static function makeCaseFunction($target, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeCaseFunction($target, $quoteType = ArkPDO::QUOTE_TYPE_RAW): ArkSQLCaseFunction
     {
         $func = new self('CASE');
         $func->resetParameterArray(
@@ -39,7 +39,7 @@ class ArkSQLCaseFunction extends ArkSQLFunction
         return $func;
     }
 
-    public static function makeCaseStatement($target, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeCaseStatement($target, $quoteType = ArkPDO::QUOTE_TYPE_RAW): ArkSQLCaseFunction
     {
         $func = new self('CASE', true);
         $func->resetParameterArray(
@@ -52,13 +52,13 @@ class ArkSQLCaseFunction extends ArkSQLFunction
         return $func;
     }
 
-    public function when($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
+    public function when($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         $this->tempWhen = ArkPDO::quoteScalar($x, $quoteType);
         return $this;
     }
 
-    public function then($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
+    public function then($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         if ($this->tempWhen === null) {
             throw new ArkPDOSQLBuilderError('WHEN NULL');
@@ -67,7 +67,7 @@ class ArkSQLCaseFunction extends ArkSQLFunction
         return $this;
     }
 
-    public function else($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE)
+    public function else($x, $quoteType = ArkPDO::QUOTE_TYPE_VALUE): static
     {
         $this->functionParameterArray['else'] = ArkPDO::quoteScalar($x, $quoteType);
         return $this;
@@ -99,7 +99,7 @@ class ArkSQLCaseFunction extends ArkSQLFunction
     /**
      * @return string|null
      */
-    public function readTarget()
+    public function readTarget(): ?string
     {
         $target = null;
         if (isset($this->functionParameterArray['target'])) {
@@ -112,7 +112,7 @@ class ArkSQLCaseFunction extends ArkSQLFunction
     /**
      * @return string[]
      */
-    public function readBranches()
+    public function readBranches(): array
     {
         $branches = null;
         if (isset($this->functionParameterArray['branches'])) {
@@ -128,7 +128,7 @@ class ArkSQLCaseFunction extends ArkSQLFunction
     /**
      * @return string|null
      */
-    public function readElse()
+    public function readElse(): ?string
     {
         $else = null;
         if (isset($this->functionParameterArray['else'])) {

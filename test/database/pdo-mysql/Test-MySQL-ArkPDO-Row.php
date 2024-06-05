@@ -3,6 +3,7 @@
 
 use sinri\ark\core\ArkLogger;
 use sinri\ark\database\exception\ArkPDOConfigError;
+use sinri\ark\database\exception\ArkPDOQueryResultFinishedStreamingSituation;
 use sinri\ark\database\exception\ArkPDOQueryResultIsNotQueriedError;
 use sinri\ark\database\exception\ArkPDOQueryResultIsNotStreamingError;
 use sinri\ark\database\model\ArkDatabaseDynamicTableModel;
@@ -35,16 +36,15 @@ try {
 
     $result_as_stream = $selection->queryForStream();
     while (true) {
-        $row = ArkTestTableRow::fetchRowFromStream($result_as_stream);
-        if ($row === null) break;
+        try {
+            $row = ArkTestTableRow::fetchRowFromStream($result_as_stream);
+        } catch (ArkPDOQueryResultFinishedStreamingSituation $e) {
+            break;
+        }
         $logger->info('STREAMING: ' . $row->getId(), ['value' => $row->getValue(), 'score' => $row->score]);
     }
     $logger->info('now ' . $result_as_stream->getStatus());
 
-} catch (ArkPDOQueryResultIsNotQueriedError $e) {
-    $logger->error($e->getMessage());
-} catch (ArkPDOConfigError $e) {
-    $logger->error($e->getMessage());
-} catch (ArkPDOQueryResultIsNotStreamingError $e) {
+} catch (ArkPDOQueryResultIsNotQueriedError|ArkPDOQueryResultIsNotStreamingError|ArkPDOConfigError $e) {
     $logger->error($e->getMessage());
 }

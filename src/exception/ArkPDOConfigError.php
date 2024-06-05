@@ -20,11 +20,11 @@ class ArkPDOConfigError extends UnexpectedValueException
     /**
      * @var string
      */
-    protected $invalidFieldName;
+    protected mixed $invalidFieldName;
     /**
      * @var int|string|null
      */
-    protected $invalidFieldValue;
+    protected string|int|null $invalidFieldValue;
 
     public function __construct($invalidField = 'ALL', $invalidFieldValue = null, Throwable $previous = null)
     {
@@ -36,7 +36,7 @@ class ArkPDOConfigError extends UnexpectedValueException
         $this->invalidFieldName = $invalidField;
     }
 
-    public function getInvalidFieldValue()
+    public function getInvalidFieldValue(): int|string|null
     {
         return $this->invalidFieldValue;
     }

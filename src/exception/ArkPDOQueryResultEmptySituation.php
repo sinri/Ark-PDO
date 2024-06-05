@@ -20,7 +20,7 @@ class ArkPDOQueryResultEmptySituation extends Exception
     /**
      * @var string
      */
-    protected $relatedSQL;
+    protected string $relatedSQL;
 
     /**
      * @return string

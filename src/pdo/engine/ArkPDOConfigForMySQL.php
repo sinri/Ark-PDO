@@ -48,42 +48,42 @@ class ArkPDOConfigForMySQL extends ArkPDOConfig
         }
     }
 
-    public function setCharset($value): ArkPDOConfig
+    public function setCharset($value): static
     {
         $field = self::CONFIG_CHARSET;
         $this->$field = $value;
         return $this;
     }
 
-    public function setPort($value): ArkPDOConfig
+    public function setPort($value): static
     {
         $field = self::CONFIG_PORT;
         $this->$field = intval($value);
         return $this;
     }
 
-    public function setHost($value): ArkPDOConfig
+    public function setHost($value): static
     {
         $field = self::CONFIG_HOST;
         $this->$field = $value;
         return $this;
     }
 
-    public function setUsername($value): ArkPDOConfig
+    public function setUsername($value): static
     {
         $field = self::CONFIG_USERNAME;
         $this->$field = $value;
         return $this;
     }
 
-    public function setPassword($value): ArkPDOConfig
+    public function setPassword($value): static
     {
         $field = self::CONFIG_PASSWORD;
         $this->$field = $value;
         return $this;
     }
 
-    public function setDatabase($value): ArkPDOConfig
+    public function setDatabase($value): static
     {
         $field = self::CONFIG_DATABASE;
         $this->$field = $value;
@@ -95,7 +95,7 @@ class ArkPDOConfigForMySQL extends ArkPDOConfig
      * @param $value
      * @return $this
      */
-    public function setOptions($value): ArkPDOConfig
+    public function setOptions($value): static
     {
         $field = self::CONFIG_OPTIONS;
         $this->$field = $value;

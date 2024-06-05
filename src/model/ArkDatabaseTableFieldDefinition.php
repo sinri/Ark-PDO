@@ -16,11 +16,11 @@ use sinri\ark\database\pdo\ArkPDO;
 
 class ArkDatabaseTableFieldDefinition
 {
-    protected $name;
-    protected $type;
-    protected $typeCategory;
-    protected $nullable;
-    protected $comment;
+    protected string $name;
+    protected string $type;
+    protected string $typeCategory;
+    protected bool $nullable;
+    protected string $comment;
 
     protected function __construct()
     {
@@ -47,98 +47,49 @@ class ArkDatabaseTableFieldDefinition
         return $field;
     }
 
-    protected static function determineTypeCategory($type): string
+    protected static function determineTypeCategory(string $type): string
     {
         $type = strtolower($type);
-        switch ($type) {
-            case 'bit':
-            case 'tinyint':
-            case 'smallint':
-            case 'mediumint':
-            case 'int':
-            case 'integer':
-            case 'bigint'://for bigint it sometimes sucks for PHP when number too large
-                return "int";
-            case 'SERIAL'://SERIAL is an alias for BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE.
-                return "string";
-            case 'decimal':
-            case 'dec':
-            case 'double':
-            case 'real':// double in PHP is as float
-            case 'float':
-                return 'float';
-            case 'bool':
-            case 'boolean':
-                // actually tinyint(1)
-                return "int";
-            case 'data':
-            case 'datetime':
-            case 'timestamp':
-            case 'time':
-            case 'year':
-                // maybe timestamp or time need integer?
-                return 'string';
-            case 'char':
-            case 'varchar':
-            case 'binary':
-            case 'varbinary':
-            case 'tinyblob':
-            case 'tinytext':
-            case 'blob':
-            case 'text':
-            case 'mediumblob':
-            case 'mediumtext':
-            case 'longblob':
-            case 'longtext':
-            case 'enum':
-            case 'set':
-                return 'string';
-            default:
-                return "string";
-        }
+        return match ($type) {
+            'bit', 'tinyint', 'smallint', 'mediumint', 'int', 'integer', 'bigint' => "int",
+            'SERIAL' => "string",
+            'decimal', 'dec', 'double', 'real', 'float' => 'float',
+            'bool', 'boolean' => "int",
+            'data', 'datetime', 'timestamp', 'time', 'year' => 'string',
+            'char', 'varchar', 'binary', 'varbinary', 'tinyblob', 'tinytext', 'blob', 'text', 'mediumblob', 'mediumtext', 'longblob', 'longtext', 'enum', 'set' => 'string',
+            default => "string",
+        };
     }
 
-    /**
-     * @return mixed
-     */
-    public function getTypeCategory()
+    public function getTypeCategory(): string
     {
         return $this->typeCategory;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getNullable()
+    public function getNullable(): bool
     {
         return $this->nullable;
     }
 
     /**
-     * @param mixed $nullable
+     * @param bool $nullable
      */
-    public function setNullable($nullable)
+    public function setNullable(bool $nullable): void
     {
         $this->nullable = $nullable;
     }
 
-    public function getComment()
+    public function getComment(): string
     {
         return $this->comment;
     }
@@ -171,7 +122,7 @@ class ArkDatabaseTableFieldDefinition
      * @throws ArkPDOStatementException
      * @throws LookUpTargetException
      */
-    public static function devShowFieldsForPHPDoc(ArkDatabaseTableCoreModel $model)
+    public static function devShowFieldsForPHPDoc(ArkDatabaseTableCoreModel $model): void
     {
         echo "THIS IS A HELPER FOR DEVELOPER TO GENERATE PHPDOC OF ArkDatabaseQueryResultRow." . PHP_EOL;
         echo "/**" . PHP_EOL;

@@ -26,7 +26,7 @@ abstract class ArkPDOConfig
     const CONFIG_ENGINE = "engine";
 
 
-    protected $dict;
+    protected array $dict;
 
     public function __construct($dict = null)
     {
@@ -45,7 +45,7 @@ abstract class ArkPDOConfig
 
     public function __isset($name): bool
     {
-        return (isset($this->dict) && isset($this->dict[$name]));
+        return (isset($this->dict[$name]));
     }
 
     protected function setEngine($value): ArkPDOConfig

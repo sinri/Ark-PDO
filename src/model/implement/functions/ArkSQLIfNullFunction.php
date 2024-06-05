@@ -11,17 +11,17 @@ use sinri\ark\database\pdo\ArkPDO;
  */
 class ArkSQLIfNullFunction extends ArkSQLFunction
 {
-    protected $target;
-    protected $resultForNull = ArkPDO::CONST_NULL;
+    protected string $target;
+    protected string $resultForNull = ArkPDO::CONST_NULL;
 
-    public static function check($target, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function check($target, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         $x = new static('IFNULL');
         $x->target = ArkPDO::quoteScalar($target, $quoteType);
         return $x;
     }
 
-    public function setResultForNull($result, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public function setResultForNull($result, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         $this->resultForNull = ArkPDO::quoteScalar($result, $quoteType);
         return $this;

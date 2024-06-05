@@ -20,12 +20,12 @@ class ArkPDOCompareTool
     const INSTANCE_CODE_A = "A";
     const INSTANCE_CODE_B = "B";
 
-    protected $dbs = [];
+    protected array $dbs = [];
 
-    protected $shouldCheckTableCreateDDL = false;
-    protected $shouldCheckTableFieldsDefinition = true;
-    protected $shouldCheckTableRowCount = true;
-    protected $bigTablesToAvoidRowCount = [];
+    protected bool $shouldCheckTableCreateDDL = false;
+    protected bool $shouldCheckTableFieldsDefinition = true;
+    protected bool $shouldCheckTableRowCount = true;
+    protected array $bigTablesToAvoidRowCount = [];
 
     /**
      * ArkPDOCompareTool constructor.
@@ -57,7 +57,7 @@ class ArkPDOCompareTool
     /**
      * @param bool $shouldCheckTableCreateDDL
      */
-    public function setShouldCheckTableCreateDDL(bool $shouldCheckTableCreateDDL)
+    public function setShouldCheckTableCreateDDL(bool $shouldCheckTableCreateDDL): void
     {
         $this->shouldCheckTableCreateDDL = $shouldCheckTableCreateDDL;
     }
@@ -73,7 +73,7 @@ class ArkPDOCompareTool
     /**
      * @param bool $shouldCheckTableFieldsDefinition
      */
-    public function setShouldCheckTableFieldsDefinition(bool $shouldCheckTableFieldsDefinition)
+    public function setShouldCheckTableFieldsDefinition(bool $shouldCheckTableFieldsDefinition): void
     {
         $this->shouldCheckTableFieldsDefinition = $shouldCheckTableFieldsDefinition;
     }
@@ -89,7 +89,7 @@ class ArkPDOCompareTool
     /**
      * @param bool $shouldCheckTableRowCount
      */
-    public function setShouldCheckTableRowCount(bool $shouldCheckTableRowCount)
+    public function setShouldCheckTableRowCount(bool $shouldCheckTableRowCount): void
     {
         $this->shouldCheckTableRowCount = $shouldCheckTableRowCount;
     }
@@ -105,7 +105,7 @@ class ArkPDOCompareTool
     /**
      * @param string[] $bigTablesToAvoidRowCount
      */
-    public function setBigTablesToAvoidRowCount(array $bigTablesToAvoidRowCount)
+    public function setBigTablesToAvoidRowCount(array $bigTablesToAvoidRowCount): void
     {
         $this->bigTablesToAvoidRowCount = $bigTablesToAvoidRowCount;
     }
@@ -115,7 +115,7 @@ class ArkPDOCompareTool
      * @throws ArkPDODatabaseQueryError
      * @throws ArkPDOStatementException
      */
-    public function compareTableStructure($tables = null)
+    public function compareTableStructure(?array $tables = null): void
     {
         echo "Compare mission accepted, fetch tables first..." . PHP_EOL;
         //echo __METHOD__.'@'.__LINE__.PHP_EOL;
@@ -216,11 +216,11 @@ class ArkPDOCompareTool
      * @return string[]
      * @throws ArkPDOStatementException
      */
-    protected function getTableNames(ArkPDO $db, $tables = null): array
+    protected function getTableNames(ArkPDO $db, ?array $tables = null): array
     {
         $rows = $db->safeQueryAll("show tables", [], PDO::FETCH_NUM);
         $ddl = array_column($rows, 0);
-        if ($tables && is_array($tables)) $ddl = array_intersect($ddl, $tables);
+        if ($tables) $ddl = array_intersect($ddl, $tables);
         array_walk($ddl, function (&$item) {
             //echo "INSIDE array walk item $item key $key".PHP_EOL;
             $item = strtoupper($item);
@@ -233,7 +233,7 @@ class ArkPDOCompareTool
      * @param string $code
      * @return ArkPDO|null
      */
-    protected function getDB(string $code): ArkPDO
+    protected function getDB(string $code): ?ArkPDO
     {
         return ArkHelper::readTarget($this->dbs, [$code]);
     }
@@ -250,11 +250,11 @@ class ArkPDOCompareTool
     /**
      * @param ArkPDO $db
      * @param string $table
-     * @return bool|mixed
+     * @return string
      * @throws ArkPDOStatementException
      * @throws ArkPDODatabaseQueryError
      */
-    protected function getTableCreation(ArkPDO $db, string $table): bool
+    protected function getTableCreation(ArkPDO $db, string $table): string
     {
         $sql = "show create table " . $table;
         $creation = $db->safeQueryAll($sql, [], PDO::FETCH_NUM);
@@ -284,7 +284,7 @@ class ArkPDOCompareTool
      * @param array $inBothButDiff
      * @return bool
      */
-    protected function checkTablesHaveSameFields(array $fieldsA, array $fieldsB, &$onlyInA = [], &$onlyInB = [], &$inBothButDiff = []): bool
+    protected function checkTablesHaveSameFields(array $fieldsA, array $fieldsB, array &$onlyInA = [], array &$onlyInB = [], array &$inBothButDiff = []): bool
     {
         $hashA = [];
         $hashB = [];

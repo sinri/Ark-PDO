@@ -28,7 +28,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeAscii($str, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeAscii($str, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('ASCII'))->appendParameter($str, $quoteType);
     }
@@ -42,7 +42,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeBin($n, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeBin($n, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('BIN'))->appendParameter($n, $quoteType);
     }
@@ -54,7 +54,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeBitLength($str, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeBitLength($str, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('BIT_LENGTH'))->appendParameter($str, $quoteType);
     }
@@ -67,11 +67,11 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * CHAR() arguments larger than 255 are converted into multiple result bytes.
      *
      * @param $chars
-     * @param false $usingCharsetName
+     * @param bool|null $usingCharsetName
      * @param string $quoteType
      * @return static
      */
-    public static function makeChar($chars, $usingCharsetName = null, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeChar($chars, ?bool $usingCharsetName = null, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         if (!is_array($chars)) {
             $chars = [$chars];
@@ -100,7 +100,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeCharLength($str, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeCharLength($str, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('CHAR_LENGTH'))->appendParameter($str, $quoteType);
     }
@@ -119,7 +119,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string[] $parts
      * @return static
      */
-    public static function makeConcat(array $parts, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeConcat(array $parts, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         if (count($parts) == 0) {
             throw new ArkPDOSQLBuilderError('CONCAT NEED ONE OR MORE ARGUMENTS');
@@ -145,7 +145,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeConcatWithSeparator(string $separator, array $parts, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeConcatWithSeparator(string $separator, array $parts, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         if (count($parts) == 0) {
             throw new ArkPDOSQLBuilderError('CONCAT NEED ONE OR MORE ARGUMENTS');
@@ -164,12 +164,12 @@ class ArkSQLStringFunction extends ArkSQLFunction
     // FIND_IN_SET(str,strlist)
     // FORMAT(X,D[,locale])
 
-    public static function makeFromBase64($str, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeFromBase64($str, $quoteType = ArkPDO::QUOTE_TYPE_RAW): ArkSQLStringFunction
     {
         return (new static('FROM_BASE64'))->appendParameter($str, $quoteType);
     }
 
-    public static function makeHex($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeHex($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW): ArkSQLStringFunction
     {
         return (new static('HEX'))->appendParameter($x, $quoteType);
     }
@@ -187,7 +187,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeLeft($str, int $len, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeLeft($str, int $len, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('LEFT'))
             ->appendParameter($str, $quoteType)
@@ -204,7 +204,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeLength($str, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeLength($str, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('LENGTH'))
             ->appendParameter($str, $quoteType);
@@ -227,7 +227,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteTypeForHaystack
      * @return static
      */
-    public static function makeLocate($substr, $str, $pos = null, $quoteTypeForNeedle = ArkPDO::QUOTE_TYPE_VALUE, $quoteTypeForHaystack = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeLocate($substr, $str, ?int $pos = null, string $quoteTypeForNeedle = ArkPDO::QUOTE_TYPE_VALUE, $quoteTypeForHaystack = ArkPDO::QUOTE_TYPE_RAW): static
     {
         $x = new static('LOCATE');
         $x->appendParameter($substr, $quoteTypeForNeedle);
@@ -246,7 +246,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeLower($str, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeLower($str, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('LOWER'))->appendParameter($str, $quoteType);
     }
@@ -260,7 +260,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeLeftTrim($str, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeLeftTrim($str, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('LTRIM'))->appendParameter($str, $quoteType);
     }
@@ -278,7 +278,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeOct($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeOct($x, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('OCT'))->appendParameter($x, $quoteType);
     }
@@ -299,7 +299,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeOrd($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeOrd($x, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('ORD'))->appendParameter($x, $quoteType);
     }
@@ -316,7 +316,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeQuote($str, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeQuote($str, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('QUOTE'))->appendParameter($str, $quoteType);
     }
@@ -331,7 +331,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeRepeat($str, int $count, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeRepeat($str, int $count, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('REPEAT'))
             ->appendParameter($str, $quoteType)
@@ -348,7 +348,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeReplace($str, $from_str, $to_str, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeReplace($str, $from_str, $to_str, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('REPLACE'))
             ->appendParameter($str, $quoteType)
@@ -363,7 +363,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeReverse($str, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeReverse($str, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('REVERSE'))->appendParameter($str, $quoteType);
     }
@@ -376,7 +376,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeRight($str, int $len, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeRight($str, int $len, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('RIGHT'))
             ->appendParameter($str, $quoteType)
@@ -392,7 +392,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeRightTrim($str, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeRightTrim($str, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('RTRIM'))->appendParameter($str, $quoteType);
     }
@@ -420,7 +420,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeSubString($str, int $pos, int $len = null, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeSubString($str, int $pos, ?int $len = null, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         $x = new static('SUBSTRING');
         $x->appendParameter($str, $quoteType);
@@ -440,7 +440,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeToBase64($str, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeToBase64($str, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('TO_BASE64'))->appendParameter($str, $quoteType);
     }
@@ -453,7 +453,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $type BOTH | LEADING | TRAILING
      * @return static
      */
-    public static function makeTrim($originalStr, $removeStr = null, $type = 'BOTH', $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeTrim(string $originalStr, ?string $removeStr = null, string $type = 'BOTH', $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         if ($removeStr === null) {
             return (new static('TRIM'))
@@ -477,7 +477,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeUnHex($x, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeUnHex($x, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('UNHEX'))->appendParameter($x, $quoteType);
     }
@@ -490,7 +490,7 @@ class ArkSQLStringFunction extends ArkSQLFunction
      * @param string $quoteType
      * @return static
      */
-    public static function makeUpper($str, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function makeUpper($str, string $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         return (new static('UPPER'))->appendParameter($str, $quoteType);
     }

@@ -11,11 +11,11 @@ use sinri\ark\database\pdo\ArkPDO;
  */
 class ArkSQLIfFunction extends ArkSQLFunction
 {
-    protected $target; // expr1
-    protected $resultForTrue;// expr2
-    protected $resultForFalse;// expr3
+    protected string $target; // expr1
+    protected string $resultForTrue;// expr2
+    protected string $resultForFalse;// expr3
 
-    public static function check($target, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public static function check($target, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         $x = new static('IF');
         $x->target = ArkPDO::quoteScalar($target, $quoteType);
@@ -24,13 +24,13 @@ class ArkSQLIfFunction extends ArkSQLFunction
         return $x;
     }
 
-    public function setResultForTrue($result, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public function setResultForTrue($result, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         $this->resultForTrue = ArkPDO::quoteScalar($result, $quoteType);
         return $this;
     }
 
-    public function setResultForFalse($result, $quoteType = ArkPDO::QUOTE_TYPE_RAW)
+    public function setResultForFalse($result, $quoteType = ArkPDO::QUOTE_TYPE_RAW): static
     {
         $this->resultForFalse = ArkPDO::quoteScalar($result, $quoteType);
         return $this;
