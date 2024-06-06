@@ -63,7 +63,7 @@ class ArkDatabaseSelectTableQuery
     /**
      * @var string
      */
-    protected string $indexHint;
+    protected string $indexHint = '';
 
     /**
      * @var string Default as Empty when no locks required;
