@@ -63,7 +63,7 @@ class ArkDatabaseSelectTableQuery
     /**
      * @var string
      */
-    protected string $indexHint = '';
+    protected string $indexHint;
 
     /**
      * @var string Default as Empty when no locks required;
@@ -72,13 +72,13 @@ class ArkDatabaseSelectTableQuery
      * * [ For { Update | Share } [ Of TableName[, ...] ] [ NOWAIT | SKIP LOCKED ]
      * * LOCK IN SHARE MODE
      */
-    protected string $lockMode = '';
+    protected string $lockMode;
 
     /**
      * @var string UNION [ALL | DISTINCT]
      * ONLY USED FOR ArkDatabaseSelectUnionQuery
      */
-    public string $unionType = '';
+    public string $unionType;
 
     public function __construct(ArkDatabaseTableReaderModel $model)
     {
@@ -90,6 +90,9 @@ class ArkDatabaseSelectTableQuery
         $this->sortExpression = '';
         $this->limit = 0;
         $this->offset = 0;
+        $this->indexHint = '';
+        $this->lockMode = '';
+        $this->unionType = '';
     }
 
     /**
