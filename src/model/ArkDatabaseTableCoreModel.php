@@ -26,7 +26,7 @@ abstract class ArkDatabaseTableCoreModel extends ArkDatabaseTableReaderModel
      */
     public function insertIgnoreOneRow(array $data, ?string $pk = null): ArkDatabaseQueryResult
     {
-        return $this->writeInto("INSERT INTO", $data, $pk);
+        return $this->writeInto("INSERT IGNORE", $data, $pk);
     }
 
     /**
